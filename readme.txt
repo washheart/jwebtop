@@ -1,15 +1,15 @@
 Use JNI to connect Java and WebTop(base on cef).
-Í¨¹ýJNIÁ¬½ÓJavaºÍwebtop£¨»ùÓÚCEF£©¡£
+é€šè¿‡JNIè¿žæŽ¥Javaå’Œwebtopï¼ˆåŸºäºŽCEFï¼‰ã€‚QQç¾¤ï¼šJWebTop 385365532ã€‚
 
-ÏîÄ¿½á¹¹£º
-	jwebtop_c£ºwebtopµÄÒ»Ð©ÐÞ¸Ä£¬Ö÷ÒªÊÇc++´úÂë
-	jwebtop_j£ºwebtopµÄjava¶Ë£¬Ö÷ÒªÊÇjava´úÂë
-	demos£º¸÷ÖÖÀý×Ó¡£
+é¡¹ç›®ç»“æž„ï¼š
+	jwebtop_cï¼šwebtopçš„ä¸€äº›ä¿®æ”¹ï¼Œä¸»è¦æ˜¯c++ä»£ç 
+	jwebtop_jï¼šwebtopçš„javaç«¯ï¼Œä¸»è¦æ˜¯javaä»£ç 
+	demosï¼šå„ç§ä¾‹å­ã€‚
 
-WebTopÊÇÒÀ¾ÝCEF·â×°µÄ£¬¿ÉÒÔÍ¨¹ýÒ»Ð©js½Ó¿ÚÓëä¯ÀÀÆ÷Í¨ÐÅ£¨Óënw£¬node-webkitÓÐµãÀàËÆ£¬µ«±¾µØ·ÃÎÊÄÜÁ¦²»Ç¿£©£¬ÆäÄ¿±êÓ¦¸ÃÓÃÓÚ¿ª·¢Ò»Ð©Çá¿Í»§¶Ë£¨²ÂµÄ£¬^_^£©£¬µ«ÊÇ´ËÏîÄ¿ÏÖÔÚ²»Î¬»¤ÁË£¬:(¡£ 
-JWebTop¶ÔWebTop½øÐÐÁËÒ»Ð©·â×°£¬½«Æä±äÎªÒ»¸öDLL£¬¿ÉÒÔÍ¨¹ýJNIÀ´ÓëJava½øÐÐ½»»¥£¬ÕâÑù¾Í¿ÉÒÔÓÃJavaÀ´Ê¹ÓÃCEFÁË¡£
-µ«ÊÇJWebTopºÍjcefµÈ¿ò¼Ü²»Í¬£¬JWebTop²»ÊÇ°ÑCEFµ±³ÉÒ»¸ö¿Ø¼þÇ¶Èëµ½µ½ÏÖÓÐJava³ÌÐòÖÐ£¬Ö»ÊÇºÍCEF½»»»Êý¾Ý¡£ 
+WebTopæ˜¯ä¾æ®CEFå°è£…çš„ï¼Œå¯ä»¥é€šè¿‡ä¸€äº›jsæŽ¥å£ä¸Žæµè§ˆå™¨é€šä¿¡ï¼ˆä¸Žnwï¼Œnode-webkitæœ‰ç‚¹ç±»ä¼¼ï¼Œä½†æœ¬åœ°è®¿é—®èƒ½åŠ›ä¸å¼ºï¼‰ï¼Œå…¶ç›®æ ‡åº”è¯¥ç”¨äºŽå¼€å‘ä¸€äº›è½»å®¢æˆ·ç«¯ï¼ˆçŒœçš„ï¼Œ^_^ï¼‰ï¼Œä½†æ˜¯æ­¤é¡¹ç›®çŽ°åœ¨ä¸ç»´æŠ¤äº†ï¼Œ:(ã€‚ 
+JWebTopå¯¹WebTopè¿›è¡Œäº†ä¸€äº›å°è£…ï¼Œå°†å…¶å˜ä¸ºä¸€ä¸ªDLLï¼Œå¯ä»¥é€šè¿‡JNIæ¥ä¸ŽJavaè¿›è¡Œäº¤äº’ï¼Œè¿™æ ·å°±å¯ä»¥ç”¨Javaæ¥ä½¿ç”¨CEFäº†ã€‚
+ä½†æ˜¯JWebTopå’Œjcefç­‰æ¡†æž¶ä¸åŒï¼ŒJWebTopä¸æ˜¯æŠŠCEFå½“æˆä¸€ä¸ªæŽ§ä»¶åµŒå…¥åˆ°åˆ°çŽ°æœ‰Javaç¨‹åºä¸­ï¼Œåªæ˜¯å’ŒCEFäº¤æ¢æ•°æ®ã€‚ 
 
-Á½¸öÀý×Ó£¨¼Æ»®£¬µ«ÉÐÎ´ÊµÏÖ£©£º 
- 1.FileManager£ºÓÃWebTop×ö½çÃæ£¬java×öºóÌ¨ÊµÏÖÎÄ¼þµÄ¹ÜÀí¡£ 
- 2.WithinSwing£º½«WebTop×÷ÎªÒ»¸ö¡°¿Ø¼þ¡±£¬Ç¶Èëµ½Swing³ÌÐòÖÐ¡£
+ä¸¤ä¸ªä¾‹å­ï¼ˆè®¡åˆ’ï¼Œä½†å°šæœªå®žçŽ°ï¼‰ï¼š 
+ 1.FileManagerï¼šç”¨WebTopåšç•Œé¢ï¼ŒjavaåšåŽå°å®žçŽ°æ–‡ä»¶çš„ç®¡ç†ã€‚ 
+ 2.WithinSwingï¼šå°†WebTopä½œä¸ºä¸€ä¸ªâ€œæŽ§ä»¶â€ï¼ŒåµŒå…¥åˆ°Swingç¨‹åºä¸­ã€‚
