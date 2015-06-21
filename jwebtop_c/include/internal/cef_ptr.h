@@ -34,6 +34,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <algorithm>
 
 ///
 // Smart pointer implementation borrowed from base/ref_counted.h

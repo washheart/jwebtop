@@ -1,5 +1,6 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
+#include <algorithm>
 #include <Windows.h>
 #include <xstring>
 #include <CommDlg.h>

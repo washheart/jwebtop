@@ -1,14 +1,14 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "air browser", "cefclient.vcxproj", "{6617FED9-C5D4-4907-BF55-A90062A6683F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9} = {A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcef_dll_wrapper", "libcef_dll_wrapper.vcxproj", "{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "..\MelodyDebug\Server\P2PServer.vcxproj", "{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,12 +34,6 @@ Global
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Release|Win32.Build.0 = Release|Win32
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Release|x64.ActiveCfg = Release|x64
 		{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}.Release|x64.Build.0 = Release|x64
-		{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}.Debug|Win32.Build.0 = Debug|Win32
-		{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}.Debug|x64.ActiveCfg = Debug|Win32
-		{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}.Release|Win32.ActiveCfg = Release|Win32
-		{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}.Release|Win32.Build.0 = Release|Win32
-		{6B09FB9C-0D2C-7324-EE7F-3DECB504C554}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

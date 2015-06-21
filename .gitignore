@@ -1,0 +1,5 @@
+# ingnore all files
+!.gitignore
+/jwebtop_c/debug/*
+/jwebtop_c/release/*
+webtop.opensdf
