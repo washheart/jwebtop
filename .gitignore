@@ -2,4 +2,5 @@
 !.gitignore
 /jwebtop_c/debug/*
 /jwebtop_c/release/*
-webtop.opensdf
+jwebtop.opensdf
+jwebtop.sdf
