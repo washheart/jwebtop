@@ -10,7 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "air browser", "cefclient.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcef_dll_wrapper", "libcef_dll_wrapper.vcxproj", "{A9D6DC71-C0DC-4549-AEA0-3B15B44E86A9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop", "..\JWebTop\JWebTop.vcxproj", "{654A6CD3-E5DC-499F-9887-5770D1D627FF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop", "JWebTop.vcxproj", "{654A6CD3-E5DC-499F-9887-5770D1D627FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
