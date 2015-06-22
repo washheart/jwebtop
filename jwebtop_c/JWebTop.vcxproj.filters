@@ -112,6 +112,9 @@
     <ClCompile Include="cefclient\uiplugin_test.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
+    <ClCompile Include="jwebtop.cpp">
+      <Filter>jwebtop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AmfStream.h">
@@ -464,6 +467,15 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>webtop_keeped</Filter>
+    </ClInclude>
+    <ClInclude Include="org_jwebtop_JWebTopNative.h">
+      <Filter>jwebtop</Filter>
+    </ClInclude>
+    <ClInclude Include="javautils.h">
+      <Filter>jwebtop</Filter>
+    </ClInclude>
+    <ClInclude Include="jwebtop_brige.h">
+      <Filter>jwebtop</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -383,6 +383,8 @@
     <ClInclude Include="cefclient\plugin_test.h" />
     <ClInclude Include="cefclient\util.h" />
     <ClInclude Include="cefclient\resource_util.h" />
+    <ClInclude Include="javautils.h" />
+    <ClInclude Include="jwebtop_brige.h" />
     <ClInclude Include="myutil.h" />
     <ClInclude Include="my_handler.h" />
     <ClInclude Include="network\gzip.h" />
@@ -392,6 +394,7 @@
     <ClInclude Include="network\TcpServer.h" />
     <ClInclude Include="network\zconf.h" />
     <ClInclude Include="network\zlib.h" />
+    <ClInclude Include="org_jwebtop_JWebTopNative.h" />
     <ClInclude Include="P2P.h" />
     <ClInclude Include="proto.h" />
     <ClInclude Include="res_scheme.h" />
@@ -404,6 +407,7 @@
     <ClCompile Include="AmfStream.cpp" />
     <ClCompile Include="base64.cpp" />
     <ClCompile Include="cefclient\cefclient_win.cpp" />
+    <ClCompile Include="jwebtop.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="cefclient\uiplugin_test.cpp" />
     <ClCompile Include="cefclient\extension_test.cpp" />
