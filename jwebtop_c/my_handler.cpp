@@ -12,6 +12,7 @@
 #include "base64.h"
 #include "filter_handler.h"
 #include "network\TcpServer.h"
+#include "jwebtop_brige.h"
 extern HINSTANCE hInst;
 extern int CDECL MessageBoxPrintf (TCHAR * szCaption, TCHAR * szFormat, ...)  ;
 
@@ -480,7 +481,11 @@ bool MyHandler::Execute(const CefString& name,
 		return false;
 
 	TransparentWnd* winHandler=(TransparentWnd*)static_cast<long>(arguments[0]->GetIntValue());
-	if(name == "close")
+	if (name == "invokeJava"){// 响应java回调函数
+		retval = CefV8Value::CreateString(invokeJavaMethod(arguments[1]->GetStringValue()));
+		return true;
+	}
+	else if (name == "close")
 	{
 		if(winHandler){
 			if(winHandler->downloadHandler){
@@ -1690,6 +1695,11 @@ void InitCallback()
     "    native function utf82gb(handler,s);"
 	"    return utf82gb(handler,s);"
     "  };"
+	"  AlloyDesktop.invokeJava = function(s,handler) {"// 注册invokeJava函数到AlloyDesktop对象
+	"    handler=handler?handler:window['handler'];"
+	"    native function invokeJava(handler,s);"
+	"    return invokeJava(handler,s);"
+	"  };"
 	"})();";
 	CefRegisterExtension("callback/test", code, new MyHandler());
 }
