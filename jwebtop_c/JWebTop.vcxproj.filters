@@ -31,9 +31,6 @@
     <ClCompile Include="cefclient\cefclient_switches.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
-    <ClCompile Include="cefclient\cefclient_win.cpp">
-      <Filter>webtop_keeped</Filter>
-    </ClCompile>
     <ClCompile Include="cefclient\client_handler.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
@@ -114,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="jwebtop.cpp">
       <Filter>jwebtop</Filter>
+    </ClCompile>
+    <ClCompile Include="cefclient\cefclient_win.cpp">
+      <Filter>webtop_changed</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

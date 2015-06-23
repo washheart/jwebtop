@@ -222,7 +222,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	hInst = hInstance; // Store instance handle in our global variable
 	static TransparentWnd* pTransparentBrowser1;
 
-	lpUrl=GetCommandLine();
+	// lpUrl=GetCommandLine();// 注释掉该行，否则会重新从命令行读取参数地址，导致程序无法显示
 	wstring s(lpUrl);
 	pTransparentBrowser1=new TransparentWnd();
 	TCHAR   szPath[1000];   
