@@ -134,6 +134,12 @@ html,body{
 	top:50px;
 	cursor:pointer;
 }
+#ttt{
+	cursor:pointer;
+	position:absolute;
+	left:105px;
+	bottom:25px;
+}
 </style>
 </head>
 <body>
@@ -147,8 +153,27 @@ html,body{
 <div id="miniBtn" class="mini">-</div>
 <div id="rotateBtn"></div>
 <div id="resetBtn"></div>
+
+<div id="ttt" onclick="alert(123)">测试函数方法 </div>
 </div>
 </div>
+<script type="text/javascript">
+<!--
+function invokeByJava(jsonv){
+	alert(jsonv.a)
+}
+function test123(){
+try{
+	var app="D:\\study\\git\\repository\\webtop_new\\Release\\demo\\music\\index.app";
+	AlloyDesktop.runApp(app,"");
+	var json1={aa:"中文数据",bb:"22"}
+	alert(JSON.stringify(json1))
+	//alert(typeof(AlloyDesktop.invokeJava));
+	alert(AlloyDesktop.invokeJava(JSON.stringify(json1)));
+}catch(e){alert(e)}
+}
+//-->
+</script>
 <script>
 r.onclick=function(){
 	if(container.className=='container'){
@@ -258,6 +283,10 @@ resetBtn.onclick=function(){
 	rotation = 0;
 	container.style.webkitTransform='';
 }
+// alert(ttt)
+ttt.onclick=test123;
+// setTimeout("test_()",2000);
 </script>
+
 </body>
 </html>

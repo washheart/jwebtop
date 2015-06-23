@@ -9,6 +9,7 @@
 #include "network\MelodyProxy.h"
 #include "base64.h"
 #include "system.h"
+#include "jwebtop_brige.h"
 using namespace Gdiplus;
 #define WM_INIT WM_USER+2
 #define ODS(msg) MessageBox(NULL, msg, msg, 0);
@@ -37,6 +38,11 @@ void TransparentWnd::CreateBrowserWindow(CefString url, UINT ex_style, bool isTr
 			0, NULL, NULL, hInst, NULL);
 	g_handler=new MyHandler();
 	g_handler->win=(long)this;
+	// 回调Java程序，告知其浏览器的hwnd
+	std::wstringstream wss;
+	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << g_handler->win <<L"}}";
+	invokeJavaMethod(CefString(wss.str()));
+
 	InitCallback();
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)this);
 	if(isTransparent){

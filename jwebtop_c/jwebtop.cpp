@@ -38,8 +38,10 @@ CefString invokeJavaMethod(CefString json){
 	jstring str = (jstring)env->CallStaticObjectMethod(g_nativeClass, g_invokeByJS,sss);
 	env->DeleteLocalRef(sss);
 	char * tmp = jstringToWindows(env, str);	
-	// MessageBox(NULL, chr2wch(tmp), L"通过Java转换后的结果", 1);
-	return CefString(env->GetStringUTFChars(str, false));
+	CefString result = CefString(env->GetStringUTFChars(str, false));
+	env->DeleteLocalRef(str);
+	delete tmp;
+	return result;
 }
 
 // jni方法：创建浏览器

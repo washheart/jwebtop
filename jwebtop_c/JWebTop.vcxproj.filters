@@ -55,9 +55,6 @@
     <ClCompile Include="network\MelodyProxy.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
-    <ClCompile Include="my_handler.cpp">
-      <Filter>webtop_keeped</Filter>
-    </ClCompile>
     <ClCompile Include="myutil.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
@@ -100,9 +97,6 @@
     <ClCompile Include="network\TcpServer.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
-    <ClCompile Include="transparent_wnd.cpp">
-      <Filter>webtop_keeped</Filter>
-    </ClCompile>
     <ClCompile Include="cefclient\uiplugin.cpp">
       <Filter>webtop_keeped</Filter>
     </ClCompile>
@@ -113,6 +107,12 @@
       <Filter>jwebtop</Filter>
     </ClCompile>
     <ClCompile Include="cefclient\cefclient_win.cpp">
+      <Filter>webtop_changed</Filter>
+    </ClCompile>
+    <ClCompile Include="my_handler.cpp">
+      <Filter>webtop_changed</Filter>
+    </ClCompile>
+    <ClCompile Include="transparent_wnd.cpp">
       <Filter>webtop_changed</Filter>
     </ClCompile>
   </ItemGroup>
