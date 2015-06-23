@@ -43,7 +43,7 @@ CefString invokeJavaMethod(CefString json){
 }
 
 // jni方法：创建浏览器
-JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_createJWebTop
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 (JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin){
 	const char * tmp = env->GetStringUTFChars(appfile, false);
 	wchar_t* buffer = chr2wch(tmp);
@@ -55,11 +55,10 @@ JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_createJWebTop
 	}
 	wWinMain(NULL, 0, buffer, 1);// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
 	delete buffer;
-	return 0;// 由于创建浏览器是阻塞式的，所以这里的返回根本不起作用
 }
 
 // jni方法：执行脚本
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_executeJs
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
 (JNIEnv * env, jclass, jlong browserHWnd, jstring json){
 	string js;
 	// js.clear();	// 可以考虑讲js作为一个全局变量，每次使用前/后都clear一下，这样效率是否更高？

@@ -19,7 +19,7 @@ extern "C" {
  * appfile 浏览器根据此配置文件进行初始化
  * parentWin 创建的浏览器的父窗口是哪个
  */
-JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_createJWebTop
+ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 (JNIEnv *, jclass, jstring appfile, jlong parentWin);
 
 /*
@@ -28,7 +28,7 @@ JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_createJWebTop
  * browserHWnd 要执行js的浏览器，browserHWnd在浏览器创建后通过回调方式传递给java程序    
  * json 需要执行的js脚本，这里是一个json字符串
  */
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_executeJs
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
   (JNIEnv *, jclass,jlong browserHWnd, jstring json);
 
 #ifdef __cplusplus
