@@ -25,6 +25,7 @@ extern HINSTANCE hInst;
 ULONG_PTR m_gdiplusToken;
 extern wstring modulePath;
 GdiplusStartupInput gdiplusStartupInput;
+extern long parentWin;
 void TransparentWnd::CreateBrowserWindow(CefString url, UINT ex_style, bool isTransparent){
 	RegisterClass(hInst);
 	this->url=url;
@@ -35,14 +36,13 @@ void TransparentWnd::CreateBrowserWindow(CefString url, UINT ex_style, bool isTr
 	}
 	hWnd = CreateWindowEx(ex_style1, L"browser", L"透明浏览器",
 			WS_OVERLAPPED&~(WS_CAPTION|WS_BORDER), 0, 0, 0,
-			0, NULL, NULL, hInst, NULL);
+			0, (HWND)parentWin, NULL, hInst, NULL);
 	g_handler=new MyHandler();
 	g_handler->win=(long)this;
 	// 回调Java程序，告知其浏览器的hwnd
 	std::wstringstream wss;
 	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << g_handler->win <<L"}}";
 	invokeJavaMethod(CefString(wss.str()));
-
 	InitCallback();
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)this);
 	if(isTransparent){
@@ -108,7 +108,7 @@ void TransparentWnd::EnableTransparent(UINT ex_style){
 	RegisterTransparentClass(hInst);
 	renderWindow=CreateWindowEx(WS_EX_LAYERED|ex_style, L"transparent", L"透明浏览器",
 		WS_POPUP&~(WS_CAPTION|WS_BORDER), 0, 0, 0,
-		0, NULL, NULL, hInst, NULL);
+		0, (HWND)parentWin, NULL, hInst, NULL);
 	SetWindowLong(renderWindow, GWL_USERDATA, (LONG)this);
 	SendMessage(renderWindow, WM_INIT, NULL, NULL);
 	//MoveWindow(renderWindow, 0, 0, 1000, 650, false);
@@ -118,6 +118,7 @@ void TransparentWnd::EnableTransparent(UINT ex_style){
 	if(g_handler->GetBrowser()){
 		g_handler->GetBrowser()->GetMainFrame()->LoadURL(url);
 	}
+	//SetParent(renderWindow, (HWND)parentWin);
 	ModifyStyle(renderWindow,0,WS_MINIMIZEBOX,0);
 }
 void TransparentWnd::CreateBrowserWindowBase(CefString path, UINT ex_style, bool isTransparent){

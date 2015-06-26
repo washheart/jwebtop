@@ -1,7 +1,7 @@
 # ingnore all files
 !.gitignore
-/jwebtop_c/debug/*
-/jwebtop_c/release/*
+/jwebtop_c/Debug/*
+/jwebtop_c/Release/*
 jwebtop_c/jwebtop.opensdf
 jwebtop_c/jwebtop.sdf
 jwebtop_c/jwebtop.v12.suo

@@ -29,7 +29,15 @@ extern "C" {
  * json 需要执行的js脚本，这里是一个json字符串
  */
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
-  (JNIEnv *, jclass,jlong browserHWnd, jstring json);
+(JNIEnv *, jclass, jlong browserHWnd, jstring json);
+
+// jni方法：设置窗口大小
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
+(JNIEnv *, jclass, jlong browserHWnd, jint w, jint h);
+
+// jni方法：设置窗口位置
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
+(JNIEnv *, jclass, jlong browserHWnd, jint x, jint y);
 
 #ifdef __cplusplus
 }

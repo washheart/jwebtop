@@ -482,7 +482,7 @@ bool MyHandler::Execute(const CefString& name,
 
 	TransparentWnd* winHandler=(TransparentWnd*)static_cast<long>(arguments[0]->GetIntValue());
 	if (name == "invokeJava"){// 响应java回调函数
-		retval = CefV8Value::CreateString(invokeJavaMethod(arguments[1]->GetStringValue()));
+		retval = CefV8Value::CreateString(invokeJavaMethod(arguments[1]->GetStringValue())); 
 		return true;
 	}
 	else if (name == "close")

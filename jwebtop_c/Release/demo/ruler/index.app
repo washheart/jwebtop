@@ -4,3 +4,4 @@ width=1010
 height=1010
 x=300
 y=-200
+exStyle=0x00000080L
