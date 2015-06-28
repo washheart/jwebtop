@@ -444,9 +444,6 @@
     <ClInclude Include="system.h">
       <Filter>webtop_keeped</Filter>
     </ClInclude>
-    <ClInclude Include="transparent_wnd.h">
-      <Filter>webtop_keeped</Filter>
-    </ClInclude>
     <ClInclude Include="exports2.h">
       <Filter>webtop_keeped</Filter>
     </ClInclude>
@@ -476,6 +473,9 @@
     </ClInclude>
     <ClInclude Include="jwebtop_brige.h">
       <Filter>jwebtop</Filter>
+    </ClInclude>
+    <ClInclude Include="transparent_wnd.h">
+      <Filter>webtop_changed</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

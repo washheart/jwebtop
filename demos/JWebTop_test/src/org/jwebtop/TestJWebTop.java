@@ -15,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
-import org.jwebtop.JWebTopNative.JWebtopJSONHandler;
+import org.jwebtop.JWebTopBrowser.IBrowserHwndFeeder;
 
 public class TestJWebTop {
 	private static void initDll(String[] args) {
@@ -31,13 +31,13 @@ public class TestJWebTop {
 				dll = tmp.getAbsolutePath();
 			}
 		}
-		System.out.println("³É¹¦¼ÓÔØdllÎÄ¼ş = " + dll);
+		System.out.println("æˆåŠŸåŠ è½½dllæ–‡ä»¶ = " + dll);
 		System.load(dll);
 	}
 
 	static void test_createBrower(String appfile) throws IOException {
-		System.out.println("×¼±¸Ö´ĞĞappfile=" + appfile);
-		JWebTopNative.createJWebTop(appfile);
+		System.out.println("å‡†å¤‡æ‰§è¡Œappfile=" + appfile);
+		JWebTopNative.getInstance().createJWebTop(appfile);
 	}
 
 	static void test_createBrower_multi(String appfile) throws IOException {
@@ -50,59 +50,58 @@ public class TestJWebTop {
 
 			@Override
 			public void run() {
-				System.out.println("×¼±¸Ö´ĞĞappfile=" + appfile);
+				System.out.println("å‡†å¤‡æ‰§è¡Œappfile=" + appfile);
 				try {
-					JWebTopNative.createJWebTop(appfile);
+					JWebTopNative.getInstance().createJWebTop(appfile);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		// Crash? ¹À¼ÆÊÇä¯ÀÀÆ÷ÄÚ²¿ÓĞĞ©¾²Ì¬±äÁ¿Ã»ÓĞÎ¬»¤ºÃ
+		// Crash? ä¼°è®¡æ˜¯æµè§ˆå™¨å†…éƒ¨æœ‰äº›é™æ€å˜é‡æ²¡æœ‰ç»´æŠ¤å¥½
 		new CreateBrowserThread(appfile).start();
 		new CreateBrowserThread(appfile).start();
 	}
 
-	// ²âÊÔ½«ä¯ÀÀÆ÷×÷ÎªÒ»¸ö¿Ø¼ş
+	// æµ‹è¯•å°†æµè§ˆå™¨ä½œä¸ºä¸€ä¸ªæ§ä»¶
 	static void test_createBrowserAsComponnet(final String appfile) {
 		final JTextArea txtJson = new JTextArea();
-		final JFrame jf = new JFrame("²âÊÔ´°¿Ú");
+		final JFrame jf = new JFrame("æµ‹è¯•çª—å£");
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		toolPanel.add(new JButton(new AbstractAction("ÏÔÊ¾´°¿Úhwnd") {
+		toolPanel.add(new JButton(new AbstractAction("æ˜¾ç¤ºçª—å£hwnd") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				long hwnd = JWebTopNative.getWindowHWND(jf);
 				System.out.println("hwnd = " + hwnd);
 			}
 		}));
-		toolPanel.add(new JButton(new AbstractAction("´´½¨ä¯ÀÀÆ÷") {
+		final JWebTopNative webtop = JWebTopNative.getInstance();
+		final JWebTopBrowser jwebtop = new JWebTopBrowser();
+		toolPanel.add(new JButton(new AbstractAction("åˆ›å»ºæµè§ˆå™¨") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new Thread() {
-					@Override
-					public void run() {
-						long hwnd = JWebTopNative.getWindowHWND(jf);
-						System.out.println("hwnd = " + hwnd);
-						try {
-							JWebTopNative.createJWebTop(appfile, hwnd);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}.start();
+				long hwnd = JWebTopNative.getWindowHWND(jf);
+				System.out.println("hwnd = " + hwnd);
+				try {
+					webtop.createJWebTop(appfile, hwnd);
+					System.out.println("jwebtop.getLocationOnScreen() = " + jwebtop.getLocationOnScreen());
+					if (jwebtop.isShowing()) jwebtop.setBrowserLocation(jwebtop.getLocationOnScreen());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}));
-		toolPanel.add(new JButton(new AbstractAction("Ö´ĞĞJS") {
+		toolPanel.add(new JButton(new AbstractAction("æ‰§è¡ŒJS") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new Thread() {
 					@Override
 					public void run() {
 						String json = txtJson.getText().trim();
-						System.out.println("×¼±¸Ö´ĞĞJS½Å±¾ = " + json);
-						// System.out.println("      Ö´ĞĞ½á¹û=" + JWebTopNative.executeJs(0L, script));
-						JWebTopNative.executeJs(JWebTopNative.hwnd, json);
+						System.out.println("å‡†å¤‡æ‰§è¡ŒJSè„šæœ¬ = " + json);
+						// System.out.println("      æ‰§è¡Œç»“æœ=" + JWebTopNative.executeJs(0L, script));
+						JWebTopNative.executeJs(webtop.getRootBrowserHwnd(), json);
 					}
 				}.start();
 			}
@@ -110,15 +109,14 @@ public class TestJWebTop {
 		JSplitPane mainPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		mainPanel.setDividerLocation(200);
 		JScrollPane jspScript = new JScrollPane(txtJson);
-		jspScript.setBorder(BorderFactory.createTitledBorder("JavaScript½Å±¾"));
+		jspScript.setBorder(BorderFactory.createTitledBorder("JavaScriptè„šæœ¬"));
 		mainPanel.add(jspScript, JSplitPane.TOP);
-		final JWebTopBrowser jwebtop = new JWebTopBrowser();
-		JWebTopNative.jsonHandler = new JWebtopJSONHandler() {
+		jwebtop.setBrowserHwndFeeder(new IBrowserHwndFeeder() {
 			@Override
-			public void setBrowserHwnd(long hwnd) {
-				jwebtop.setBrowserHwnd(hwnd);
+			public long getBrowserHwnd() {
+				return webtop.getRootBrowserHwnd();
 			}
-		};
+		});
 		jwebtop.setTopWindow(jf);
 		mainPanel.add(jwebtop, JSplitPane.BOTTOM);
 
@@ -130,7 +128,7 @@ public class TestJWebTop {
 
 	public static void main(String[] args) {
 		try {
-			// System.in.read();// ÓÃÓÚµ÷ÊÔdllÊ±¸½¼Ó½ø³ÌÊ¹ÓÃ
+			// System.in.read();// ç”¨äºè°ƒè¯•dllæ—¶é™„åŠ è¿›ç¨‹ä½¿ç”¨
 			initDll(args);
 			String appfile = args[1].trim();
 			// test_createBrower(appfile);

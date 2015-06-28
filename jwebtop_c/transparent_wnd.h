@@ -23,6 +23,7 @@ private:
 	CRITICAL_SECTION cs;		//临界段
 	CefString url;
 	HINSTANCE hinst;
+	HWND parentHwnd = NULL;// 父窗口的句柄，可以为NULL
 public:
 	string lastMessage;
 	string lastResponse;
@@ -145,5 +146,6 @@ public:
 	int restoreY;
 	void GetUsers();
 	static string makeGUID();
+	void SetParentWin(HWND parentHwnd);
 };
 #endif

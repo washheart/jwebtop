@@ -25,7 +25,8 @@ extern HINSTANCE hInst;
 ULONG_PTR m_gdiplusToken;
 extern wstring modulePath;
 GdiplusStartupInput gdiplusStartupInput;
-extern long parentWin;
+extern long g_parentWin;
+
 void TransparentWnd::CreateBrowserWindow(CefString url, UINT ex_style, bool isTransparent){
 	RegisterClass(hInst);
 	this->url=url;
@@ -34,15 +35,12 @@ void TransparentWnd::CreateBrowserWindow(CefString url, UINT ex_style, bool isTr
 	if(isTransparent){
 		ex_style1=WS_EX_TOOLWINDOW;
 	}
+	if (this->parentHwnd == NULL)this->parentHwnd = (HWND)g_parentWin;// 如果没有指定单独的父窗口，则取全部父窗口
 	hWnd = CreateWindowEx(ex_style1, L"browser", L"透明浏览器",
 			WS_OVERLAPPED&~(WS_CAPTION|WS_BORDER), 0, 0, 0,
-			0, (HWND)parentWin, NULL, hInst, NULL);
+			0, this->parentHwnd, NULL, hInst, NULL);
 	g_handler=new MyHandler();
 	g_handler->win=(long)this;
-	// 回调Java程序，告知其浏览器的hwnd
-	std::wstringstream wss;
-	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << g_handler->win <<L"}}";
-	invokeJavaMethod(CefString(wss.str()));
 	InitCallback();
 	SetWindowLong(hWnd, GWL_USERDATA, (LONG)this);
 	if(isTransparent){
@@ -61,6 +59,10 @@ void TransparentWnd::CreateBrowserWindow(CefString url, UINT ex_style, bool isTr
 		ShowWindow(hWnd, SW_SHOW);
 		UpdateWindow(hWnd);
 	}
+	// 回调Java程序，告知其浏览器的hwnd
+	std::wstringstream wss;
+	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << g_handler->win <<L"}}";
+	invokeJavaMethod(CefString(wss.str()));
 }
 CefString TransparentWnd::GetSaveName(CefString fileName){
 	TCHAR szFile[2048];
@@ -108,7 +110,7 @@ void TransparentWnd::EnableTransparent(UINT ex_style){
 	RegisterTransparentClass(hInst);
 	renderWindow=CreateWindowEx(WS_EX_LAYERED|ex_style, L"transparent", L"透明浏览器",
 		WS_POPUP&~(WS_CAPTION|WS_BORDER), 0, 0, 0,
-		0, (HWND)parentWin, NULL, hInst, NULL);
+		0, this->parentHwnd, NULL, hInst, NULL);
 	SetWindowLong(renderWindow, GWL_USERDATA, (LONG)this);
 	SendMessage(renderWindow, WM_INIT, NULL, NULL);
 	//MoveWindow(renderWindow, 0, 0, 1000, 650, false);
@@ -120,6 +122,9 @@ void TransparentWnd::EnableTransparent(UINT ex_style){
 	}
 	//SetParent(renderWindow, (HWND)parentWin);
 	ModifyStyle(renderWindow,0,WS_MINIMIZEBOX,0);
+}
+void TransparentWnd::SetParentWin(HWND parentHwnd){
+	this->parentHwnd = parentHwnd;
 }
 void TransparentWnd::CreateBrowserWindowBase(CefString path, UINT ex_style, bool isTransparent){
 	TCHAR   szPath[1000];   
@@ -262,8 +267,8 @@ void TransparentWnd::RunAppIn(CefString appName, CefString param, CefString base
 		this->Max();
 	}
 	else{
-		SetSize(w,h);
-		Move(_x,_y);
+		if (w != -1 && h != -1)SetSize(w, h);
+		if (_x != -1 && _y != -1)Move(_x, _y);
 	}
 	this->SetTitle(name);
 	if(enableDrag>0){

@@ -10,40 +10,58 @@ import java.awt.event.ComponentListener;
 import javax.swing.JComponent;
 
 /**
- * ÓëÊµ¼Êä¯ÀÀÆ÷¿Ø¼ş¶ÔÓ¦µÄJava¿Ø¼ş<br>
- * Í¨¹ı¼àÌıJava¿Ø¼şµÄÒÆ¶¯¡¢×îĞ¡»¯µÈÏà¹ØÊÂ¼ş£¬È»ºó½«ÕâĞ©ÊÂ¼ş·Ö·¢¸øÊµ¼ÊµÄä¯ÀÀÆ÷¿Ø¼ş
+ * ä¸å®é™…æµè§ˆå™¨æ§ä»¶å¯¹åº”çš„Javaæ§ä»¶<br>
+ * é€šè¿‡ç›‘å¬Javaæ§ä»¶çš„ç§»åŠ¨ã€æœ€å°åŒ–ç­‰ç›¸å…³äº‹ä»¶ï¼Œç„¶åå°†è¿™äº›äº‹ä»¶åˆ†å‘ç»™å®é™…çš„æµè§ˆå™¨æ§ä»¶
  * 
  * @author washheart@163.com
  */
 public class JWebTopBrowser extends JComponent {
+	interface IBrowserHwndFeeder {
 
-	class BrowserWindow {
-		private long browserHwnd = 0L;
+		long getBrowserHwnd();
 
-		// Ö»±£ÁôsetLocation·½·¨Ä¿Ç°¿´Ò²Ã»ÓĞÊ²Ã´ÎÊÌâ
-		// public void setSize(int w, int h) {
-		// // if (browserHwnd == 0) return;
-		// // if (w == JWebTopBrowser.this.getWidth() && h == JWebTopBrowser.this.getHeight()) return;
-		// // System.out.println("setSize[" + browserHwnd + "]w=" + w + ",=h" + h);
-		// // JWebTopNative.setSize(browserHwnd, w, h);
-		// }
-
-		public void setVisible(boolean aFlag) {
-			if (!aFlag) JWebTopNative.setSize(browserHwnd, 0, 0);
-		}
-
-		public void setLocation(Point locationOnScreen) {
-			if (browserHwnd == 0) return;
-			int x = locationOnScreen.x, y = locationOnScreen.y;
-			// ÊÇ·ñĞèÒªÒÆ¶¯ºÍÉèÖÃ´óĞ¡ÔÚdll¶ËÈ¥¼ì²é£¬ÕâÀï²»¼ì²éÁË
-			JWebTopNative.setLocation(browserHwnd, x, y);
-			JWebTopNative.setSize(browserHwnd, JWebTopBrowser.this.getWidth(), JWebTopBrowser.this.getHeight());
-		}
 	}
 
-	protected BrowserWindow browserWindow = new BrowserWindow();
-	protected Window topWindow;
+	// class BrowserWindow {
+	// åªä¿ç•™setLocationæ–¹æ³•ç›®å‰çœ‹ä¹Ÿæ²¡æœ‰ä»€ä¹ˆé—®é¢˜
+	// public void setSize(int w, int h) {
+	// // if (browserHwnd == 0) return;
+	// // if (w == JWebTopBrowser.this.getWidth() && h == JWebTopBrowser.this.getHeight()) return;
+	// // System.out.println("setSize[" + browserHwnd + "]w=" + w + ",=h" + h);
+	// // JWebTopNative.setSize(browserHwnd, w, h);
+	// }
 
+	public void setBrowserVisible(boolean aFlag) {
+		if (!aFlag) JWebTopNative.setSize(getBrowserHwnd(), 0, 0);
+	}
+
+	public void setBrowserLocation(Point locationOnScreen) {
+		long browserHwnd = getBrowserHwnd();
+		if (browserHwnd == 0) return;
+		int x = locationOnScreen.x, y = locationOnScreen.y;
+		// æ˜¯å¦éœ€è¦ç§»åŠ¨å’Œè®¾ç½®å¤§å°åœ¨dllç«¯å»æ£€æŸ¥ï¼Œè¿™é‡Œä¸æ£€æŸ¥äº†
+		JWebTopNative.setLocation(browserHwnd, x, y);
+		JWebTopNative.setSize(browserHwnd, JWebTopBrowser.this.getWidth(), JWebTopBrowser.this.getHeight());
+	}
+
+	private long getBrowserHwnd() {
+		// TODO Auto-generated method stub
+		return browserHwndFeeder == null ? 0 : browserHwndFeeder.getBrowserHwnd();
+	}
+
+	// }
+
+	public IBrowserHwndFeeder getBrowserHwndFeeder() {
+		return browserHwndFeeder;
+	}
+
+	public void setBrowserHwndFeeder(IBrowserHwndFeeder browserHwndFeeder) {
+		this.browserHwndFeeder = browserHwndFeeder;
+	}
+
+	// protected BrowserWindow browserWindow = new BrowserWindow();
+	protected Window topWindow;
+	protected IBrowserHwndFeeder browserHwndFeeder = null;
 	private ComponentListener swtPanelComponentListener = new ComponentAdapter() {
 		@Override
 		public void componentMoved(ComponentEvent e) {
@@ -86,20 +104,20 @@ public class JWebTopBrowser extends JComponent {
 
 	protected void moveSwtWindow() {
 		if (!this.isShowing()) return;
-		this.browserWindow.setLocation(getLocationOnScreen());
+		this.setBrowserLocation(getLocationOnScreen());
 		// this.browserWindow.setSize(this.getWidth(), this.getHeight());
 	}
 
 	private ComponentListener topWindowComponentListener = null;
 
 	// private WindowStateListener topWindowStateListener = null;
-
-	public void setBrowserHwnd(long browserHwnd) {
-		this.browserWindow.browserHwnd = browserHwnd;
-	}
+	//
+	// public void setBrowserHwnd(long browserHwnd) {
+	// this.browserHwnd = browserHwnd;
+	// }
 
 	public void setTopWindow(Window w) {
-		if (w == null) throw new RuntimeException("±ØĞëÉèÖÃÈİÆ÷ËùÔÚ´°¿Ú£¬·ñÔò²»ÄÜ´´½¨SWT×é¼ş£¡");
+		if (w == null) throw new RuntimeException("å¿…é¡»è®¾ç½®å®¹å™¨æ‰€åœ¨çª—å£ï¼Œå¦åˆ™ä¸èƒ½åˆ›å»ºSWTç»„ä»¶ï¼");
 		if (topWindowComponentListener == null) {
 			topWindowComponentListener = new ComponentAdapter() {
 				@Override
@@ -140,7 +158,7 @@ public class JWebTopBrowser extends JComponent {
 	@Override
 	public void setVisible(boolean aFlag) {
 		super.setVisible(aFlag);
-		this.browserWindow.setVisible(aFlag);
+		this.setBrowserVisible(aFlag);
 		if (aFlag) {
 			moveSwtWindow();
 		}

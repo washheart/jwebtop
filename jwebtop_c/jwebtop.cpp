@@ -18,7 +18,8 @@ HINSTANCE g_hIntance;
 JavaVM* g_jvm;// 保存全局的虚拟机环境
 jclass g_nativeClass;// 记录全局的本地类变量：com.toone.util.natives.NativeMethods
 jmethodID g_invokeByJS;// 监视设备时的回调方法
-long parentWin;
+long g_parentWin;// 全局父窗口
+
 BOOL APIENTRY DllMain(HMODULE hModule,DWORD  ul_reason_for_call,LPVOID lpReserved){
 	switch (ul_reason_for_call)
 	{
@@ -46,11 +47,11 @@ CefString invokeJavaMethod(CefString json){
 
 // jni方法：创建浏览器
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
-(JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin_){
+(JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin){
 	const char * tmp = env->GetStringUTFChars(appfile, false);
 	wchar_t* buffer = chr2wch(tmp);
 	env->ReleaseStringUTFChars(appfile, tmp);
-	parentWin = parentWin_;
+	g_parentWin = parentWin;
 	if (g_invokeByJS == NULL){// 第一次被java端调用
 		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
 		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象

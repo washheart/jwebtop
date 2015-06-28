@@ -9,14 +9,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 /**
- * ÓëJWebTop½»»¥µÄJNI½Ó¿Újava¶Ë
+ * ä¸JWebTopäº¤äº’çš„JNIæ¥å£javaç«¯
  * 
  * @author washheart@163.com
  */
 public final class JWebTopNative {
-
-	static long hwnd = 0L;
-
 	private static native void nCreateJWebTop(String appfile, long parenHwnd);
 
 	private static native void nExecuteJs(long broserHWnd, String json);
@@ -25,23 +22,55 @@ public final class JWebTopNative {
 
 	private static native void nSetLocation(long browserHwnd, int xOnScreen, int yOnScreen);
 
+	private final static JWebTopNative INSTANCE = new JWebTopNative();
+
+	private long rootBrowserHwnd = 0L;
+
+	private final class CreateBrowserLocker {
+		long hwnd = 0L;
+	}
+
+	private final CreateBrowserLocker locker = new CreateBrowserLocker();
+	private JWebtopJSONDispater jsonHandler = null;
+
+	public static JWebTopNative getInstance() {
+		return INSTANCE;
+	}
+
+	private JWebTopNative() {}
+
 	/**
-	 * ´´½¨JWebTopä¯ÀÀÆ÷
+	 * åˆ›å»ºJWebTopæµè§ˆå™¨
 	 * 
 	 * @param appfile
+	 * @return
 	 */
-	public static void createJWebTop(String appfile, long parenHwnd) throws IOException {
-		appfile = new File(appfile).getCanonicalPath();// Èç¹û²»ÊÇ¾ø¶ÔÂ·¾¶£¬ä¯ÀÀÆ÷ÎŞ·¨ÏÔÊ¾³öÀ´
-		nCreateJWebTop(appfile, parenHwnd);
+	public long createJWebTop(String appfile, final long parenHwnd) throws IOException {
+		final String appfile2 = new File(appfile).getCanonicalPath();// å¦‚æœä¸æ˜¯ç»å¯¹è·¯å¾„ï¼Œæµè§ˆå™¨æ— æ³•æ˜¾ç¤ºå‡ºæ¥
+		new Thread() {
+			@Override
+			public void run() {
+				System.out.println("hwnd = " + parenHwnd);
+				nCreateJWebTop(appfile2, parenHwnd);
+			}
+		}.start();
+		synchronized (locker) {
+			try {
+				locker.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return locker.hwnd;
 	}
 
-	public static void createJWebTop(String appfile) throws IOException {
-		createJWebTop(appfile, 0);
+	public long createJWebTop(String appfile) throws IOException {
+		return createJWebTop(appfile, 0);
 	}
 
 	/**
-	 * Ö´ĞĞjs¡£<br/>
-	 * ÕâÀï·¢ËÍÊÇ°ü×°µÄJSONÊı¾İ£¬¶ø²»ÊÇ¾ßÌåµÄjs·½·¨£¬·µ»ØµÄÒ²ÊÇJSONÊı¾İ
+	 * æ‰§è¡Œjsã€‚<br/>
+	 * è¿™é‡Œå‘é€æ˜¯åŒ…è£…çš„JSONæ•°æ®ï¼Œè€Œä¸æ˜¯å…·ä½“çš„jsæ–¹æ³•ï¼Œè¿”å›çš„ä¹Ÿæ˜¯JSONæ•°æ®
 	 * 
 	 * @param json
 	 * @return
@@ -50,28 +79,58 @@ public final class JWebTopNative {
 		nExecuteJs(browserHWnd, script);
 	}
 
+	void dispatch(String json) throws IOException {
+		if (json.startsWith("@")) {// çº¦å®šé€šè¿‡ç‰¹æ®Šæ ‡è®°æ¥è¿›è¡Œå¤„ç†
+		}
+		if (rootBrowserHwnd == 0) {
+			JsonFactory f = new JsonFactory();
+			JsonParser p = f.createParser(json);
+			JsonToken result = null;
+			while ((result = p.nextToken()) != null) {
+				if (result == JsonToken.FIELD_NAME) {
+					String field = p.getText();
+					p.nextToken();
+					if ("hwnd".equals(field)) {
+						rootBrowserHwnd = p.getLongValue();
+						synchronized (locker) {
+							locker.hwnd = rootBrowserHwnd;
+							locker.notify();
+						}
+					}
+				}
+			}
+			p.close();
+		} else {
+			if (jsonHandler != null) jsonHandler.dispatcher(json);
+		}
+	}
+
+	public long getRootBrowserHwnd() {
+		return rootBrowserHwnd;
+	}
+
 	/**
-	 * ´Ë·½·¨²»¿ÉÒÔ±»»ìÏı£¬Æä»á±»DLLµ÷ÓÃ
+	 * æ­¤æ–¹æ³•ä¸å¯ä»¥è¢«æ··æ·†ï¼Œå…¶ä¼šè¢«DLLè°ƒç”¨
 	 * 
 	 * @param json
 	 * @return
 	 */
-	public static String invokeByJS(String json) {
+	private static String invokeByJS(String json) {
 		try {
 			StringBuilder sb = new StringBuilder(json);
-			System.out.println("´Ódll¶Ë·¢ÆğµÄµ÷ÓÃ = " + json);
-			print(json);
+			System.out.println("ä»dllç«¯å‘èµ·çš„è°ƒç”¨ = " + json);
+			INSTANCE.dispatch(json);
 			sb.reverse();
-			System.out.println("\t\t×¼±¸·µ»ØµÄ½á¹û = " + sb);
+			System.out.println("\t\tå‡†å¤‡è¿”å›çš„ç»“æœ = " + sb);
 			return sb.toString();
 		} catch (Throwable e) {
 			e.printStackTrace();
-			return "{success:false,msg:\"µ÷ÓÃJavaÊ§°Ü" + e.getMessage() + "\"}";
+			return "{success:false,msg:\"è°ƒç”¨Javaå¤±è´¥" + e.getMessage() + "\"}";
 		}
 	}
 
 	/**
-	 * ÉèÖÃÖ¸¶¨´°¿ÚµÄ´óĞ¡
+	 * è®¾ç½®æŒ‡å®šçª—å£çš„å¤§å°
 	 * 
 	 * @param browserHwnd
 	 * @param w
@@ -82,7 +141,7 @@ public final class JWebTopNative {
 	}
 
 	/**
-	 * ÉèÖÃÖ¸¶¨´°¿ÚµÄÎ»ÖÃ
+	 * è®¾ç½®æŒ‡å®šçª—å£çš„ä½ç½®
 	 * 
 	 * @param browserHwnd
 	 * @param xOnScreen
@@ -92,41 +151,15 @@ public final class JWebTopNative {
 		if (browserHwnd != 0) nSetLocation(browserHwnd, xOnScreen, yOnScreen);
 	}
 
-	public interface JWebtopJSONHandler {
-
-		void setBrowserHwnd(long hwnd);// FIXME:ÁÙÊ±µ÷ÊÔÓÃ
-
-	}
-
-	public static JWebtopJSONHandler jsonHandler = null;
-
-	static void print(String json) throws IOException {
-		JsonFactory f = new JsonFactory();
-		JsonParser p = f.createParser(json);
-		JsonToken result = null;
-		while ((result = p.nextToken()) != null) {
-			if (result == JsonToken.FIELD_NAME) {
-				String field = p.getText();
-				p.nextToken();
-				if ("hwnd".equals(field)) {
-					hwnd = p.getLongValue();
-					if (jsonHandler != null) jsonHandler.setBrowserHwnd(hwnd);
-				}
-				System.out.println("\t" + field + "=" + p.getText());
-			}
-		}
-		p.close();
-	}
-
 	/**
-	 * µÃµ½Ä³Java¿Ø¼ş¶ÔÓ¦µÄ¾ä±úHWND
+	 * å¾—åˆ°æŸJavaæ§ä»¶å¯¹åº”çš„å¥æŸ„HWND
 	 * 
 	 * @param target
-	 *            ¸ø¶¨µÄ¿Ø¼ş
-	 * @return ¿Ø¼şwindowsID
+	 *            ç»™å®šçš„æ§ä»¶
+	 * @return æ§ä»¶windowsID
 	 */
 	public static long getWindowHWND(Component target) {
-		return ((sun.awt.windows.WComponentPeer/* ´ËÀàÀ´×ÔJDK£¬´¿jre²»ĞĞ */) target.getPeer()).getHWnd();
+		return ((sun.awt.windows.WComponentPeer/* æ­¤ç±»æ¥è‡ªJDKï¼Œçº¯jreä¸è¡Œ */) target.getPeer()).getHWnd();
 	}
 
 }
