@@ -95,7 +95,7 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		JSONObject rtn = new JSONObject();
 		rtn.put("method", "showDetail");
 		String detail = null;
-		if (note == null) {
+		if (note == null || note.trim().length() == 0) {
 			detail = "请使用“添加日记”按钮新建日记";
 		} else {
 			detail = "在这里输入【" + note + "】日记的内容";
@@ -127,17 +127,21 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 	}
 
 	public String getListAppFile() {
+		File f = new File("res/list/index.app");
+		if (f.exists()) return f.getAbsolutePath();
 		URL url = WithinSwingCtrl.class.getClassLoader().getResource("");
 		return url.getFile() + "../../demos/WithinSwing/res/list/index.app";
 	}
 
 	public String getDetailAppFile() {
+		File f = new File("res/detail/index.app");
+		if (f.exists()) return f.getAbsolutePath();
 		URL url = WithinSwingCtrl.class.getClassLoader().getResource("");
-		String f = url.getFile() + "../../demos/WithinSwing/res/detail/index.app";
+		String fs = url.getFile() + "../../demos/WithinSwing/res/detail/index.app";
 		try {
-			return new File(f).getCanonicalPath();
+			return new File(fs).getCanonicalPath();
 		} catch (IOException e) {
-			return f;
+			return fs;
 		}
 	}
 

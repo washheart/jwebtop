@@ -126,7 +126,6 @@ public class WithinSwing extends JFrame {
 		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
 			if (JOptionPane.showConfirmDialog(this, "确认退出系统吗?", "退出系统", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 				ctrl.notifyWillClose();
-				JOptionPane.showMessageDialog(this, "dddddddddd");
 				System.exit(0);//
 			} else {
 				return;
@@ -137,10 +136,6 @@ public class WithinSwing extends JFrame {
 
 	public static void main(String[] args) {
 		try {
-
-			// URL url = WithinSwingCtrl.class.getClassLoader().getResource("");
-			// File file = new File(url.getFile() + "../res");
-			// System.out.println("url = " + file.getCanonicalPath());
 			initDll(args);
 			new WithinSwing();
 		} catch (Throwable e) {
