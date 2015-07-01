@@ -38,25 +38,23 @@ CefString invokeJavaMethod(CefString json){
 	jstring sss = env->NewStringUTF(json.ToString().c_str());
 	jstring str = (jstring)env->CallStaticObjectMethod(g_nativeClass, g_invokeByJS,sss);
 	env->DeleteLocalRef(sss);
-	char * tmp = jstringToWindows(env, str);	
+	// char * tmp = jstringToWindows(env, str);	
 	CefString result = CefString(env->GetStringUTFChars(str, false));
 	env->DeleteLocalRef(str);
-	delete tmp;
+	// delete tmp;
 	return result;
 }
 
 // jni方法：创建浏览器
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 (JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin){
-	const char * tmp = env->GetStringUTFChars(appfile, false);
-	wchar_t* buffer = chr2wch(tmp);
-	env->ReleaseStringUTFChars(appfile, tmp);
+	CefString result = CefString(env->GetStringUTFChars(appfile, false));
 	g_parentWin = parentWin;
 	if (g_invokeByJS == NULL){// 第一次被java端调用
 		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
 		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
 		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
-		wWinMain(NULL, 0, buffer, 1);// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
+		wWinMain(NULL, 0, LPTSTR(result.ToWString().c_str()), 1);// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
 	}
 	else{
 		// 这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
@@ -64,7 +62,7 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 		//CefString appName("D:\\study\\git\\repository\\webtop_new\\Release\\demo\\music\\index.app");
 		//win->RunAppIn(appName, "", pTransparentBrowser1->GetUrl());
 	}
-	delete buffer;
+//	delete buffer;
 }
 
 // jni方法：执行脚本
