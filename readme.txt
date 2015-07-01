@@ -10,6 +10,6 @@ WebTop是依据CEF封装的，可以通过一些js接口与浏览器通信（与
 JWebTop对WebTop进行了一些封装，将其变为一个DLL，可以通过JNI来与Java进行交互，这样就可以用Java来使用CEF了。
 但是JWebTop和jcef等框架不同，JWebTop不是把CEF当成一个控件嵌入到到现有Java程序中，只是和CEF交换数据。 
 
-两个例子（计划，但尚未实现）： 
+两个例子（WithinSwing已完成，FileManager还没有）： 
  1.FileManager：用WebTop做界面，java做后台实现文件的管理。 
  2.WithinSwing：将WebTop作为一个“控件”，嵌入到Swing程序中。
