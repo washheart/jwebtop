@@ -50,7 +50,6 @@ public final class JWebTopNative {
 		new Thread() {
 			@Override
 			public void run() {
-				System.out.println("hwnd = " + parenHwnd);
 				nCreateJWebTop(appfile2, parenHwnd);
 			}
 		}.start();
@@ -79,7 +78,7 @@ public final class JWebTopNative {
 		nExecuteJs(browserHWnd, script);
 	}
 
-	void dispatch(String json) throws IOException {
+	String dispatch(String json) throws IOException {
 		if (json.startsWith("@")) {// 约定通过特殊标记来进行处理
 		}
 		if (rootBrowserHwnd == 0) {
@@ -101,8 +100,17 @@ public final class JWebTopNative {
 			}
 			p.close();
 		} else {
-			if (jsonHandler != null) jsonHandler.dispatcher(json);
+			if (jsonHandler != null) {
+				String rtn = jsonHandler.dispatcher(json);
+				System.out.println("rtn = " + rtn);
+				return rtn;
+			}
 		}
+		return "";
+	}
+
+	public void setJsonHandler(JWebtopJSONDispater jsonHandler) {
+		this.jsonHandler = jsonHandler;
 	}
 
 	public long getRootBrowserHwnd() {
@@ -117,12 +125,13 @@ public final class JWebTopNative {
 	 */
 	private static String invokeByJS(String json) {
 		try {
-			StringBuilder sb = new StringBuilder(json);
+			// StringBuilder sb = new StringBuilder(json);
 			System.out.println("从dll端发起的调用 = " + json);
-			INSTANCE.dispatch(json);
-			sb.reverse();
-			System.out.println("\t\t准备返回的结果 = " + sb);
-			return sb.toString();
+			// INSTANCE.dispatch(json);
+			// sb.reverse();
+			// System.out.println("\t\t准备返回的结果 = " + sb);
+			// return sb.toString();
+			return INSTANCE.dispatch(json);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return "{success:false,msg:\"调用Java失败" + e.getMessage() + "\"}";

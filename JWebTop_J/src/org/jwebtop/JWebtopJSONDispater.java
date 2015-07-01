@@ -7,5 +7,5 @@ package org.jwebtop;
  */
 public interface JWebtopJSONDispater {
 
-	void dispatcher(String json);
+	String dispatcher(String json);
 }

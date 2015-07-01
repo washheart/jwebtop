@@ -2,4 +2,4 @@
 url=index.html
 x=-1
 exStyle=0x00000080L
-disableTransparent=0
+disableTransparent=1

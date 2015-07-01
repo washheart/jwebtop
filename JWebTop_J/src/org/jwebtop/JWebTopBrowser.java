@@ -16,20 +16,10 @@ import javax.swing.JComponent;
  * @author washheart@163.com
  */
 public class JWebTopBrowser extends JComponent {
-	interface IBrowserHwndFeeder {
-
+	public interface IBrowserHwndFeeder {
+		// 用于返回浏览器Hwnd，因为浏览器一般是后创建
 		long getBrowserHwnd();
-
 	}
-
-	// class BrowserWindow {
-	// 只保留setLocation方法目前看也没有什么问题
-	// public void setSize(int w, int h) {
-	// // if (browserHwnd == 0) return;
-	// // if (w == JWebTopBrowser.this.getWidth() && h == JWebTopBrowser.this.getHeight()) return;
-	// // System.out.println("setSize[" + browserHwnd + "]w=" + w + ",=h" + h);
-	// // JWebTopNative.setSize(browserHwnd, w, h);
-	// }
 
 	public void setBrowserVisible(boolean aFlag) {
 		if (!aFlag) JWebTopNative.setSize(getBrowserHwnd(), 0, 0);
@@ -45,11 +35,8 @@ public class JWebTopBrowser extends JComponent {
 	}
 
 	private long getBrowserHwnd() {
-		// TODO Auto-generated method stub
 		return browserHwndFeeder == null ? 0 : browserHwndFeeder.getBrowserHwnd();
 	}
-
-	// }
 
 	public IBrowserHwndFeeder getBrowserHwndFeeder() {
 		return browserHwndFeeder;
@@ -59,7 +46,6 @@ public class JWebTopBrowser extends JComponent {
 		this.browserHwndFeeder = browserHwndFeeder;
 	}
 
-	// protected BrowserWindow browserWindow = new BrowserWindow();
 	protected Window topWindow;
 	protected IBrowserHwndFeeder browserHwndFeeder = null;
 	private ComponentListener swtPanelComponentListener = new ComponentAdapter() {
@@ -74,9 +60,7 @@ public class JWebTopBrowser extends JComponent {
 		}
 
 		@Override
-		public void componentHidden(ComponentEvent e) {
-			// browserWindow.setSize(0, 0);
-		}
+		public void componentHidden(ComponentEvent e) {}
 
 		@Override
 		public void componentShown(ComponentEvent e) {
@@ -105,16 +89,9 @@ public class JWebTopBrowser extends JComponent {
 	protected void moveSwtWindow() {
 		if (!this.isShowing()) return;
 		this.setBrowserLocation(getLocationOnScreen());
-		// this.browserWindow.setSize(this.getWidth(), this.getHeight());
 	}
 
 	private ComponentListener topWindowComponentListener = null;
-
-	// private WindowStateListener topWindowStateListener = null;
-	//
-	// public void setBrowserHwnd(long browserHwnd) {
-	// this.browserHwnd = browserHwnd;
-	// }
 
 	public void setTopWindow(Window w) {
 		if (w == null) throw new RuntimeException("必须设置容器所在窗口，否则不能创建SWT组件！");
@@ -125,30 +102,12 @@ public class JWebTopBrowser extends JComponent {
 					JWebTopBrowser.this.moveSwtWindow();
 				}
 			};
-			// topWindowStateListener = new WindowStateListener() {
-			// private int w, h;
-			//
-			// @Override
-			// public void windowStateChanged(WindowEvent e) {
-			// int state = e.getNewState();
-			// if (state == WindowEvent.WINDOW_ICONIFIED) {
-			// this.w = JWebTopBrowser.this.getWidth();
-			// this.h = JWebTopBrowser.this.getHeight();
-			// browserWindow.setSize(0, 0);
-			// } else {
-			// browserWindow.setSize(w, h);
-			// }
-			// // TODO Auto-generated method stub
-			// }
-			// };
 		}
 		if (this.topWindow != null) {
 			this.topWindow.removeComponentListener(topWindowComponentListener);
-			// this.topWindow.removeWindowStateListener(topWindowStateListener);
 		}
 		this.topWindow = w;
 		this.topWindow.addComponentListener(topWindowComponentListener);
-		// this.topWindow.addWindowStateListener(topWindowStateListener);
 		this.addComponentListener(swtPanelComponentListener);
 		if (this.isShowing()) moveSwtWindow();
 	}
