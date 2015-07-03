@@ -1363,6 +1363,7 @@ void TransparentWnd::StartDrag(){
 		dragY=pt.y-y;
 	}
 	else{
+		ReleaseCapture();// 必须先要用此方法释放鼠标？？？很奇怪，难道CEF还有其他隐藏的窗口
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(pt.x, pt.y));
 	}
 }
