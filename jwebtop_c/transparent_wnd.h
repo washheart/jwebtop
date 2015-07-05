@@ -48,6 +48,7 @@ public:
 	~TransparentWnd(void);
 	void Move(int x, int y);
 	void SetSize(int w, int h);
+	void SetBound(int x, int y,int w, int h);
 	void SetUrl(CefString url);
 	void response(CefString response, LPVOID pParam);
 	void cancelResponse(LPVOID pParam);

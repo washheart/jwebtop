@@ -1,14 +1,23 @@
 //closeBtn.onclick = function() {
 //	AlloyDesktop.close();
 //}
+var fm={};
 var isMax = false;
 $("#miniBtn").click(function() {
 	AlloyDesktop.mini();
 })
+var prex,prey,prew,preh;
 $("#maxBtn").click(function() {
 	if (isMax) {
-		AlloyDesktop.restore();
+		// AlloyDesktop.restore();
+		AlloyDesktop.setBound( prex,prey,prew,preh);
 	} else {
+		var jo=AlloyDesktop.getPos();
+		prex=jo.x;
+		prey=jo.y;
+		jo = AlloyDesktop.getSize();
+		prew=jo.width;
+		preh=jo.height;
 		AlloyDesktop.max();
 	}
 	isMax = !isMax;
@@ -24,7 +33,7 @@ $("#titleBar").mouseup(function() {
 	AlloyDesktop.stopDrag();
 })
 var sizeHandler = function(e) {
-	jo = AlloyDesktop.getSize();
+	var jo = AlloyDesktop.getSize();
 	$("#treeDemo").height(jo.height - 40 - 10 - 2);// 40=标题栏高度，10=treeDemo上下padding，2=上下border
 	$("#files").height(jo.height - 40-21 );// 40=标题栏高度，10=上下padding，21=上面的空白
 	$("#files").width(jo.width - $("#treeDemo").width() - 10 - 2);// 10=treeDemo左右padding，2=左右border

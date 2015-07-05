@@ -1396,6 +1396,22 @@ void TransparentWnd::SetSize(int w, int h){
 		MoveWindow(hWnd, x, y, w, h, true);// 强制重绘(可能可以优化)
 	}
 }
+void TransparentWnd::SetBound(int x,int y, int w, int h){
+	this->x = x;
+	this->y = y;
+	this->width = w;
+	this->height = h;
+	MoveHandler(x, y);
+	g_handler->SetSize(w, h);
+	SizeHandler();
+	if (isTransparent){
+		// SetWindowPos(renderWindow, 0, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSIZE);
+		MoveWindow(renderWindow, x, y, w, h, true);// 强制重绘(可能可以优化)
+	}
+	else{
+		MoveWindow(hWnd, x, y, width, height, true);// 每次移动并重绘，否则（嵌入后）xp系统下会有重影（不嵌入时还没有测，如果可行，可以考虑搞个变量来控制）
+	}
+}
 string TransparentWnd::getLastMessage(){
 	return lastMessage;
 }

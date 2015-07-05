@@ -95,3 +95,11 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 	if (winHandler->x == x&&winHandler->y == y)return;
 	winHandler->Move(x, y);
 }
+
+// jni方法：设置窗口位置和大小
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
+(JNIEnv *, jclass, jlong browserHWnd, jint x, jint y, int w, int h){
+	TransparentWnd* winHandler = (TransparentWnd*)static_cast<long>(browserHWnd);
+	if (winHandler->x == x&&winHandler->y == y)return;
+	winHandler->SetBound(x, y, w, h);
+}
