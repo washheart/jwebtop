@@ -1,0 +1,97 @@
+html,body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: 100%;
+	font-family: inherit;
+}
+
+.titleContent {
+	cursor: move;
+	height: 30px;
+	position: fixed top: 0;
+	left: 0;
+	padding-left: 10px;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px cursor:pointer;
+	background-color: #000088;
+	color: #FFFFFF;
+}
+
+.controlBtn {
+	position: absolute;
+	cursor: pointer;
+	width: 30px;
+	height: 20px;
+}
+
+#miniBtn {
+	background: url(../img/control-min.png);
+	right: 45px;
+	top: 10px;
+}
+
+#maxBtn {
+	background: url(../img/control-max.png);
+	right: 25px;
+	top: 11px;
+}
+
+#closeBtn {
+	background: url(../img/control-close.png);
+	right: 5px;
+	top: 10px;
+}
+
+ul.ztree {
+	border-right: 1px solid #617775;
+	background: #f0f6e4;
+	width: 220px;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+.content_wrap {
+	background: #fff6e4;
+	border: 1px solid gray;
+}
+
+table {
+	border-collapse: collapse;
+	border-left: 1px solid #666;
+	border-bottom: 1px solid #666;
+	width: 100%
+}
+tr{width: 100%}
+th {
+	text-align: center;
+	background: #009933;
+	border-right: 1px solid #666;
+	border-top: 1px solid #666;
+}
+
+td {
+	border-right: 1px solid #666;
+	border-top: 1px solid #666;
+}
+#files {
+	position: absolute;
+	top: 40px;
+	left: 232px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	margin-top: 21px;
+}
+
+#files table thead {
+	width: 100%;
+	position: fixed;
+	top: 40px;
+	left: 232px;
+	background: #eeeeee;
+	height: 20px;
+}

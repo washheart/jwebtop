@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JWebTop_J"/>
+	<classpathentry kind="lib" path="/JWebTop_J/lib/fastjson-1.1.28.jar"/>
+	<classpathentry kind="lib" path="/JWebTop_J/lib/jackson-core-2.4.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

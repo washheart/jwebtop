@@ -22,6 +22,8 @@ public final class JWebTopNative {
 
 	private static native void nSetLocation(long browserHwnd, int xOnScreen, int yOnScreen);
 
+	private static native void nMove(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
+
 	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
 	private long rootBrowserHwnd = 0L;
@@ -158,6 +160,19 @@ public final class JWebTopNative {
 	 */
 	public static void setLocation(long browserHwnd, int xOnScreen, int yOnScreen) {
 		if (browserHwnd != 0) nSetLocation(browserHwnd, xOnScreen, yOnScreen);
+	}
+
+	/**
+	 * 移动并重设大小
+	 * 
+	 * @param browserHwnd
+	 * @param xOnScreen
+	 * @param yOnScreen
+	 * @param w
+	 * @param h
+	 */
+	public static void move(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h) {
+		if (browserHwnd != 0) nMove(browserHwnd, xOnScreen, yOnScreen, w, h);
 	}
 
 	/**
