@@ -30,6 +30,7 @@ public class JWebTopBrowser extends JComponent {
 		if (browserHwnd == 0) return;
 		int x = locationOnScreen.x, y = locationOnScreen.y;
 		// 是否需要移动和设置大小在dll端去检查，这里不检查了
+		// (此方法有时有点问题：刷新不及时)JWebTopNative.setBound(browserHwnd, x, y, JWebTopBrowser.this.getWidth(), JWebTopBrowser.this.getHeight());
 		JWebTopNative.setLocation(browserHwnd, x, y);
 		JWebTopNative.setSize(browserHwnd, JWebTopBrowser.this.getWidth(), JWebTopBrowser.this.getHeight());
 	}

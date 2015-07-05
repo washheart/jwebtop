@@ -1396,7 +1396,7 @@ void TransparentWnd::SetSize(int w, int h){
 		MoveWindow(hWnd, x, y, w, h, true);// 强制重绘(可能可以优化)
 	}
 }
-void TransparentWnd::SetBound(int x,int y, int w, int h){
+void TransparentWnd::SetBound(int x, int y, int w, int h){
 	this->x = x;
 	this->y = y;
 	this->width = w;
@@ -1405,7 +1405,6 @@ void TransparentWnd::SetBound(int x,int y, int w, int h){
 	g_handler->SetSize(w, h);
 	SizeHandler();
 	if (isTransparent){
-		// SetWindowPos(renderWindow, 0, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSIZE);
 		MoveWindow(renderWindow, x, y, w, h, true);// 强制重绘(可能可以优化)
 	}
 	else{

@@ -590,6 +590,14 @@ bool MyHandler::Execute(const CefString& name,
 		winHandler->Restore();
 		return true;
 	}
+	else if (name == "setBound"){
+		int x = static_cast<int>(arguments[1]->GetIntValue());
+		int y = static_cast<int>(arguments[2]->GetIntValue());
+		int w = static_cast<int>(arguments[3]->GetIntValue());
+		int h = static_cast<int>(arguments[4]->GetIntValue());
+		winHandler->SetBound(x, y, w, h);
+		return true;
+	}
 	else if(name == "setTopMost")
 	{
 		winHandler->SetTopMost();
@@ -1220,6 +1228,11 @@ void InitCallback()
 	"    handler=handler?handler:window['handler'];"
     "    native function mini(handler);"
 	"    return mini(handler);"
+    "  };"
+    "  AlloyDesktop.setBound = function(x,y,w,h,handler) {"
+	"    handler=handler?handler:window['handler'];"
+    "    native function setBound(handler);"
+	"    return setBound(handler,x,y,w,h);"
     "  };"
     "  AlloyDesktop.restore = function(handler) {"
 	"    handler=handler?handler:window['handler'];"

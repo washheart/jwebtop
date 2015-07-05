@@ -39,6 +39,10 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 (JNIEnv *, jclass, jlong browserHWnd, jint x, jint y);
 
+// jni方法：设置窗口位置和大小
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
+(JNIEnv *, jclass, jlong browserHWnd, jint x, jint y,int w,int h);
+
 #ifdef __cplusplus
 }
 #endif

@@ -18,11 +18,11 @@ public final class JWebTopNative {
 
 	private static native void nExecuteJs(long broserHWnd, String json);
 
-	private static native void nSetSize(long browserHwnd, int i, int j);
+	private static native void nSetSize(long browserHwnd, int w, int h);
 
 	private static native void nSetLocation(long browserHwnd, int xOnScreen, int yOnScreen);
 
-	private static native void nMove(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
+	private static native void nSetBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
 
 	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
@@ -163,7 +163,7 @@ public final class JWebTopNative {
 	}
 
 	/**
-	 * 移动并重设大小
+	 * 移动并重设大小(性能较高， 但此方法有时有点问题：刷新不及时)
 	 * 
 	 * @param browserHwnd
 	 * @param xOnScreen
@@ -171,8 +171,8 @@ public final class JWebTopNative {
 	 * @param w
 	 * @param h
 	 */
-	public static void move(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h) {
-		if (browserHwnd != 0) nMove(browserHwnd, xOnScreen, yOnScreen, w, h);
+	public static void setBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h) {
+		if (browserHwnd != 0) nSetBound(browserHwnd, xOnScreen, yOnScreen, w, h);
 	}
 
 	/**
