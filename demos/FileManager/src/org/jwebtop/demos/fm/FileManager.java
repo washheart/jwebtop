@@ -13,20 +13,36 @@ import org.jwebtop.JWebTopNative;
  */
 public class FileManager {
 	private static void initDll(String[] args) {
-		String dll = "JWebTop.dll";
-		File tmp = null;
+		String dir = "";
 		if (args.length > 0) {
-			args[0] = args[0].trim();
-			tmp = new File(args[0]);
-			dll = tmp.getAbsolutePath();
+			dir = new File(args[0].trim()).getAbsolutePath();
 		} else {
-			tmp = new File(dll);
-			if (tmp.isFile()) {
-				dll = tmp.getAbsolutePath();
-			}
+			dir = new File("").getAbsolutePath();
 		}
-		System.out.println("成功加载dll文件 = " + dll);
-		System.load(dll);
+		dir += File.separator;
+		// dir = "D:\\c\\jwebtop\\jwebtop_c\\Release\\";
+		System.out.println("dir = " + dir);
+		String[] dlls = { //
+		"d3dcompiler_43.dll",//
+				"d3dx9_43.dll", //
+				"icudt.dll", //
+				"avutil-51.dll", //
+				"avcodec-53.dll", //
+				"avformat-53.dll",//
+				"libcef.dll", //
+				"libGLESv2.dll",//
+				"libEGL.dll",//
+				"zlibwapi.dll",
+				//
+				"msvcr120.dll",//
+				"msvcp120.dll",//
+				// "msvcrt.dll",//
+				//
+				"JWebTop.dll" };
+		for (String dll : dlls) {
+			String f = dir + dll;
+			if (new File(f).exists()) System.load(f);
+		}
 	}
 
 	private FMCtrl ctrl;
