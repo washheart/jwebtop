@@ -1,26 +1,30 @@
 //closeBtn.onclick = function() {
 //	AlloyDesktop.close();
 //}
-var fm={};
-var isMax = false;
+var fm = {
+	isMax : false,
+	prex : 0,
+	prey : 0,
+	prew : 0,
+	preh : 0
+};
 $("#miniBtn").click(function() {
 	AlloyDesktop.mini();
 })
-var prex,prey,prew,preh;
 $("#maxBtn").click(function() {
-	if (isMax) {
+	if (fm.isMax) {
 		// AlloyDesktop.restore();
-		AlloyDesktop.setBound( prex,prey,prew,preh);
+		AlloyDesktop.setBound(fm.prex, fm.prey, fm.prew, fm.preh);
 	} else {
-		var jo=AlloyDesktop.getPos();
-		prex=jo.x;
-		prey=jo.y;
+		var jo = AlloyDesktop.getPos();
+		fm.prex = jo.x;
+		fm.prey = jo.y;
 		jo = AlloyDesktop.getSize();
-		prew=jo.width;
-		preh=jo.height;
+		fm.prew = jo.width;
+		fm.preh = jo.height;
 		AlloyDesktop.max();
 	}
-	isMax = !isMax;
+	fm.isMax = !fm.isMax;
 })
 $("#closeBtn").click(function() {
 	AlloyDesktop.close();
@@ -35,7 +39,7 @@ $("#titleBar").mouseup(function() {
 var sizeHandler = function(e) {
 	var jo = AlloyDesktop.getSize();
 	$("#treeDemo").height(jo.height - 40 - 10 - 2);// 40=标题栏高度，10=treeDemo上下padding，2=上下border
-	$("#files").height(jo.height - 40-21 );// 40=标题栏高度，10=上下padding，21=上面的空白
+	$("#files").height(jo.height - 40 - 21);// 40=标题栏高度，10=上下padding，21=上面的空白
 	$("#files").width(jo.width - $("#treeDemo").width() - 10 - 2);// 10=treeDemo左右padding，2=左右border
 	setTableHeaderWidth();
 }
