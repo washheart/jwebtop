@@ -1,8 +1,10 @@
 # ingnore all files
 !.gitignore
-/jwebtop_c/Debug/*
-/jwebtop_c/Release/*
-jwebtop_c/jwebtop.opensdf
-jwebtop_c/jwebtop.sdf
-jwebtop_c/jwebtop.v12.suo
-jwebtop_c/JWebTop.vcxproj.user
+/jwebtop_c/JWebTop/Debug/*
+/jwebtop_c/JWebTop/Release/*
+/jwebtop_c/libcef_dll/Debug/*
+/jwebtop_c/libcef_dll/Release/*
+jwebtop_c/*.opensdf
+jwebtop_c/*.sdf
+jwebtop_c/*.suo
+jwebtop_c/JWebTop2.0.vcxproj.user
