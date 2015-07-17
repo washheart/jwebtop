@@ -3,7 +3,7 @@
 #include "include\cef_client.h"
 #include "JWebTopConfigs.h"
 
-class BrowerWindowInfo{
+class BrowserWindowInfo{
 public:
 	HWND hWnd;
 	HWND bWnd;
@@ -13,9 +13,9 @@ public:
 	JWebTopConfigs  configs;            // 窗口相关的一些配置信息
 
 	bool isDraging;                     // 是否正在拖动窗口
-	int dragX, dragY;
+	LONG dragX, dragY;
 };
-typedef std::map<HWND, BrowerWindowInfo> BrowerWindowInfoMap;// 定义一个存储BrowerWindowInfo的Map
+typedef std::map<HWND, BrowserWindowInfo*> BrowserWindowInfoMap;// 定义一个存储BrowserWindowInfo的Map
 
 // 对CEF浏览器窗口的消息进行拦截
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

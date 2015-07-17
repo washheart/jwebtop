@@ -6,7 +6,7 @@
 #include "JWebTop/util/StrUtil.h"
 #include "JWebTop/tests/TestUtil.h"
 using namespace std;
-BrowerWindowInfoMap BrowerWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
+BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
 
 HICON GetIcon(CefString url, CefString path){
 	if (path.ToWString().find(L":") == -1){// 如果指定的路径是相对路径
@@ -19,60 +19,66 @@ HICON GetIcon(CefString url, CefString path){
 	return (HICON)::LoadImage(NULL, path.ToWString().data(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 }
 
-BrowerWindowInfo getBrowserWindowInfo(HWND hWnd){
-	BrowerWindowInfo bwInfo;
-	BrowerWindowInfoMap::iterator it = BrowerWindowInfos.find(hWnd);
-	if (BrowerWindowInfos.end() != it) {
-		bwInfo = it->second;
+BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
+	BrowserWindowInfoMap::iterator it = BrowserWindowInfos.find(hWnd);
+	if (BrowserWindowInfos.end() != it) {
+		return it->second;
 	}
-	return bwInfo;
+	return NULL;
 }
 // 用于调试工具窗口的cefclient（如果传入JWebTopHandler会把对JWebTop的窗口设置在DEBUG上也应用一次）
 class DEBUG_Handler : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler); };
+// 拦截浏览器窗口的消息
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
-	BrowerWindowInfo bwInfo = getBrowserWindowInfo(hWnd);
-	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了
+	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
+	stringstream sss;
+	sss << "mid [x=" << message << ",bwInfo=" << bwInfo << "]" << "\r\n";
+	writeLog(sss.str());
 	switch (message) {
-	case WM_CLOSE:
-		BrowerWindowInfos.erase(hWnd);// 当窗口关闭时，清理数据
-		break;
-	case WM_LBUTTONDOWN:// 鼠标左键
-		bwInfo.isDraging = true;
-		bwInfo.dragX = LOWORD(lParam);
-		bwInfo.dragY = HIWORD(lParam);
+		//case WM_CLOSE:case WM_RBUTTONDOWN:case WM_LBUTTONDOWN:break;// 窗口创建/销毁、鼠标左右键按下监听不到，需要通过PARENTNOTIFY方式
+	case WM_PARENTNOTIFY:
+	{
+
+							UINT msg2 = LOWORD(wParam);
+							// 如果有多个的话可以考虑用switch方式
+							if (msg2 == WM_LBUTTONDOWN){
+								POINT pt;
+								GetCursorPos(&pt);
+								bwInfo->isDraging = true;
+								bwInfo->dragX = LOWORD(lParam);
+								bwInfo->dragY = HIWORD(lParam);
+							}
+							else if (msg2 == WM_DESTROY){
+								SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldProc);// 设置回原来的处理函数
+								BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
+							}
+	}
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
-		bwInfo.isDraging = false;
+		bwInfo->isDraging = false;
 		break;
 	case WM_MOUSEMOVE:{
-						  POINT pt;
-						  GetCursorPos(&pt);
-						  RECT rc,hrc;
-						  GetWindowRect(hWnd, &rc);
-						  GetWindowRect(bwInfo.hWnd, &hrc);
-						  int x = pt.x - bwInfo.dragX+hrc.left;
-						  int y = pt.y - bwInfo.dragY+hrc.top;
-#ifdef WebTopLog
-						  stringstream s;
-						  s << "   mv[x=" << x << ",y=" << y << "] cased_mid:" << message << "\r\n";
-						  writeLog(s.str());
-#endif
-						  // 下面两种方式都可以拖动
-						  //MoveWindow(bwInfo.hWnd, x, y, rc.right, rc.bottom, true);
-						  SetWindowPos(bwInfo.hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-						  break;
+						  if (bwInfo->isDraging){
+							  POINT pt;
+							  GetCursorPos(&pt);
+							  LONG x = pt.x - bwInfo->dragX;
+							  LONG y = pt.y - bwInfo->dragY;
+							  SetWindowPos(bwInfo->hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);// 移动窗口，但不改变窗口大小和窗口所在层次
+						  }
 	}
+		break;
 	case WM_KEYUP:
 		if (wParam == VK_F12){// 按下F12时打开调试工具(有时会触发异常)
-			if (bwInfo.configs.enableDebug){
+			if (bwInfo->configs.enableDebug){
 				CefPoint(pp);
 				pp.x = 300;
 				pp.y = 300;
 				CefWindowInfo windowInfo;
 				CefBrowserSettings settings;
 				windowInfo.SetAsPopup(NULL, "cef_debug");
-				CefRefPtr<CefBrowserHost> host = bwInfo.browser->GetHost();
+				CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
 				host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
 			}
 		}
@@ -80,10 +86,8 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 			createNewBrowser(NULL);
 		}
 		break;
-	case WM_PARENTNOTIFY:
-		break;
 	}
-	return CallWindowProc((WNDPROC)getBrowserWindowInfo(hWnd).oldProc, hWnd, message, wParam, lParam);
+	return CallWindowProc((WNDPROC)bwInfo->oldProc, hWnd, message, wParam, lParam);
 }
 
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
@@ -118,21 +122,20 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 		changed = true;
 	}
 	HWND bWnd = GetNextWindow(hWnd, GW_CHILD);// 得到真实的浏览器窗口
-	if (changed){// 如果窗口的状态发生了改变
-		//RECT rc;
-		//GetWindowRect(hWnd, &rc);// 获取窗口大小（如果窗口有边框和标题栏，则会带上的）
-		//MoveWindow(bWnd, 0, 0, rc.right - rc.left, rc.bottom - rc.top, true);// 这样移动之后有可能会造成浏览器的实际大小“稍稍”大于窗口可视面积，但影响不大
-	}
+	//if (changed){// 如果窗口的状态发生了改变
+	//	//RECT rc;
+	//	//GetWindowRect(hWnd, &rc);// 获取窗口大小（如果窗口有边框和标题栏，则会带上的）
+	//	//MoveWindow(bWnd, 0, 0, rc.right - rc.left, rc.bottom - rc.top, true);// 这样移动之后有可能会造成浏览器的实际大小“稍稍”大于窗口可视面积，但影响不大
+	//}
 	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);
 	if (preWndProc != (LONG)JWebTop_BrowerWndProc){
 		SetWindowLongPtr(bWnd, GWLP_WNDPROC, (LONG)JWebTop_BrowerWndProc);
-		//SetWindowLongPtr(hWnd, GWLP_USERDATA, preWndProc);// 估计CEF有使用GWLP_USERDATA，所以这样设置不管用，反而会导致出错
-		BrowerWindowInfo bwInfo;
-		bwInfo.hWnd = hWnd;
-		bwInfo.bWnd = bWnd;
-		bwInfo.oldProc = preWndProc;
-		bwInfo.browser = browser;
-		bwInfo.configs = configs;
-		BrowerWindowInfos.insert(std::pair<HWND, BrowerWindowInfo>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
+		BrowserWindowInfo * bwInfo = new BrowserWindowInfo();
+		bwInfo->hWnd = hWnd;
+		bwInfo->bWnd = bWnd;
+		bwInfo->oldProc = preWndProc;
+		bwInfo->browser = browser;
+		bwInfo->configs = configs;
+		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 	}
 }
