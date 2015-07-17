@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="jwebtop">
+      <UniqueIdentifier>{e9ce5d8b-9c05-463a-9d81-9e9c6bdea90f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop\jshandler">
+      <UniqueIdentifier>{b43e101a-d11f-47ba-9172-474cd600a5bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop\winctrl">
+      <UniqueIdentifier>{8e52f096-6ad9-4287-b714-d40b4cfd37e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop\browser">
+      <UniqueIdentifier>{aa6858b3-c3c5-422c-89f2-74b424b0bc69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop\util">
+      <UniqueIdentifier>{4a962bb5-b67c-4460-88f0-5e9f40f0b1f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop\tests">
+      <UniqueIdentifier>{83533c7e-2865-45c2-b014-6db11f2d7f63}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="JWebTop_main.cpp">
+      <Filter>jwebtop</Filter>
+    </ClCompile>
+    <ClCompile Include="handler\JWebTopJSHanlder.cpp">
+      <Filter>jwebtop\jshandler</Filter>
+    </ClCompile>
+    <ClCompile Include="winctrl\JWebTopWinCtrl.cpp">
+      <Filter>jwebtop\winctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="browser\JWebTopRenderer.cc">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
+    <ClCompile Include="browser\JWebTopBrowser.cpp">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
+    <ClCompile Include="browser\JWebTopHandler.cc">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
+    <ClCompile Include="winctrl\JWebTopConfigs.cpp">
+      <Filter>jwebtop\winctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="browser\JWebTopCommons.cpp">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
+    <ClCompile Include="util\StrUtil.cpp">
+      <Filter>jwebtop\util</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\TestUtil.cpp">
+      <Filter>jwebtop\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="handler\JWebTopJSHanlder.h">
+      <Filter>jwebtop\jshandler</Filter>
+    </ClInclude>
+    <ClInclude Include="winctrl\JWebTopWinCtrl.h">
+      <Filter>jwebtop\winctrl</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopHandler.h">
+      <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopRenderer.h">
+      <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopBrowser.h">
+      <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="winctrl\JWebTopConfigs.h">
+      <Filter>jwebtop\winctrl</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopCommons.h">
+      <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="util\StrUtil.h">
+      <Filter>jwebtop\util</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\TestUtil.h">
+      <Filter>jwebtop\tests</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

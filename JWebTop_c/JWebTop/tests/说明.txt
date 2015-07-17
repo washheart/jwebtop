@@ -1,0 +1,2 @@
+调试时把例子复制到当前项目的release或debug下进行调试。
+JWebTop.exe会自动找其所在目录的index.app执行

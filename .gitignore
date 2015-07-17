@@ -1,5 +1,6 @@
 # ingnore all files
 !.gitignore
+/jwebtop_c/Debug/*
 /jwebtop_c/JWebTop/Debug/*
 /jwebtop_c/JWebTop/Release/*
 /jwebtop_c/libcef_dll/Debug/*
