@@ -15,8 +15,9 @@ public:
 	int max;                       // 默认是否最大化
 
 	bool enableDebug;              // 是否允许调试，默认(false)不显示调试工具
-	bool enableResize;             // 是否可以调整窗口大小
-	bool disableRefresh;           // 是否禁止刷新
+	bool enableResize;             // （尚未实现）是否可以调整窗口大小
+	bool disableRefresh;           // （尚未实现）是否禁止刷新
+	bool enableDrag;               // 是否通过页面进行拖动（默认可以）
 
 	CefString appDefFile;          // 当前配置对应的配置文件（有可能为null）
 	CefString appPath;             // 当前配置文件所在目录（不能为null）

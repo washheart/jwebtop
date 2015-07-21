@@ -1,6 +1,8 @@
 [BASE]
 url=index.html
-name=播放器
 x=100
 y=100
 enableDrag=1
+name=测试下中文
+style=369819648
+exStyle=128

@@ -43,11 +43,13 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 							UINT msg2 = LOWORD(wParam);
 							// 如果有多个的话可以考虑用switch方式
 							if (msg2 == WM_LBUTTONDOWN){
-								POINT pt;
-								GetCursorPos(&pt);
-								bwInfo->isDraging = true;
-								bwInfo->dragX = LOWORD(lParam);
-								bwInfo->dragY = HIWORD(lParam);
+								if (bwInfo->configs.enableDrag){// 是否允许拖动
+									POINT pt;
+									GetCursorPos(&pt);
+									bwInfo->isDraging = true;
+									bwInfo->dragX = LOWORD(lParam);
+									bwInfo->dragY = HIWORD(lParam);
+								}
 							}
 							else if (msg2 == WM_DESTROY){
 								SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldProc);// 设置回原来的处理函数
@@ -96,6 +98,14 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
 	bool changed = false;
+#ifdef WebTopLog
+	stringstream ss;
+	DWORD dd = WS_OVERLAPPED | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	ss << "dwStyle=====" << dd << "\r\n";
+	DWORD dx = WS_EX_TOOLWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR;
+	ss << "dwExStyle===" << dx << "\r\n";
+	writeLog(ss.str());
+#endif 
 	//根据配置信息对窗口重新进行装饰(url、title在createBrower时处理了）
 	if (configs.dwStyle != 0){
 		DWORD dwStyle = winInfo.dwStyle;
