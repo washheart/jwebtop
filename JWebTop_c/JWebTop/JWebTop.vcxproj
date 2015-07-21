@@ -149,6 +149,9 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PostBuildEvent>
+      <Command>Xcopy  "$(ProjectDir)tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="browser\JWebTopBrowser.cpp" />
