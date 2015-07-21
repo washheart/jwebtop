@@ -72,7 +72,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	}
 		break;
 	case WM_KEYUP:
-		if (wParam == VK_F12){// 按下F12时打开调试工具(有时会触发异常)
+		if (wParam == VK_F1){// 按下F12时打开调试工具(F12有时会触发异常，暂时改为F1)
 			if (bwInfo->configs.enableDebug){
 				CefPoint(pp);
 				pp.x = 300;
@@ -98,12 +98,12 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
 	bool changed = false;
-#ifdef WebTopLog
+#ifdef JWebTopLog
 	stringstream ss;
 	DWORD dd = WS_OVERLAPPED | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	ss << "dwStyle=====" << dd << "\r\n";
+	ss << "可以用在配置参数上：dwStyle=" << dd << "\r\n";
 	DWORD dx = WS_EX_TOOLWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR;
-	ss << "dwExStyle===" << dx << "\r\n";
+	ss << "可以用在配置参数上：dwExStyle===" << dx << "\r\n";
 	writeLog(ss.str());
 #endif 
 	//根据配置信息对窗口重新进行装饰(url、title在createBrower时处理了）
@@ -148,4 +148,16 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 		bwInfo->configs = configs;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 	}
+}
+
+void setSize(HWND hWnd, int w, int h){
+	//WINDOWINFO winInfo;
+	//GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
+	RECT rect;
+	GetWindowRect(hWnd, &rect);
+	//rect.right = rect.left + w;
+	//rect.bottom = rect.top + h;
+	rect.right =  w;
+	rect.bottom =  h;
+	MoveWindow(hWnd, rect.left, rect.top, rect.right, rect.bottom,false);
 }

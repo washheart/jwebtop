@@ -534,6 +534,11 @@ const std::string  jsCode = "var JWebTop;"
 "  };"
 "})();";
 // Client app implementation for the renderer process.
+
+class JJSHandler{
+
+};
+
 class JWebTopJSHandler : public CefV8Handler {
 public:
 	virtual bool Execute(const CefString& name,

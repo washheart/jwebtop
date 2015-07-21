@@ -21,7 +21,7 @@ CefString JWebTopConfigs::getAbsolutePath(std::wstring relativePath){
 }
 
 JWebTopConfigs loadConfigs(std::wstring appDefFile){
-#ifdef WebTopLog
+#ifdef JWebTopLog
 	writeLog(L"appDefFile=====" + appDefFile + L"\r\n");
 #endif
 	JWebTopConfigs configs = JWebTopConfigs();
@@ -43,7 +43,7 @@ JWebTopConfigs loadConfigs(std::wstring appDefFile){
 	configs.x = GetPrivateProfileInt(L"BASE", L"x", -1, appDefFile.data());
 	configs.y = GetPrivateProfileInt(L"BASE", L"y", -1, appDefFile.data());
 	configs.enableDrag = 1 == GetPrivateProfileInt(L"BASE", L"enableDrag", 1, appDefFile.data());        // 默认可以通过页面进行拖动
-	configs.disableRefresh = 1 == GetPrivateProfileInt(L"BASE", L"disableRefresh", 0, appDefFile.data());// 默认禁止刷新
+	configs.disableRefresh = 0 == GetPrivateProfileInt(L"BASE", L"disableRefresh", 0, appDefFile.data());// 默认禁止刷新
 	configs.enableDebug = 0 == GetPrivateProfileInt(L"BASE", L"disableDevelop", 1, appDefFile.data());   // 默认不可以调试
 	configs.enableResize = 1 == GetPrivateProfileInt(L"BASE", L"enableResize", 1, appDefFile.data());    // 默认可以改变大小
 	//disableTransparent = 1==GetPrivateProfileInt(L"BASE", L"disableTransparent", 0, appDefFile.data());

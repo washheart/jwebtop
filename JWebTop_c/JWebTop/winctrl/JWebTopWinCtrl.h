@@ -23,4 +23,5 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser,JWebTopConfigs configs);
 
+void setSize(HWND hWnd, int w, int h);
 #endif

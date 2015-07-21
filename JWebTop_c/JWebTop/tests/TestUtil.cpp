@@ -1,4 +1,4 @@
-#ifdef WebTopLog
+#ifdef JWebTopLog
 #include "TestUtil.h"
 #include <Windows.h>
 #include <string>

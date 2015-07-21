@@ -13,6 +13,8 @@
 
 #include "JWebTop\winctrl\JWebTopWinCtrl.h"
 #include "JWebTop\winctrl\JWebTopConfigs.h"
+#include "JWebTop/tests/TestUtil.h"
+using namespace std;
 
 JWebTopHandler::JWebTopHandler()
     : is_closing_(false) {
@@ -83,6 +85,23 @@ void JWebTopHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
   frame->LoadString(ss.str(), failedUrl);
 }
 
+void JWebTopHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	int httpStatusCode){
+	stringstream extensionCode;
+	CefRefPtr<CefBrowserHost> host = browser->GetHost();
+	HWND hwnd = host->GetWindowHandle();
+	extensionCode << "if(JWebTop)JWebTop.handler=0x" << hwnd << ";";
+	extensionCode << "var e = new CustomEvent('AlloyDesktopReady');"<<"setTimeout('dispatchEvent(e);',0);" << endl;
+	extensionCode << "var handler=0x" << hwnd << ";";
+	//frame->ExecuteJavaScript(ss.str(), "", 0);
+
+#ifdef JWebTopLog
+	writeLog(L"在OnContextCreated方法中执行JS\r\n\t");
+	writeLog(extensionCode.str());
+#endif
+	frame->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+}
 void JWebTopHandler::CloseAllBrowsers(bool force_close) {
   if (!CefCurrentlyOn(TID_UI)) {
     // Execute on the UI thread.

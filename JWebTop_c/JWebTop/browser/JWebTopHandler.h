@@ -40,7 +40,10 @@ public:
 		CefRefPtr<CefFrame> frame,
 		ErrorCode errorCode,
 		const CefString& errorText,
-		const CefString& failedUrl) OVERRIDE;
+		const CefString& failedUrl) OVERRIDE;  
+	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		int httpStatusCode);
 
 	// Request that all existing browser windows close.
 	void CloseAllBrowsers(bool force_close);

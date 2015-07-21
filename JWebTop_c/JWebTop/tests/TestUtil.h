@@ -1,4 +1,4 @@
-#ifdef WebTopLog
+#ifdef JWebTopLog
 #ifndef __TESTS_H__
 #define __TESTS_H__
 #include <string>

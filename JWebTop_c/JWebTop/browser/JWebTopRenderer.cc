@@ -7,6 +7,7 @@
 #include "JWebTopRenderer.h"
 #include "JWebTop/handler/JWebTopJSHanlder.h"
 #include "include/base/cef_logging.h"
+#include "JWebTop/tests/TestUtil.h"
 
 JWebTopRender::JWebTopRender() {
 }
@@ -20,21 +21,6 @@ void JWebTopRender::OnRenderThreadCreated(
     (*it)->OnRenderThreadCreated(this, extra_info);
 }
 
-void initCallBack(){
-	std::string extensionCode =
-		"var jwebtop;if(!jwebtop)jwebtop = {}; "
-		"(function() {"
-		" jwebtop.myval = 'My Value!'; "
-		"})(); ";
-	//std::string extensionCode = "var jwebtop;if(!jwebtop)jwebtop = {};";
-	CefRegisterExtension("jwebtop", extensionCode, NULL);
-}
-void JWebTopRender::OnWebKitInitialized() {
-  DelegateSet::iterator it = delegates_.begin();
-  for (; it != delegates_.end(); ++it)
-    (*it)->OnWebKitInitialized(this);
-  initCallBack();
-}
 
 void JWebTopRender::OnBrowserCreated(CefRefPtr<CefBrowser> browser) {
   DelegateSet::iterator it = delegates_.begin();
@@ -72,19 +58,32 @@ bool JWebTopRender::OnBeforeNavigation(CefRefPtr<CefBrowser> browser,
 
   return false;
 }
+
+void initCallBack(){
+#ifdef JWebTopLog
+	writeLog(L"在initCallBack方法中执行JS");
+	writeLog(jsCode);
+#endif
+	CefRegisterExtension("jwebtop", jsCode, new JWebTopJSHandler());
+	//std::string extensionCode =
+	//	"var jwebtop;if(!jwebtop)jwebtop = {}; "
+	//	"(function() {"
+	//	" jwebtop.myval = 'My Value!'; "
+	//	"})(); ";
+	//CefRegisterExtension("jwebtop", jsCode,NULL);
+}
+void JWebTopRender::OnWebKitInitialized() {
+	DelegateSet::iterator it = delegates_.begin();
+	for (; it != delegates_.end(); ++it)
+		(*it)->OnWebKitInitialized(this);
+	initCallBack();
+}
 void JWebTopRender::OnContextCreated(CefRefPtr<CefBrowser> browser,
                                          CefRefPtr<CefFrame> frame,
                                          CefRefPtr<CefV8Context> context) {
   DelegateSet::iterator it = delegates_.begin();
   for (; it != delegates_.end(); ++it)
 	  (*it)->OnContextCreated(this, browser, frame, context);
-  CefRefPtr<CefV8Value> object = context->GetGlobal();
-  CefRefPtr<CefV8Handler> handler2 = new JWebTopJSHandler();
-  CefRefPtr<CefV8Value> func2 = CefV8Value::CreateFunction("ctrlwin", handler2);
-  object->SetValue("ctrlwin", func2, V8_PROPERTY_ATTRIBUTE_NONE);
-  object->SetValue("myjs", CefV8Value::CreateFunction("myjs", handler2), V8_PROPERTY_ATTRIBUTE_NONE);
-  object->SetValue("showDevTools", CefV8Value::CreateFunction("showDevTools", handler2), V8_PROPERTY_ATTRIBUTE_NONE);
-  //initCallBack();// 在这里加入，会导致程序崩溃
 }
 
 void JWebTopRender::OnContextReleased(CefRefPtr<CefBrowser> browser,

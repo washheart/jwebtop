@@ -6,3 +6,4 @@ enableDrag=1
 name=╡Бйтобжпнд
 style=369819648
 exStyle=128
+disableDevelop=0
