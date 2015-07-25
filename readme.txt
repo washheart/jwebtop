@@ -1,4 +1,5 @@
 （当前版本有很多JS函数尚未增加，有些例子跑不起来，若要看例子，请获取JWebTop1.0分支）
+（另外，Debug和Release文件太大，青岛Q群[JWebTop:385365532]下载）
 Use JNI to connect Java and WebTop(base on cef).
 通过JNI连接Java和webtop（基于CEF）。QQ群：JWebTop 385365532。
 
