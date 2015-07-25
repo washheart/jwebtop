@@ -159,16 +159,16 @@ void setSize2(HWND hWnd, int w, int h){
 }
 
 namespace jw{
-	void setTitle(HWND hWnd,wstring title){
+	void setTitle(HWND hWnd, wstring title){
 		SetWindowText(hWnd, title.c_str());
+	}
+	wstring getTitle(HWND hWnd){
+		TCHAR title[1000];// 声明并初始化
+		::GetWindowText(hWnd, title, sizeof(title));// 获取窗口名称
+		return title;
 	}
 
 	void setSize(HWND hWnd, int w, int h){
-	/*	RECT rect;
-		::GetWindowRect(hWnd, &rect);
-		rect.right = w;
-		rect.bottom = h;*/
-		//::MoveWindow(hWnd, rect.left, rect.top, rect.right, rect.bottom, true);
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);// 只改变窗口大小，不改变窗口坐标和窗口所在层次
 	}
 	void move(HWND hWnd, int x, int y){

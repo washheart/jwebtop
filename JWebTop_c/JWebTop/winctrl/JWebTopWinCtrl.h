@@ -31,6 +31,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser,JWebTopConfigs configs);
 // 
 namespace jw{
 	void setTitle(HWND hWnd, std::wstring title);
+	std::wstring getTitle(HWND hWnd);
 	void move(HWND hWnd, int x, int y);
 	void setSize(HWND hWnd, int w, int h);
 	void setBound(HWND hWnd, int x, int y, int w, int h);

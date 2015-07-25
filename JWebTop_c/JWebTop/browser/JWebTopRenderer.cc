@@ -5,7 +5,7 @@
 #include <string>
 
 #include "JWebTopRenderer.h"
-#include "JWebTop/handler/JWebTopJSHanlder.h"
+#include "JWebTop/jshandler/JWebTopJSHanlder.h"
 #include "include/base/cef_logging.h"
 #include "JWebTop/tests/TestUtil.h"
 

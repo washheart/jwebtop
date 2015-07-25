@@ -158,7 +158,7 @@
     <ClCompile Include="browser\JWebTopCommons.cpp" />
     <ClCompile Include="browser\JWebTopClient.cc" />
     <ClCompile Include="browser\JWebTopRenderer.cc" />
-    <ClCompile Include="handler\JWebTopJSHanlder.cpp" />
+    <ClCompile Include="jshandler\JWebTopJSHanlder.cpp" />
     <ClCompile Include="JWebTop_main.cpp" />
     <ClCompile Include="tests\TestUtil.cpp" />
     <ClCompile Include="util\StrUtil.cpp" />
@@ -170,7 +170,8 @@
     <ClInclude Include="browser\JWebTopCommons.h" />
     <ClInclude Include="browser\JWebTopClient.h" />
     <ClInclude Include="browser\JWebTopRenderer.h" />
-    <ClInclude Include="handler\JWebTopJSHanlder.h" />
+    <ClInclude Include="jshandler\JJH_Windows.h" />
+    <ClInclude Include="jshandler\JWebTopJSHanlder.h" />
     <ClInclude Include="tests\TestUtil.h" />
     <ClInclude Include="util\StrUtil.h" />
     <ClInclude Include="winctrl\JWebTopConfigs.h" />
