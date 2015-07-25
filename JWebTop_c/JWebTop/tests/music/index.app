@@ -2,6 +2,8 @@
 url=index.html
 x=100
 y=100
+width=370
+height=180
 enableDrag=1
 name=╡Бйтобжпнд
 style=369819648

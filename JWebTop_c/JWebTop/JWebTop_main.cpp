@@ -59,7 +59,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	// 对CEF进行一些设置
 	CefString(&settings.cache_path) = L"data/browser"; // 配置缓存目录（包括WebSQL和IndexDB的数据库位置）
 	settings.log_severity = LOGSEVERITY_DISABLE;       // 配置日志级别：关闭日志
-	//settings.single_process = true;				   // 设置后browser和render会合并为一个进程（不稳定？）
+	settings.single_process = true;				   // 设置后browser和render会合并为一个进程（不稳定？）
 	CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
 	// Run the CEF message loop. This will block until CefQuitMessageLoop() is called.
 	CefRunMessageLoop();

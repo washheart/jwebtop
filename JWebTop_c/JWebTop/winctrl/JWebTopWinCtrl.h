@@ -35,5 +35,7 @@ namespace jw{
 	void move(HWND hWnd, int x, int y);
 	void setSize(HWND hWnd, int w, int h);
 	void setBound(HWND hWnd, int x, int y, int w, int h);
+	RECT getBound(HWND hWnd);
+	void close(HWND hWnd);
 }
 #endif

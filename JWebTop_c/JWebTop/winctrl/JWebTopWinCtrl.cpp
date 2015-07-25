@@ -168,14 +168,26 @@ namespace jw{
 		return title;
 	}
 
+	void move(HWND hWnd, int x, int y){
+		::SetWindowPos(hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING);// 移动窗口，但不改变窗口大小和窗口所在层次
+	}
+
 	void setSize(HWND hWnd, int w, int h){
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);// 只改变窗口大小，不改变窗口坐标和窗口所在层次
 	}
-	void move(HWND hWnd, int x, int y){
-		::SetWindowPos(hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING);// 移动窗口，但不改变窗口大小和窗口所在层次
 
-	}
 	void setBound(HWND hWnd, int x, int y, int w, int h){
 		::MoveWindow(hWnd, x, y, w, h, false);
+	}
+	RECT getBound(HWND hWnd){
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		return rt;
+	}
+	void close(HWND hWnd){
+		//BrowserWindowInfos.g
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		//bw->browser->GetMainFrame()->
+		bw->browser->GetHost()->CloseBrowser(true);
 	}
 }

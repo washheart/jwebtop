@@ -32,4 +32,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "move", new JJH_Move());
 	regist(jWebTop, "setTitle", new JJH_SetTitle());
 	regist(jWebTop, "getTitle", new JJH_GetTitle());
+	regist(jWebTop, "setBound", new JJH_SetBound());
+	regist(jWebTop, "getBound", new JJH_GetBound());
+	regist(jWebTop, "close", new JJH_Close());
 }
