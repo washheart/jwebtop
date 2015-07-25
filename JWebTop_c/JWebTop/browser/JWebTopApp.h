@@ -5,7 +5,7 @@
 #include "include/cef_app.h"
 #include "JWebTopRenderer.h"
 
-class JWebTopBrowser : public CefApp,
+class JWebTopApp : public CefApp,
 	public CefBrowserProcessHandler {
 public:
 	// CefApp methods:
@@ -23,7 +23,7 @@ public:
 	virtual void OnContextInitialized() OVERRIDE;
 
 private:
-	 IMPLEMENT_REFCOUNTING(JWebTopBrowser);
+	 IMPLEMENT_REFCOUNTING(JWebTopApp);
 };
 
 #endif  // CEF_JWEBTOP_APP_H_

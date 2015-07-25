@@ -154,7 +154,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="browser\JWebTopBrowser.cpp" />
+    <ClCompile Include="browser\JWebTopApp.cpp" />
     <ClCompile Include="browser\JWebTopCommons.cpp" />
     <ClCompile Include="browser\JWebTopHandler.cc" />
     <ClCompile Include="browser\JWebTopRenderer.cc" />
@@ -166,7 +166,7 @@
     <ClCompile Include="winctrl\JWebTopWinCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="browser\JWebTopBrowser.h" />
+    <ClInclude Include="browser\JWebTopApp.h" />
     <ClInclude Include="browser\JWebTopCommons.h" />
     <ClInclude Include="browser\JWebTopHandler.h" />
     <ClInclude Include="browser\JWebTopRenderer.h" />

@@ -4,7 +4,7 @@
 
 #include <windows.h>
 
-#include "browser/JWebTopBrowser.h"
+#include "browser/JWebTopApp.h"
 #include "include/cef_sandbox_win.h"
 
 #if defined(CEF_USE_SANDBOX)
@@ -38,7 +38,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
 	// SimpleApp implements application-level callbacks. It will create the first
 	// browser instance in OnContextInitialized() after CEF has initialized.
-	CefRefPtr<JWebTopBrowser> app(new JWebTopBrowser);
+	CefRefPtr<JWebTopApp> app(new JWebTopApp);
 
 	// CEF applications have multiple sub-processes (render, plugin, GPU, etc)
 	// that share the same executable. This function checks the command-line and,
