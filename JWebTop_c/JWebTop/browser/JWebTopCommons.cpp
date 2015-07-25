@@ -1,20 +1,13 @@
 #include "JWebTopCommons.h"
-#include "JWebTopHandler.h"
+#include "JWebTopClient.h"
 #include "include/cef_browser.h"
-#include "include/cef_command_line.h"
 #include "include/wrapper/cef_helpers.h"
 #include <string>
-#include <io.h>
-#include <tchar.h>
-#include <Windows.h>
-#include <atlconv.h>
-#include <atlbase.h>
-#include "JWebTop/util/StrUtil.h"
 using namespace std;
 
 
-CefRefPtr<JWebTopHandler> g_handler;// 全局保留一个JWebTopHandler即可
-// 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopHandler传递参数，（因为JWebTopHandler是全局唯一实例）使用后置空
+CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
+// 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
 JWebTopConfigs  tmpConfigs;
 
 extern LPTSTR g_lpCmdLine;// 
@@ -49,7 +42,7 @@ void createNewBrowser(JWebTopConfigs configs){
 	// On Windows we need to specify certain flags that will be passed to
 	window_info.SetAsPopup(NULL, configs.name);
 #endif
-	if (g_handler == NULL)g_handler = new JWebTopHandler();
+	if (g_handler == NULL)g_handler = new JWebTopClient();
 	CefBrowserSettings browser_settings;
 	//window_info.window_name = UUID::Data1();// 用UUID作为窗口名称，建立窗口名与JWebTopConfigs的关联？？？
 	tmpConfigs = configs;

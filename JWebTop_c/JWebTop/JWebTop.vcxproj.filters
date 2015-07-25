@@ -33,9 +33,6 @@
     <ClCompile Include="browser\JWebTopRenderer.cc">
       <Filter>jwebtop\browser</Filter>
     </ClCompile>
-    <ClCompile Include="browser\JWebTopHandler.cc">
-      <Filter>jwebtop\browser</Filter>
-    </ClCompile>
     <ClCompile Include="winctrl\JWebTopConfigs.cpp">
       <Filter>jwebtop\winctrl</Filter>
     </ClCompile>
@@ -51,6 +48,9 @@
     <ClCompile Include="browser\JWebTopApp.cpp">
       <Filter>jwebtop\browser</Filter>
     </ClCompile>
+    <ClCompile Include="browser\JWebTopClient.cc">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="handler\JWebTopJSHanlder.h">
@@ -58,9 +58,6 @@
     </ClInclude>
     <ClInclude Include="winctrl\JWebTopWinCtrl.h">
       <Filter>jwebtop\winctrl</Filter>
-    </ClInclude>
-    <ClInclude Include="browser\JWebTopHandler.h">
-      <Filter>jwebtop\browser</Filter>
     </ClInclude>
     <ClInclude Include="browser\JWebTopRenderer.h">
       <Filter>jwebtop\browser</Filter>
@@ -78,6 +75,9 @@
       <Filter>jwebtop\tests</Filter>
     </ClInclude>
     <ClInclude Include="browser\JWebTopApp.h">
+      <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopClient.h">
       <Filter>jwebtop\browser</Filter>
     </ClInclude>
   </ItemGroup>

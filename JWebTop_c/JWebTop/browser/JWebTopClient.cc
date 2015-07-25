@@ -2,7 +2,7 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
-#include "JWebTopHandler.h"
+#include "JWebTopClient.h"
 
 #include <sstream>
 #include <string>
@@ -15,30 +15,30 @@
 #include "JWebTop/tests/TestUtil.h"
 using namespace std;
 
-JWebTopHandler::JWebTopHandler()
+JWebTopClient::JWebTopClient()
 : is_closing_(false) {
 }
 
-JWebTopHandler::~JWebTopHandler() {
+JWebTopClient::~JWebTopClient() {
 }
 
 extern HANDLE hFile;
 extern DWORD filePos;
 class DEBUG_Handler1 : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler1); };
-// 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopHandler传递参数，（因为JWebTopHandler是全局唯一实例）使用后置空
+// 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
 extern JWebTopConfigs  tmpConfigs;
-void JWebTopHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
+void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	browser_list_.push_back(browser);// 记录下已经创建的窗口来
 	renderBrowserWindow(browser, tmpConfigs);
 #ifdef JWebTopLog
-	writeLog("===JWebTopHandler-------------------------OnAfterCreated\r\n");
+	writeLog("===JWebTopClient-------------------------OnAfterCreated\r\n");
 	CefWindowInfo windowInfo;
 	windowInfo.SetAsPopup(NULL, "cef_debug");
 	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler1(), CefBrowserSettings(), CefPoint());
 #endif
 }
 
-bool JWebTopHandler::DoClose(CefRefPtr<CefBrowser> browser) {
+bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 
 	// Closing the main window requires special handling. See the DoClose()
@@ -54,7 +54,7 @@ bool JWebTopHandler::DoClose(CefRefPtr<CefBrowser> browser) {
 	return false;
 }
 
-void JWebTopHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
+void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	// Remove from the list of existing browsers.
 	BrowserList::iterator bit = browser_list_.begin();
@@ -69,7 +69,7 @@ void JWebTopHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	}
 }
 
-void JWebTopHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
+void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	ErrorCode errorCode,
 	const CefString& errorText,
@@ -89,7 +89,7 @@ void JWebTopHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 }
 
 
-void JWebTopHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
+void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	int httpStatusCode){
 	stringstream extensionCode;
@@ -101,10 +101,10 @@ void JWebTopHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	frame->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
 
-void JWebTopHandler::CloseAllBrowsers(bool force_close) {
+void JWebTopClient::CloseAllBrowsers(bool force_close) {
 	if (!CefCurrentlyOn(TID_UI)) {
 		// Execute on the UI thread.
-		CefPostTask(TID_UI, base::Bind(&JWebTopHandler::CloseAllBrowsers, this, force_close));
+		CefPostTask(TID_UI, base::Bind(&JWebTopClient::CloseAllBrowsers, this, force_close));
 		return;
 	}
 	if (browser_list_.empty()) return;

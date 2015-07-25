@@ -8,14 +8,14 @@
 #include "JWebTop/winctrl/JWebTopConfigs.h"
 #include <list>
 
-class JWebTopHandler : public CefClient,
+class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
 	//public CefKeyboardHandler,
 	public CefLoadHandler {
 public:
-	JWebTopHandler();
-	~JWebTopHandler();
+	JWebTopClient();
+	~JWebTopClient();
 
 	// CefClient methods:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE{
@@ -70,7 +70,7 @@ private:
 	bool is_closing_;
 
 	// Include the default reference counting implementation.
-	IMPLEMENT_REFCOUNTING(JWebTopHandler);
+	IMPLEMENT_REFCOUNTING(JWebTopClient);
 };
 
 #endif  // CEF_JWEBTOP_BROWSER_HANDLER_H_
