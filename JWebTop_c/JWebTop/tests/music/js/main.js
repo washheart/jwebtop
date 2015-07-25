@@ -426,12 +426,19 @@ time.onclick=function(){
 	return false;
 }
 var readyHandler=function(){
-	AlloyDesktop=JWebTop;
 	AlloyDesktop.move(100,100);
 	AlloyDesktop.setSize(270,80);
 	setTimeout('AlloyDesktop.toImage("screen.png")',2000);
 }
+
 addEventListener("AlloyDesktopReady",readyHandler);
-closeBtn.onclick=function(){
+	closeBtn.onclick=function(){
 	AlloyDesktop.close();
 }
+
+// 兼容之前的AlloyDesktop函数和事件
+addEventListener("JWebTopReady",function(){	
+	AlloyDesktop=JWebTop;
+	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
+	JWebTop.setTitle("12345678");
+});

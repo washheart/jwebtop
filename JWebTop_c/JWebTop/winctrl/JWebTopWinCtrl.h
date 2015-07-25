@@ -1,6 +1,12 @@
 #ifndef CEF_JWEBTOP_WIN_CTRL_H_
 #define CEF_JWEBTOP_WIN_CTRL_H_
-#include "include\cef_client.h"
+#include <sstream>
+#include <string>
+//#include "include\cef_client.h"
+#include "include/cef_browser.h"
+#include "include/cef_resource_handler.h"
+#include "include/cef_request.h"
+#include "include/wrapper/cef_message_router.h"
 #include "JWebTopConfigs.h"
 
 class BrowserWindowInfo{
@@ -22,6 +28,11 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser,JWebTopConfigs configs);
-
-void setSize(HWND hWnd, int w, int h);
+// 
+namespace jw{
+	void setTitle(HWND hWnd, std::wstring title);
+	void move(HWND hWnd, int x, int y);
+	void setSize(HWND hWnd, int w, int h);
+	void setBound(HWND hWnd, int x, int y, int w, int h);
+}
 #endif

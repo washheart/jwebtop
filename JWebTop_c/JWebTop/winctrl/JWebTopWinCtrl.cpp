@@ -1,7 +1,5 @@
 #include "JWebTopWinCtrl.h"
 
-#include <sstream>
-#include <string>
 #include "JWebTop/browser/JWebTopCommons.h"
 #include "JWebTop/util/StrUtil.h"
 #include "JWebTop/tests/TestUtil.h"
@@ -32,14 +30,15 @@ class DEBUG_Handler : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler); };
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
-	stringstream sss;
-	sss << "mid [x=" << message << ",bwInfo=" << bwInfo << "]" << "\r\n";
-	writeLog(sss.str());
 	switch (message) {
 		//case WM_CLOSE:case WM_RBUTTONDOWN:case WM_LBUTTONDOWN:break;// 窗口创建/销毁、鼠标左右键按下监听不到，需要通过PARENTNOTIFY方式
 	case WM_PARENTNOTIFY:
 	{
-
+#ifdef JWebTopLog
+							stringstream sss;
+							sss << "mid WM_PARENTNOTIFY[wParam=" << wParam << ",lParam=" << lParam << "]" << "\r\n";
+							writeLog(sss.str());
+#endif
 							UINT msg2 = LOWORD(wParam);
 							// 如果有多个的话可以考虑用switch方式
 							if (msg2 == WM_LBUTTONDOWN){
@@ -98,14 +97,6 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
 	bool changed = false;
-#ifdef JWebTopLog
-	stringstream ss;
-	DWORD dd = WS_OVERLAPPED | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	ss << "可以用在配置参数上：dwStyle=" << dd << "\r\n";
-	DWORD dx = WS_EX_TOOLWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR;
-	ss << "可以用在配置参数上：dwExStyle===" << dx << "\r\n";
-	writeLog(ss.str());
-#endif 
 	//根据配置信息对窗口重新进行装饰(url、title在createBrower时处理了）
 	if (configs.dwStyle != 0){
 		DWORD dwStyle = winInfo.dwStyle;
@@ -148,16 +139,43 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 		bwInfo->configs = configs;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 	}
+#ifdef JWebTopLog
+	stringstream ss;
+	ss << "hWnd===" << hWnd << ",bWnd=" << bWnd << ",rWnd=<<" << GetNextWindow(bWnd, GW_CHILD) //
+		<< ",pWnd=" << ::GetAncestor(browser->GetHost()->GetWindowHandle(), GA_ROOT)
+		<< ",aWnd1=" << ::GetAncestor(hWnd, GA_ROOT)
+		<< ",aWnd2=" << ::GetAncestor(bWnd, GA_ROOT)
+		<< "\r\n";
+	writeLog(ss.str());
+#endif 
 }
 
-void setSize(HWND hWnd, int w, int h){
-	//WINDOWINFO winInfo;
-	//GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
+void setSize2(HWND hWnd, int w, int h){
 	RECT rect;
 	GetWindowRect(hWnd, &rect);
-	//rect.right = rect.left + w;
-	//rect.bottom = rect.top + h;
-	rect.right =  w;
-	rect.bottom =  h;
-	MoveWindow(hWnd, rect.left, rect.top, rect.right, rect.bottom,false);
+	rect.right = w;
+	rect.bottom = h;
+	MoveWindow(hWnd, rect.left, rect.top, rect.right, rect.bottom, false);
+}
+
+namespace jw{
+	void setTitle(HWND hWnd,wstring title){
+		SetWindowText(hWnd, title.c_str());
+	}
+
+	void setSize(HWND hWnd, int w, int h){
+	/*	RECT rect;
+		::GetWindowRect(hWnd, &rect);
+		rect.right = w;
+		rect.bottom = h;*/
+		//::MoveWindow(hWnd, rect.left, rect.top, rect.right, rect.bottom, true);
+		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);// 只改变窗口大小，不改变窗口坐标和窗口所在层次
+	}
+	void move(HWND hWnd, int x, int y){
+		::SetWindowPos(hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING);// 移动窗口，但不改变窗口大小和窗口所在层次
+
+	}
+	void setBound(HWND hWnd, int x, int y, int w, int h){
+		::MoveWindow(hWnd, x, y, w, h, false);
+	}
 }
