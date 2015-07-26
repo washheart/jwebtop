@@ -8,6 +8,7 @@
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
 
 // JJH=JWebTop JavaScriptHandler
+
 //getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 class JJH_GetPos : public CefV8Handler {
 public:

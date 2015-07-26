@@ -19,15 +19,18 @@ HWND getHWND(CefRefPtr<CefV8Value> object/*JS对象*/, const CefV8ValueList& argum
 void regist(const CefRefPtr<CefV8Value> jWebTop, const CefString& fn, CefRefPtr<CefV8Handler> handler){
 	jWebTop->SetValue(fn, CefV8Value::CreateFunction(fn, handler), V8_PROPERTY_ATTRIBUTE_NONE);
 }
+
+extern  bool g_single_process;
 void regist(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	CefRefPtr<CefV8Context> context){
+
 	CefRefPtr<CefV8Value> object = context->GetGlobal();
 	// 尝试添加自定义对象
 	CefRefPtr<CefV8Accessor> accessor;// 有必要的话，可以扩展该类
 	CefRefPtr<CefV8Value> jWebTop = object->CreateObject(accessor);
 	object->SetValue("JWebTop", jWebTop, V8_PROPERTY_ATTRIBUTE_NONE);// 把创建的对象附加到V8根对象上
-	// 
+
 
 	regist(jWebTop, "getPos", new JJH_GetPos());//getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 	regist(jWebTop, "setSize", new JJH_SetSize());//setSize(x, y, handler);//设置窗口大小
@@ -46,11 +49,19 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "mini", new JJH_Mini());	          // mini(hander);//最小化窗口
 	regist(jWebTop, "restore", new JJH_Restore());	      // restore(handler);//还原窗口，对应于hide函数
 	regist(jWebTop, "setTopMost", new JJH_SetTopMost());  // setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
-	regist(jWebTop, "close", new JJH_Close());            // close(handler);// 关闭窗口
 
 	regist(jWebTop, "setWindowStyle", new JJH_SetWindowStyle());	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
-	regist(jWebTop, "loadUrl", new JJH_LoadUrl());	//loadUrl(url, handler);//加载网页，url为网页路径
-	regist(jWebTop, "reload", new JJH_Reload());	//reload(handler);//重新加载当前页面
-	regist(jWebTop, "reloadIgnoreCache", new JJH_ReloadIgnoreCache());	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
-	regist(jWebTop, "showDev", new JJH_ShowDev());	//showDev(handler);//打开开发者工具
+	// 
+	//std::stringstream ss;
+	//ss << "window.g_single_process=" << g_single_process;
+	//frame->ExecuteJavaScript(CefString(ss.str()), L"", 0);
+	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
+	// 多进程模式要通过消息传递数据，参见JWebTopClient#OnAfterCreated
+	if (g_single_process){
+		regist(jWebTop, "close", new JJH_Close());      // close(handler);// 关闭窗口
+		regist(jWebTop, "loadUrl", new JJH_LoadUrl());	//loadUrl(url, handler);//加载网页，url为网页路径
+		regist(jWebTop, "reload", new JJH_Reload());	//reload(handler);//重新加载当前页面
+		regist(jWebTop, "reloadIgnoreCache", new JJH_ReloadIgnoreCache());	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
+		regist(jWebTop, "showDev", new JJH_ShowDev());	//showDev(handler);//打开开发者工具
+	}
 }

@@ -4,6 +4,9 @@
 #include "include/wrapper/cef_helpers.h"
 #include <string>
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
+#include  "JWebTop/json/json.h"
+#include "JWebTop/util/StrUtil.h"
+
 using namespace std;
 
 const char kTestMessageName[] = "close";
@@ -16,16 +19,34 @@ namespace jc/*jc=JWebTop Client*/{
 		virtual bool OnQuery(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id,
 			const CefString& request,// request为消息JSON对象{request:msg}的msg部分（可以扩展一个JSON工具来进行解析）【解析代码：cef_message_router.cc=》CefMessageRouterRendererSideImpl】
 			bool persistent, CefRefPtr<Callback> callback) OVERRIDE{
+			stringstream jsons;
+			jsons << wch2chr(request.ToWString().c_str());
+
+			Json::Reader reader;
+			Json::Value value;
+			if (!reader.parse(jsons, value))return false;
+			string methodName = value["m"].asString();
+			if (methodName == "close"){
+				Json::Value handler=value["handler"];
+				if (handler == NULL)return false;
+				jw::close((HWND)handler.asInt());
+			}
+			else if (methodName == "loadUrl"){
+				Json::Value handler = value["handler"];
+				if (handler == NULL)return false;
+				Json::Value url = value["url"];
+				if (url == NULL)return false;
+				jw::loadUrl((HWND)handler.asInt(), chr2wch(url.asString().c_str()));
+			}
+			string name = value["name"].asString();
+			//CefRefPtr<CefValue> json = CefParseJSON(request, NULL);
 			//// 解析以逗号分隔的其他参数
 			//const std::string& message_name = request;
 			//std::vector<int> vec;
 			//const std::string& vals = message_name.substr(sizeof(kTestMessageName));std::stringstream ss(vals);int i;
 			//while (ss >> i) {vec.push_back(i);if (ss.peek() == ',')ss.ignore();}
 			//jw::close((HWND)vec[0]);// 这种方式，获取到的BrowerWindowInfo也是NULL（很奇怪）
-			if (request == "close"){
-				callback.get()->Success(L"Close Ok!");
-				browser->GetHost()->CloseBrowser(true);// 关闭浏览器
-			}
+			
 			return true;
 		}
 	};

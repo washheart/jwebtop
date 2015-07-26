@@ -6,13 +6,13 @@
 
 #include <sstream>
 #include <string>
-
 #include "include/cef_app.h"
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
 #include "JWebTop/tests/TestUtil.h"
 #include "JWebTopCommons.h"
+
 using namespace std;
 
 JWebTopClient::JWebTopClient()
@@ -22,8 +22,7 @@ JWebTopClient::JWebTopClient()
 JWebTopClient::~JWebTopClient() {
 }
 
-extern HANDLE hFile;
-extern DWORD filePos;
+extern bool g_single_process;
 // 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
 extern JWebTopConfigs  tmpConfigs;
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
@@ -43,15 +42,6 @@ void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	MessageHandlerSet::const_iterator it = message_handler_set_.begin();
 	for (; it != message_handler_set_.end(); ++it)
 		message_router_->AddHandler(*(it), false);
-
-	// 添加JWebTop对象的handler属性和close方法
-	stringstream extensionCode;
-	CefRefPtr<CefBrowserHost> host = browser->GetHost();
-	HWND hwnd = host->GetWindowHandle();
-	extensionCode << "if(!JWebTop)JWebTop={};";
-	extensionCode << "JWebTop.handler=" << (LONG)hwnd << ";" << endl;
-	//extensionCode << "JWebTop.close=function(){window.cefQuery({request:\"close\"})};" << endl;// 按发送消息的方式注册close函数到JWebTop对象，这种没有直接注册使用快捷
-	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
 
 bool JWebTopClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
@@ -143,8 +133,26 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	int httpStatusCode){
-	// 页面加载后，触发JWebTopReady消息
+	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
 	stringstream extensionCode;
+	CefRefPtr<CefBrowserHost> host = browser->GetHost();
+	HWND hwnd = host->GetWindowHandle();
+	extensionCode << "if(!JWebTop)JWebTop={};";
+	extensionCode << "JWebTop.handler=" << (LONG)hwnd << ";" << endl;
+	extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
+	if (!g_single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
+		// close(handler);// 关闭窗口
+		extensionCode << "JWebTop.close=function(handler){JWebTop.cefQuery({m:'close',handler:(handler?handler:JWebTop.handler)})};" << endl;
+		//loadUrl(url, handler);//加载网页，url为网页路径
+		extensionCode << "JWebTop.loadUrl=function(url,handler){JWebTop.cefQuery({m:'loadUrl',url:url,handler:(handler?handler:JWebTop.handler)})};" << endl;
+		//reload(handler);//重新加载当前页面
+		extensionCode << "JWebTop.reload=function(handler){JWebTop.cefQuery({m:'reload',handler:(handler?handler:JWebTop.handler)})};" << endl;
+		//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
+		extensionCode << "JWebTop.reloadIgnoreCache=function(handler){JWebTop.cefQuery({m:'reloadIgnoreCache',handler:(handler?handler:JWebTop.handler)})};" << endl;
+		//showDev(handler);//打开开发者工具
+		extensionCode << "JWebTop.showDev=function(){JWebTop.cefQuery({m:'showDev',handler:JWebTop.handler})};" << endl;
+	}
+	// 页面加载后，触发JWebTopReady消息
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
