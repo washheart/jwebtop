@@ -56,9 +56,6 @@
     <ClInclude Include="winctrl\JWebTopWinCtrl.h">
       <Filter>jwebtop\winctrl</Filter>
     </ClInclude>
-    <ClInclude Include="browser\JWebTopRenderer.h">
-      <Filter>jwebtop\browser</Filter>
-    </ClInclude>
     <ClInclude Include="winctrl\JWebTopConfigs.h">
       <Filter>jwebtop\winctrl</Filter>
     </ClInclude>

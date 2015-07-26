@@ -432,7 +432,7 @@ var readyHandler=function(){
 }
 
 addEventListener("AlloyDesktopReady",readyHandler);
-	closeBtn.onclick=function(){
+closeBtn.onclick=function(){
 	AlloyDesktop.close();
 }
 
@@ -440,5 +440,4 @@ addEventListener("AlloyDesktopReady",readyHandler);
 addEventListener("JWebTopReady",function(){	
 	AlloyDesktop=JWebTop;
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
-	JWebTop.setTitle("12345678");
 });

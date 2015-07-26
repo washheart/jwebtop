@@ -10,9 +10,9 @@
 #include "include/cef_app.h"
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
-
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
 #include "JWebTop/tests/TestUtil.h"
+#include "JWebTopCommons.h"
 using namespace std;
 
 JWebTopClient::JWebTopClient()
@@ -36,6 +36,59 @@ void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	windowInfo.SetAsPopup(NULL, "cef_debug");
 	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler1(), CefBrowserSettings(), CefPoint());
 #endif
+
+	CefMessageRouterConfig config;
+	message_router_ = CefMessageRouterBrowserSide::Create(config);
+	// Register handlers with the router.
+	jc::CreateMessageHandlers(message_handler_set_);
+	MessageHandlerSet::const_iterator it = message_handler_set_.begin();
+	for (; it != message_handler_set_.end(); ++it)
+		message_router_->AddHandler(*(it), false);
+
+	// 添加JWebTop对象的handler属性和close方法
+	stringstream extensionCode;
+	CefRefPtr<CefBrowserHost> host = browser->GetHost();
+	HWND hwnd = host->GetWindowHandle();
+	extensionCode << "if(!JWebTop)JWebTop={};";
+	extensionCode << "JWebTop.handler=" << (LONG)hwnd << ";" << endl;
+	extensionCode << "JWebTop.close=function(){window.cefQuery({request:\"close\"})};" << endl;
+	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+}
+
+bool JWebTopClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	CefRefPtr<CefRequest> request,
+	bool is_redirect) {
+	CEF_REQUIRE_UI_THREAD();
+	message_router_->OnBeforeBrowse(browser, frame);
+	return false;
+}
+
+bool JWebTopClient::OnProcessMessageReceived(
+	CefRefPtr<CefBrowser> browser,
+	CefProcessId source_process,
+	CefRefPtr<CefProcessMessage> message) {
+	CEF_REQUIRE_UI_THREAD();
+	if (message_router_->OnProcessMessageReceived(browser, source_process,
+		message)) {
+		return true;
+	}
+	//// Check for messages from the client renderer.
+	//std::string message_name = message->GetName();
+	//if (message_name == kFocusedNodeChangedMessage) {
+	//	// A message is sent from ClientRenderDelegate to tell us whether the
+	//	// currently focused DOM node is editable. Use of |focus_on_editable_field_|
+	//	// is redundant with CefKeyEvent.focus_on_editable_field in OnPreKeyEvent
+	//	// but is useful for demonstration purposes.
+	//	focus_on_editable_field_ = message->GetArgumentList()->GetBool(0);
+	//	return true;
+	//}
+	return false;
+}
+void JWebTopClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+	TerminationStatus status) {
+	CEF_REQUIRE_UI_THREAD();
+	message_router_->OnRenderProcessTerminated(browser);
 }
 
 bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
@@ -88,17 +141,13 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	frame->LoadString(ss.str(), failedUrl);
 }
 
-
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	int httpStatusCode){
+	// 页面加载后，触发JWebTopReady消息
 	stringstream extensionCode;
-	CefRefPtr<CefBrowserHost> host = browser->GetHost();
-	HWND hwnd = host->GetWindowHandle();
-	extensionCode << "if(JWebTop)JWebTop.handler=" << (LONG)hwnd << ";";
-	extensionCode << "console.info('JWebTop.handler == = ' + JWebTop.handler);";
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
-	frame->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
 
 void JWebTopClient::CloseAllBrowsers(bool force_close) {

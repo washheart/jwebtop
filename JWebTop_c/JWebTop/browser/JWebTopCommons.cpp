@@ -3,8 +3,36 @@
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
 #include <string>
+#include "JWebTop/winctrl/JWebTopWinCtrl.h"
 using namespace std;
 
+const char kTestMessageName[] = "close";
+namespace jc/*jc=JWebTop Client*/{
+	class Handler : public CefMessageRouterBrowserSide::Handler {
+	public:
+		Handler() {}
+
+		// 响应render进程发送过来的消息
+		virtual bool OnQuery(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id,
+			const CefString& request,// request为消息JSON对象{request:msg}的msg部分（可以扩展一个JSON工具来进行解析）【解析代码：cef_message_router.cc=》CefMessageRouterRendererSideImpl】
+			bool persistent, CefRefPtr<Callback> callback) OVERRIDE{
+			//// 解析以逗号分隔的其他参数
+			//const std::string& message_name = request;
+			//std::vector<int> vec;
+			//const std::string& vals = message_name.substr(sizeof(kTestMessageName));std::stringstream ss(vals);int i;
+			//while (ss >> i) {vec.push_back(i);if (ss.peek() == ',')ss.ignore();}
+			//jw::close((HWND)vec[0]);// 这种方式，获取到的BrowerWindowInfo也是NULL（很奇怪）
+			if (request == "close"){
+				callback.get()->Success(L"Close Ok!");
+				browser->GetHost()->CloseBrowser(true);// 关闭浏览器
+			}
+			return true;
+		}
+	};
+	void CreateMessageHandlers(MessageHandlerSet& handlers) {
+		handlers.insert(new Handler());
+	}
+}
 
 CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
 // 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空

@@ -4,15 +4,17 @@
 #ifndef CEF_JWEBTOP_BROWSER_HANDLER_H_
 #define CEF_JWEBTOP_BROWSER_HANDLER_H_
 
-#include "include/cef_client.h"
-#include "JWebTop/winctrl/JWebTopConfigs.h"
 #include <list>
+#include <set>
+#include "include/cef_client.h"
+#include "include/wrapper/cef_message_router.h"
+#include "JWebTop/winctrl/JWebTopConfigs.h"
 
 class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
-	//public CefKeyboardHandler,
-	public CefLoadHandler {
+	public CefLoadHandler,
+	public CefRequestHandler {
 public:
 	JWebTopClient();
 	~JWebTopClient();
@@ -27,7 +29,12 @@ public:
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE{
 		return this;
 	}
-
+	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() OVERRIDE{
+		return this;
+	}
+	bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+		CefProcessId source_process,
+		CefRefPtr<CefProcessMessage> message) OVERRIDE;
 	// CefDisplayHandler methods:
 	//virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) OVERRIDE;
 
@@ -45,13 +52,18 @@ public:
 		CefRefPtr<CefFrame> frame,
 		int httpStatusCode);
 
+	// CefRequestHandler-------------------------------------------------------------------------------
+	bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		CefRefPtr<CefRequest> request,
+		bool is_redirect) OVERRIDE;
+	void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+		TerminationStatus status) OVERRIDE;
+
 	// Request that all existing browser windows close.
 	void CloseAllBrowsers(bool force_close);
 
 	bool IsClosing() const { return is_closing_; }
-
-	CefRefPtr<CefBrowser> GetBrowser();
-	HWND GetBrowserHwnd();
 
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
 	//virtual bool OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
@@ -66,8 +78,12 @@ private:
 	// List of existing browser windows. Only accessed on the CEF UI thread.
 	typedef std::list<CefRefPtr<CefBrowser> > BrowserList;
 	BrowserList browser_list_;
-
 	bool is_closing_;
+
+	// 和render进程进行通信的相关变量
+	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;
+	CefRefPtr<CefMessageRouterBrowserSide> message_router_;
+	MessageHandlerSet message_handler_set_;
 
 	// Include the default reference counting implementation.
 	IMPLEMENT_REFCOUNTING(JWebTopClient);

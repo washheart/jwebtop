@@ -34,5 +34,5 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "getTitle", new JJH_GetTitle());
 	regist(jWebTop, "setBound", new JJH_SetBound());
 	regist(jWebTop, "getBound", new JJH_GetBound());
-	regist(jWebTop, "close", new JJH_Close());
+	//regist(jWebTop, "close", new JJH_Close());// 这里不能获取到browser，所以需要采用post message方式【在Client中注册】
 }

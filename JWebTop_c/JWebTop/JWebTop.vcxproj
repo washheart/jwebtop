@@ -169,7 +169,6 @@
     <ClInclude Include="browser\JWebTopApp.h" />
     <ClInclude Include="browser\JWebTopCommons.h" />
     <ClInclude Include="browser\JWebTopClient.h" />
-    <ClInclude Include="browser\JWebTopRenderer.h" />
     <ClInclude Include="jshandler\JJH_Windows.h" />
     <ClInclude Include="jshandler\JWebTopJSHanlder.h" />
     <ClInclude Include="tests\TestUtil.h" />
