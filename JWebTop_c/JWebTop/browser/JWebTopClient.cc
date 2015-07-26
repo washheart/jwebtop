@@ -24,7 +24,6 @@ JWebTopClient::~JWebTopClient() {
 
 extern HANDLE hFile;
 extern DWORD filePos;
-class DEBUG_Handler1 : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler1); };
 // 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
 extern JWebTopConfigs  tmpConfigs;
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
@@ -34,7 +33,7 @@ void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	writeLog("===JWebTopClient-------------------------OnAfterCreated\r\n");
 	CefWindowInfo windowInfo;
 	windowInfo.SetAsPopup(NULL, "cef_debug");
-	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler1(), CefBrowserSettings(), CefPoint());
+	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), CefPoint());
 #endif
 
 	CefMessageRouterConfig config;

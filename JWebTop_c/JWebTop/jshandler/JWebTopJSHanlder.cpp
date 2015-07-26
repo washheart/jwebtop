@@ -28,11 +28,29 @@ void regist(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefV8Value> jWebTop = object->CreateObject(accessor);
 	object->SetValue("JWebTop", jWebTop, V8_PROPERTY_ATTRIBUTE_NONE);// 把创建的对象附加到V8根对象上
 	// 
-	regist(jWebTop, "setSize", new JJH_SetSize());
-	regist(jWebTop, "move", new JJH_Move());
-	regist(jWebTop, "setTitle", new JJH_SetTitle());
-	regist(jWebTop, "getTitle", new JJH_GetTitle());
-	regist(jWebTop, "setBound", new JJH_SetBound());
-	regist(jWebTop, "getBound", new JJH_GetBound());
-	regist(jWebTop, "close", new JJH_Close());
+
+	regist(jWebTop, "getPos", new JJH_GetPos());//getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
+	regist(jWebTop, "setSize", new JJH_SetSize());//setSize(x, y, handler);//设置窗口大小
+	regist(jWebTop, "getSize", new JJH_GetSize());//getSize(handler);//获得窗口大小，返回值为一object，格式如下{width:130,height:54}
+	regist(jWebTop, "getScreenSize", new JJH_GetScreenSize());//getScreenSize();//获取屏幕大小，返回值为一object，格式如下{width:130,height:54}
+	regist(jWebTop, "move", new JJH_Move());//move(x, y, handler);//移动窗口
+	regist(jWebTop, "setBound", new JJH_SetBound());//setBound(x, y,w ,h, handler);// 同时设置窗口的坐标和大小
+	regist(jWebTop, "getBound", new JJH_GetBound());//getBound(handler);//获取窗口的位置和大小，返回值为一object，格式如下{x:100,y:100,width:130,height:54}
+	regist(jWebTop, "setTitle", new JJH_SetTitle());//setTitle(title, handler);// 设置窗口名称
+	regist(jWebTop, "getTitle", new JJH_GetTitle());//getTitle(handler);// 获取窗口名称，返回值为一字符串
+
+	regist(jWebTop, "bringToTop", new JJH_BringToTop());  // bringToTop(handler);//窗口移到最顶层
+	regist(jWebTop, "focus", new JJH_Focus());      	  // focus(handler);//使窗口获得焦点
+	regist(jWebTop, "hide", new JJH_Hide());	          // hide(handler);//隐藏窗口
+	regist(jWebTop, "max", new JJH_Max());	              // max(handler);//最大化窗口
+	regist(jWebTop, "mini", new JJH_Mini());	          // mini(hander);//最小化窗口
+	regist(jWebTop, "restore", new JJH_Restore());	      // restore(handler);//还原窗口，对应于hide函数
+	regist(jWebTop, "setTopMost", new JJH_SetTopMost());  // setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
+	regist(jWebTop, "close", new JJH_Close());            // close(handler);// 关闭窗口
+
+	regist(jWebTop, "setWindowStyle", new JJH_SetWindowStyle());	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
+	regist(jWebTop, "loadUrl", new JJH_LoadUrl());	//loadUrl(url, handler);//加载网页，url为网页路径
+	regist(jWebTop, "reload", new JJH_Reload());	//reload(handler);//重新加载当前页面
+	regist(jWebTop, "reloadIgnoreCache", new JJH_ReloadIgnoreCache());	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
+	regist(jWebTop, "showDev", new JJH_ShowDev());	//showDev(handler);//打开开发者工具
 }
