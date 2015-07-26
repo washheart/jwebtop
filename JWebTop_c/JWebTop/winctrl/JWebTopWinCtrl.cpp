@@ -138,6 +138,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 		bwInfo->browser = browser;
 		bwInfo->configs = configs;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
+		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 	}
 #ifdef JWebTopLog
 	stringstream ss;
@@ -185,9 +186,7 @@ namespace jw{
 		return rt;
 	}
 	void close(HWND hWnd){
-		//BrowserWindowInfos.g
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		//bw->browser->GetMainFrame()->
-		bw->browser->GetHost()->CloseBrowser(true);
+		if (bw != NULL)bw->browser->GetHost()->CloseBrowser(true);
 	}
 }

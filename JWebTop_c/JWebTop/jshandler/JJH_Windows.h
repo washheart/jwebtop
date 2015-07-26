@@ -74,4 +74,14 @@ public:
 private:
 	IMPLEMENT_REFCOUNTING(JJH_GetTitle);
 };
+
+class JJH_Close : public CefV8Handler {
+public:
+	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		jw::close(getHWND(object, arguments, 0));// 如果是多进程方式，直接调用取不到BrowserWindowInfo，需要采用消息通信方式
+		return true;
+	}
+private:
+	IMPLEMENT_REFCOUNTING(JJH_Close);
+};
 #endif

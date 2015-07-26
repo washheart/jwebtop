@@ -51,7 +51,7 @@ void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	HWND hwnd = host->GetWindowHandle();
 	extensionCode << "if(!JWebTop)JWebTop={};";
 	extensionCode << "JWebTop.handler=" << (LONG)hwnd << ";" << endl;
-	extensionCode << "JWebTop.close=function(){window.cefQuery({request:\"close\"})};" << endl;
+	//extensionCode << "JWebTop.close=function(){window.cefQuery({request:\"close\"})};" << endl;// 按发送消息的方式注册close函数到JWebTop对象，这种没有直接注册使用快捷
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
 
