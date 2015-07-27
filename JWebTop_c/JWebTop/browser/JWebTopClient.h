@@ -32,6 +32,11 @@ public:
 	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() OVERRIDE{
 		return this;
 	}
+	// 替换默认的一些对话框
+	// virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE{
+	//	 return dialog_handler_;
+	// }
+
 	bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message) OVERRIDE;

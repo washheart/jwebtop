@@ -435,19 +435,26 @@ addEventListener("AlloyDesktopReady",readyHandler);
 closeBtn.onclick=function(){
 	AlloyDesktop.close();
 }
-
+onbeforeunload=function(){return "您确认要关闭软件？";}
 // 兼容之前的AlloyDesktop函数和事件
 addEventListener("JWebTopReady",function(){	
 	AlloyDesktop=JWebTop;
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
 });
-addEventListener("JWebTopResize",function(e){	
-	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
-	var e = new CustomEvent('AlloyDesktopWindowResize',e);
+addEventListener("JWebTopResize",function(v){	
+	var e = new CustomEvent('AlloyDesktopWindowResize',v);
+	dispatchEvent(e);
+});
+addEventListener("JWebTopMove",function(v){
+	var e = new CustomEvent('AlloyDesktopWindowMove',v);
 	dispatchEvent(e);
 });
 
-var sizeHandler = function(e) {
+
+// 测试AlloyDesktop兼容性的js 
+addEventListener("AlloyDesktopWindowResize", function(e) {
 	console.info("JWebTopResize==w="+e.detail.width+"  h="+e.detail.height) 
-}
-addEventListener("AlloyDesktopWindowResize", sizeHandler);
+});
+addEventListener("AlloyDesktopWindowMove", function(e) {
+	console.info("JWebTopMove====x="+e.detail.x    +"  y="+e.detail.y) 
+});

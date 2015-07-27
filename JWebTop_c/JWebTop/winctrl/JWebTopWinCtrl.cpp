@@ -24,12 +24,72 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 	}
 	return NULL;
 }
+// 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
+LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
+	switch (message) {
+	case WM_SIZE:
+	{
+					stringstream js_event;
+					js_event << "var e = new CustomEvent(' ',{"// AlloyDesktopWindowResize
+						<< "	detail:{"
+						<< "		width:" << LOWORD(lParam) << ","
+						<< "		height:" << HIWORD(lParam)
+						<< "	}"
+						<< "});"
+						<< "dispatchEvent(e);";
+					bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
+					break;
+	}// End case-WM_SIZE
+	case WM_MOVE:
+	{
+					stringstream js_event;
+					js_event << "var e = new CustomEvent('JWebTopMove',{"// AlloyDesktopWindowMove
+						<< "	detail:{"
+						<< "		x:" << LOWORD(lParam) << ","
+						<< "		y:" << HIWORD(lParam)
+						<< "	}"
+						<< "});"
+						<< "dispatchEvent(e);";
+					bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
+					break;
+	}// End case-WM_MOVE
+	case WM_ACTIVATE:
+	{
+						stringstream js_event;
+						js_event << "var e = new CustomEvent('JWebTopWindowActive',{"// AlloyDesktopWindowActive
+							<< "	detail:{"
+							<< "		handler:0x" << bwInfo->hWnd
+							<< "       ,w:'main'"
+							<< "	}"
+							<< "});"
+							<< "dispatchEvent(e);";
+						bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
+						break;
+	}// End case-WM_ACTIVATE
+	case WM_ACTIVATEAPP:
+	{
+						   stringstream js_event;
+						   js_event << "var e = new CustomEvent('JWebTopActive',{"
+							   << "	detail:{"
+							   << "		handler:0x" << bwInfo->hWnd
+							   << "       ,w:'main'"
+							   << "	}"
+							   << "});"
+							   << "dispatchEvent(e);";
+						   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
+						   break;
+	}// End case-WM_ACTIVATEAPP
+
+	}// End switch-message
+	return CallWindowProc((WNDPROC)bwInfo->oldMainProc, hWnd, message, wParam, lParam);
+}
 // 拦截浏览器窗口的消息
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
-		//case WM_CLOSE:case WM_RBUTTONDOWN:case WM_LBUTTONDOWN:break;// 窗口创建/销毁、鼠标左右键按下监听不到，需要通过PARENTNOTIFY方式
 	case WM_PARENTNOTIFY:
 	{
 #ifdef JWebTopLog
@@ -49,7 +109,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 								}
 							}
 							else if (msg2 == WM_DESTROY){
-								SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldProc);// 设置回原来的处理函数
+								SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldBrowserProc);// 设置回原来的处理函数
 								BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
 							}
 	}
@@ -85,26 +145,8 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 			createNewBrowser(NULL);
 		}
 		break;
-	case WM_SIZE:
-	{
-#ifdef  JWebTopLog
-					stringstream js_event;
-					js_event << "var e = new CustomEvent('JWebTopResize',{"// AlloyDesktopWindowResize
-						<< "	detail:{"
-						<< "		width:" << LOWORD(lParam) << ","
-						<< "		height:" << HIWORD(lParam)
-						<< "	}"
-						<< "});"
-						<< "dispatchEvent(e);";
-					bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
-					stringstream m_size;
-					m_size << " WM_SIZE ";
-					writeLog(" WM_SIZE "); writeLog(js_event.str()); writeLog("\r\n");
-#endif
-					break;
-	}// End case-WM_SIZE
 	}// End switch-message
-	return CallWindowProc((WNDPROC)bwInfo->oldProc, hWnd, message, wParam, lParam);
+	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
 
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
@@ -150,7 +192,10 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
 		BrowserWindowInfo * bwInfo = new BrowserWindowInfo();
 		bwInfo->hWnd = hWnd;
 		bwInfo->bWnd = bWnd;
-		bwInfo->oldProc = preWndProc;
+		bwInfo->oldBrowserProc = preWndProc;
+		preWndProc = GetWindowLongPtr(hWnd, GWLP_WNDPROC);
+		bwInfo->oldMainProc = preWndProc;
+		SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)JWebTop_WindowWndProc);// 替换主窗口的消息处理函数
 		bwInfo->browser = browser;
 		bwInfo->configs = configs;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
