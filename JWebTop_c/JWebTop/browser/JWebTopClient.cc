@@ -150,7 +150,7 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 		//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
 		extensionCode << "JWebTop.reloadIgnoreCache=function(handler){JWebTop.cefQuery({m:'reloadIgnoreCache',handler:(handler?handler:JWebTop.handler)})};" << endl;
 		//showDev(handler);//打开开发者工具
-		extensionCode << "JWebTop.showDev=function(){JWebTop.cefQuery({m:'showDev',handler:JWebTop.handler})};" << endl;
+		extensionCode << "JWebTop.showDev=function(handler){JWebTop.cefQuery({m:'showDev',handler:(handler?handler:JWebTop.handler)})};" << endl;
 	}
 	// 页面加载后，触发JWebTopReady消息
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;

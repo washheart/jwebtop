@@ -85,7 +85,25 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 			createNewBrowser(NULL);
 		}
 		break;
-	}
+	case WM_SIZE:
+	{
+#ifdef  JWebTopLog
+					stringstream js_event;
+					js_event << "var e = new CustomEvent('JWebTopResize',{"// AlloyDesktopWindowResize
+						<< "	detail:{"
+						<< "		width:" << LOWORD(lParam) << ","
+						<< "		height:" << HIWORD(lParam)
+						<< "	}"
+						<< "});"
+						<< "dispatchEvent(e);";
+					bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
+					stringstream m_size;
+					m_size << " WM_SIZE ";
+					writeLog(" WM_SIZE "); writeLog(js_event.str()); writeLog("\r\n");
+#endif
+					break;
+	}// End case-WM_SIZE
+	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldProc, hWnd, message, wParam, lParam);
 }
 
@@ -207,7 +225,7 @@ namespace jw{
 	}
 	// focus(handler);//使窗口获得焦点
 	void focus(HWND hWnd){
-		SetFocus(hWnd); 
+		SetFocus(hWnd);
 	}
 	// hide(handler);//隐藏窗口
 	void hide(HWND hWnd){
@@ -238,7 +256,7 @@ namespace jw{
 		SetWindowLong(hWnd, GWL_EXSTYLE, dwNewExStyle);//设置新的扩展样式
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
-	 //close(handler);// 关闭窗口
+	//close(handler);// 关闭窗口
 	void close(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
 		if (bw != NULL)bw->browser->GetHost()->CloseBrowser(true);

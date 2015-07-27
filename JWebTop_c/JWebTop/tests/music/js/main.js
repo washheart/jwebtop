@@ -441,3 +441,13 @@ addEventListener("JWebTopReady",function(){
 	AlloyDesktop=JWebTop;
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
 });
+addEventListener("JWebTopResize",function(e){	
+	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
+	var e = new CustomEvent('AlloyDesktopWindowResize',e);
+	dispatchEvent(e);
+});
+
+var sizeHandler = function(e) {
+	console.info("JWebTopResize==w="+e.detail.width+"  h="+e.detail.height) 
+}
+addEventListener("AlloyDesktopWindowResize", sizeHandler);

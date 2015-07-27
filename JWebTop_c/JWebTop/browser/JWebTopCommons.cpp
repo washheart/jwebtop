@@ -38,6 +38,21 @@ namespace jc/*jc=JWebTop Client*/{
 				if (url == NULL)return false;
 				jw::loadUrl((HWND)handler.asInt(), chr2wch(url.asString().c_str()));
 			}
+			else if (methodName == "reload"){
+				Json::Value handler = value["handler"];
+				if (handler == NULL)return false;
+				jw::reload((HWND)handler.asInt());
+			}
+			else if (methodName == "reloadIgnoreCache"){
+				Json::Value handler = value["handler"];
+				if (handler == NULL)return false;
+				jw::reloadIgnoreCache((HWND)handler.asInt());
+			}
+			else if (methodName == "showDev"){
+				Json::Value handler = value["handler"];
+				if (handler == NULL)return false; 
+				jw::showDev((HWND)handler.asInt());
+			}
 			string name = value["name"].asString();
 			//CefRefPtr<CefValue> json = CefParseJSON(request, NULL);
 			//// 解析以逗号分隔的其他参数
