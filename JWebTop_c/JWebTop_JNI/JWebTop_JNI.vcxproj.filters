@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="jni_jdk1_6_24">
+      <UniqueIdentifier>{d5c999ba-8828-4854-816d-35048b023945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop">
+      <UniqueIdentifier>{6836dc99-0bc0-444c-81ab-70df4acf0458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JWebTop.exe">
+      <UniqueIdentifier>{6fdb2cfa-726a-413f-b0b2-e2c1d570c40b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="jwebtop.cpp">
+      <Filter>jwebtop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\JWebTop_main.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\winctrl\JWebTopConfigs.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\winctrl\JWebTopWinCtrl.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\util\StrUtil.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\tests\TestUtil.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\jshandler\JWebTopJSHanlder.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\browser\JWebTopApp.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\browser\JWebTopClient.cc">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\browser\JWebTopCommons.cpp">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JWebTop\browser\JWebTopRenderer.cc">
+      <Filter>JWebTop.exe</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="jni_jdk1_6_24\jawt.h">
+      <Filter>jni_jdk1_6_24</Filter>
+    </ClInclude>
+    <ClInclude Include="jni_jdk1_6_24\jawt_md.h">
+      <Filter>jni_jdk1_6_24</Filter>
+    </ClInclude>
+    <ClInclude Include="jni_jdk1_6_24\jni.h">
+      <Filter>jni_jdk1_6_24</Filter>
+    </ClInclude>
+    <ClInclude Include="jni_jdk1_6_24\jni_md.h">
+      <Filter>jni_jdk1_6_24</Filter>
+    </ClInclude>
+    <ClInclude Include="org_jwebtop_JWebTopNative.h">
+      <Filter>jwebtop</Filter>
+    </ClInclude>
+    <ClInclude Include="javautils.h">
+      <Filter>jwebtop</Filter>
+    </ClInclude>
+    <ClInclude Include="jwebtop_brige.h">
+      <Filter>jwebtop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\winctrl\JWebTopConfigs.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\winctrl\JWebTopWinCtrl.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\util\StrUtil.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\tests\TestUtil.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\assertions.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\autolink.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\config.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\features.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\forwards.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\json.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\reader.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\value.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\version.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\json\writer.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\jshandler\JJH_Windows.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\jshandler\JWebTopJSHanlder.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\browser\JWebTopApp.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\browser\JWebTopClient.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JWebTop\browser\JWebTopCommons.h">
+      <Filter>JWebTop.exe</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

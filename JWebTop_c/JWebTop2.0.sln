@@ -6,6 +6,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcef_dll_wrapper", "libce
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop", "JWebTop\JWebTop.vcxproj", "{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_JNI", "JWebTop_JNI\JWebTop_JNI.vcxproj", "{654A6CD3-E5DC-499F-9887-5770D1D627FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -20,6 +22,10 @@ Global
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Debug|Win32.Build.0 = Debug|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Release|Win32.ActiveCfg = Release|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Release|Win32.Build.0 = Release|Win32
+		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Debug|Win32.Build.0 = Debug|Win32
+		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Release|Win32.ActiveCfg = Release|Win32
+		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
