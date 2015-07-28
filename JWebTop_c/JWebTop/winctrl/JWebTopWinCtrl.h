@@ -50,12 +50,15 @@ namespace jw{
 	void mini(HWND hWnd);	    // mini(hander);//最小化窗口
 	void restore(HWND hWnd);	// restore(handler);//还原窗口，对应于hide函数
 	void setTopMost(HWND hWnd);	// setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
-	void close(HWND hWnd);      //close(handler);// 关闭窗口
+	void close(HWND hWnd);      // close(handler);// 关闭窗口
 
 	void setWindowStyle(HWND hWnd, int exStyle);	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
 	void loadUrl(HWND hWnd, std::wstring url);	//loadUrl(url, handler);//加载网页，url为网页路径
 	void reload(HWND hWnd);	//reload(handler);//重新加载当前页面
 	void reloadIgnoreCache(HWND hWnd);	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
 	void showDev(HWND hWnd);	//showDev(handler);//打开开发者工具
+
+	void ExecJS(HWND hWnd, std::string js);
+	void ExecJS(HWND hWnd, std::wstring js);
 }
 #endif

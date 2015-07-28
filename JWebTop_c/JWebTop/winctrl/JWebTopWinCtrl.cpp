@@ -142,7 +142,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 			}
 		}
 		else if (wParam == VK_F11){// 按下F12时打开调试工具
-			createNewBrowser(NULL);
+			createNewBrowser(JWebTopConfigs());
 		}
 		break;
 	}// End switch-message
@@ -336,6 +336,19 @@ namespace jw{
 			CefWindowInfo windowInfo;
 			windowInfo.SetAsPopup(NULL, "cef_debug");
 			bw->browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), CefPoint());
+		}
+	}
+
+	void ExecJS(HWND hWnd, string js){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL){
+			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
+		}
+	}
+	void ExecJS(HWND hWnd, wstring js){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL){
+			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
 		}
 	}
 }

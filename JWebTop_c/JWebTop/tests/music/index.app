@@ -9,3 +9,5 @@ name=╡Бйтобжпнд
 style=369819648
 exStyle=128
 disableDevelop=0
+[CEF]
+single_process=0
