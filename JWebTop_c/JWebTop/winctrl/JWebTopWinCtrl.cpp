@@ -128,30 +128,13 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 						  }
 	}
 		break;
-	case WM_KEYUP:
-		if (wParam == VK_F1){// 按下F12时打开调试工具(F12有时会触发异常，暂时改为F1)
-			if (bwInfo->configs.enableDebug){
-				CefPoint(pp);
-				pp.x = 300;
-				pp.y = 300;
-				CefWindowInfo windowInfo;
-				CefBrowserSettings settings;
-				windowInfo.SetAsPopup(NULL, "cef_debug");
-				CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
-				host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
-			}
-		}
-		else if (wParam == VK_F11){// 按下F12时打开调试工具
-			createNewBrowser(NULL);
-		}
-		break;
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
 
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
-	JWebTopConfigs configs = (* p_configs);
+	JWebTopConfigs configs = (*p_configs);
 	HWND hWnd = browser->GetHost()->GetWindowHandle();// 浏览器所在窗口的handle
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
@@ -213,7 +196,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 #endif 
 	// 回调Java程序，告知其浏览器的hwnd
 	std::wstringstream wss;
-	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd<< L"}}";
+	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
 #ifdef JWebTopJNI
 	jw::invokeJavaMethod(CefString(wss.str()));
 #endif
