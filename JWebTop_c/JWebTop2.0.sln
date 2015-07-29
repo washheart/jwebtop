@@ -12,20 +12,27 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
+		发布版本|Win32 = 发布版本|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DC86979F-523F-4DE4-9166-54CED83695D9}.Debug|Win32.ActiveCfg = Debug|Win32
 		{DC86979F-523F-4DE4-9166-54CED83695D9}.Debug|Win32.Build.0 = Debug|Win32
 		{DC86979F-523F-4DE4-9166-54CED83695D9}.Release|Win32.ActiveCfg = Release|Win32
 		{DC86979F-523F-4DE4-9166-54CED83695D9}.Release|Win32.Build.0 = Release|Win32
+		{DC86979F-523F-4DE4-9166-54CED83695D9}.发布版本|Win32.ActiveCfg = 发布版本|Win32
+		{DC86979F-523F-4DE4-9166-54CED83695D9}.发布版本|Win32.Build.0 = 发布版本|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Debug|Win32.Build.0 = Debug|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Release|Win32.ActiveCfg = Release|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Release|Win32.Build.0 = Release|Win32
+		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.发布版本|Win32.ActiveCfg = 发布版本|Win32
+		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.发布版本|Win32.Build.0 = 发布版本|Win32
 		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Debug|Win32.ActiveCfg = Debug|Win32
 		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Debug|Win32.Build.0 = Debug|Win32
 		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Release|Win32.ActiveCfg = Release|Win32
 		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.Release|Win32.Build.0 = Release|Win32
+		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.发布版本|Win32.ActiveCfg = 发布版本|Win32
+		{654A6CD3-E5DC-499F-9887-5770D1D627FF}.发布版本|Win32.Build.0 = 发布版本|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
