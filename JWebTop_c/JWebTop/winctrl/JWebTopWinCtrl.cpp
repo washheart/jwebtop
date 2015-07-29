@@ -142,7 +142,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 			}
 		}
 		else if (wParam == VK_F11){// 按下F12时打开调试工具
-			createNewBrowser(JWebTopConfigs());
+			createNewBrowser(NULL);
 		}
 		break;
 	}// End switch-message
@@ -150,7 +150,8 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 }
 
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
-void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs){
+void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
+	JWebTopConfigs configs = (* p_configs);
 	HWND hWnd = browser->GetHost()->GetWindowHandle();// 浏览器所在窗口的handle
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息

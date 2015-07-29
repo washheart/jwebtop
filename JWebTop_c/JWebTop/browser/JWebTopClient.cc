@@ -24,7 +24,7 @@ JWebTopClient::~JWebTopClient() {
 
 extern bool g_single_process;
 // 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
-extern JWebTopConfigs  tmpConfigs;
+extern JWebTopConfigs * tmpConfigs;
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	browser_list_.push_back(browser);// 记录下已经创建的窗口来
 	renderBrowserWindow(browser, tmpConfigs);

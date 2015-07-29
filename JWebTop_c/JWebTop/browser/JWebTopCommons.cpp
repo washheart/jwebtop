@@ -71,22 +71,24 @@ namespace jc/*jc=JWebTop Client*/{
 }
 
 CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
-// 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
-JWebTopConfigs  tmpConfigs;
 
-void createNewBrowser(JWebTopConfigs configs){
+extern JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
+extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
+
+void createNewBrowser(JWebTopConfigs * configs){
 	CEF_REQUIRE_UI_THREAD();
+	if (configs == NULL)configs = g_configs;
+	tmpConfigs = configs;
 	// 用于构建本地窗口的配置信息（注：有些信息[style、exStyle]设置了不太管用，可以在Handler的OnAfterCreated中对窗口进行修饰）
 	CefWindowInfo window_info;
 
 #if defined(OS_WIN)
 	// On Windows we need to specify certain flags that will be passed to
-	window_info.SetAsPopup(NULL, configs.name);
+	window_info.SetAsPopup(NULL, configs->name);
 #endif
 	if (g_handler == NULL)g_handler = new JWebTopClient();
 	CefBrowserSettings browser_settings;
 	//window_info.window_name = UUID::Data1();// 用UUID作为窗口名称，建立窗口名与JWebTopConfigs的关联？？？
-	tmpConfigs = configs;
 	// 创建浏览器窗口
-	CefBrowserHost::CreateBrowser(window_info, g_handler.get(), configs.getAbsolutePath(configs.url.ToWString()), browser_settings, NULL);
+	CefBrowserHost::CreateBrowser(window_info, g_handler.get(), configs->getAbsolutePath(configs->url.ToWString()), browser_settings, NULL);
 }

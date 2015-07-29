@@ -10,7 +10,7 @@
 //void createNewBrowser(LPCTSTR appDefFile);
 
 // 新建一个浏览器窗口
-void createNewBrowser(JWebTopConfigs configs);
+void createNewBrowser(JWebTopConfigs * configs);
 
 namespace jc/*jc=JWebTop Client*/{
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;

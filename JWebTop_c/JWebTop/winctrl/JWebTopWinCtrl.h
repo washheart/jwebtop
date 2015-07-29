@@ -30,7 +30,7 @@ typedef std::map<HWND, BrowserWindowInfo*> BrowserWindowInfoMap;// 定义一个存储B
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
-void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs configs);
+void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * configs);
 // 
 namespace jw{
 	POINT getPos(HWND hWnd);//getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
