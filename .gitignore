@@ -3,9 +3,12 @@
 /jwebtop_c/Debug/*
 /jwebtop_c/JWebTop/Debug/*
 /jwebtop_c/JWebTop/Release/*
+/jwebtop_c/JWebTop/发布版本/*
 /jwebtop_c/libcef_dll/Debug/*
-/jwebtop_c/libcef_dll/Release/*
-jwebtop_c/*.opensdf
-jwebtop_c/*.sdf
-jwebtop_c/*.suo
-jwebtop_c/JWebTop2.0.vcxproj.user
+/jwebtop_c/libcef_dll/Debug/*
+/jwebtop_c/libcef_dll/发布版本/*
+/jwebtop_c/JWebTop_JNI/Debug/*
+/jwebtop_c/JWebTop_JNI/Release/*
+/jwebtop_c/JWebTop_JNI/发布版本/*
+
+~*

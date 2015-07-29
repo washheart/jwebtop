@@ -1,0 +1,7 @@
+# ingnore all files
+!.gitignore
+
+*.opensdf
+*.sdf
+*.suo
+JWebTop2.0.vcxproj.user
