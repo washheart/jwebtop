@@ -211,6 +211,12 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 
+	// 回调Java程序，告知其浏览器的hwnd
+	std::wstringstream wss;
+	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd<< L"}}";
+#ifdef JWebTopJNI
+	jw::invokeJavaMethod(CefString(wss.str()));
+#endif
 }
 
 namespace jw{

@@ -60,5 +60,9 @@ namespace jw{
 
 	void ExecJS(HWND hWnd, std::string js);
 	void ExecJS(HWND hWnd, std::wstring js);
+
+#ifdef JWebTopJNI // 只有在JWebTop_JNI项目下，下面的代码才会编译
+	CefString invokeJavaMethod(CefString json);// 用途：从JS调用Java代码。用法：invokeJava(jsonstring);
+#endif
 }
 #endif

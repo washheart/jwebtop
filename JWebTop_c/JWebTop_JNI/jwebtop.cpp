@@ -27,7 +27,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	return TRUE;
 }
 // 用于回调java程序的方法（定义于jwebtop_brige.h）
-CefString invokeJavaMethod(CefString json){
+CefString jw::invokeJavaMethod(CefString json){
 	JNIEnv *env;
 	if (g_jvm->AttachCurrentThread((void **)&env, NULL) < 0) return CefString();
 	jstring sss = env->NewStringUTF(json.ToString().c_str());
