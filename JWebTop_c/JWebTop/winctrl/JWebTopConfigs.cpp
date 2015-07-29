@@ -78,27 +78,27 @@ JWebTopConfigs JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	// cef
 	configs.single_process = GetPrivateProfileInt(L"CEF", L"single_process", configs.single_process, appDefFile.data());             // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
 	TCHAR user_data_path_[1000];
-	GetPrivateProfileString(L"CEF", L"user_data_path", configs.user_data_path.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"user_data_path", configs.user_data_path.ToWString().c_str(), user_data_path_, 1000, appDefFile.data());
 	configs.user_data_path = CefString(user_data_path_); // 用户数据保存目录
 	TCHAR cache_path_[1000];
-	GetPrivateProfileString(L"CEF", L"cache_path", configs.cache_path.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"cache_path", configs.cache_path.ToWString().c_str(), cache_path_, 1000, appDefFile.data());
 	configs.cache_path = CefString(cache_path_); // 浏览器缓存数据的保存目录
 	configs.persist_session_cookies = GetPrivateProfileInt(L"CEF", L"single_process", configs.persist_session_cookies, appDefFile.data());             // 是否需要持久化用户cookie数据（若要设置为true，需要同时指定cache_path）
 	TCHAR user_agent_[1000];
-	GetPrivateProfileString(L"CEF", L"user_agent", configs.user_agent.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"user_agent", configs.user_agent.ToWString().c_str(), user_agent_, 1000, appDefFile.data());
 	configs.user_agent = CefString(user_agent_);  // HTTP请求中的user_agent,CEF默认是Chorminum的user agent
 	TCHAR locale_[1000];
-	GetPrivateProfileString(L"CEF", L"locale", configs.locale.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"locale", configs.locale.ToWString().c_str(), locale_, 1000, appDefFile.data());
 	configs.locale = CefString(locale_);  // CEF默认是en-US
 	configs.log_severity = GetPrivateProfileInt(L"CEF", L"log_severity", configs.log_severity, appDefFile.data());// 指定日志输出级别，默认不输出(disable),其他取值：verbose,info,warning,error,error-report
 	TCHAR log_file_[1000];
-	GetPrivateProfileString(L"CEF", L"log_file_", configs.log_file.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"log_file_", configs.log_file.ToWString().c_str(), log_file_, 1000, appDefFile.data());
 	configs.log_file = CefString(log_file_);  // 指定调试时的日志文件，默认为"debug.log"。如果关闭日志，则不输出日志
 	TCHAR resources_dir_path_[1000];
-	GetPrivateProfileString(L"CEF", L"resources_dir_path", configs.resources_dir_path.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"resources_dir_path", configs.resources_dir_path.ToWString().c_str(), resources_dir_path_, 1000, appDefFile.data());
 	configs.resources_dir_path = CefString(resources_dir_path_);  // 指定cef资源文件（ cef.pak、devtools_resources.pak）的目录，默认从程序运行目录取
 	TCHAR locales_dir_path_[1000];
-	GetPrivateProfileString(L"CEF", L"locales_dir_path", configs.locales_dir_path.ToWString().c_str(), url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"locales_dir_path", configs.locales_dir_path.ToWString().c_str(), locales_dir_path_, 1000, appDefFile.data());
 	configs.locales_dir_path = CefString(locales_dir_path_);// 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
 	configs.ignore_certificate_errors = GetPrivateProfileInt(L"CEF", L"ignore_certificate_errors", configs.ignore_certificate_errors, appDefFile.data());             // 是否忽略SSL证书错误
 	configs.remote_debugging_port = GetPrivateProfileInt(L"CEF", L"remote_debugging_port", configs.remote_debugging_port, appDefFile.data());                 // 远程调试端口，取值范围[1024-65535]

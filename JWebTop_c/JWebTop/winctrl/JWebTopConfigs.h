@@ -28,20 +28,20 @@ public:
 	CefString icon;                // 窗口图标
 
 	// [CEF]小节：cef配置参数（cef相关参数只在应用启动时起作用），配置在[CEF]小节下
-	int single_process = 1;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
-	CefString user_data_path = L"data/jwebtop";  // 用户数据保存目录
-	CefString cache_path = L"data/jwebtop";      // 浏览器缓存数据的保存目录
-	int persist_session_cookies;                 // 是否需要持久化用户cookie数据（若要设置为true，需要同时指定cache_path）
-	CefString user_agent = L"JWebTop2.0";        // HTTP请求中的user_agent,CEF默认是Chorminum的user agent
-	CefString locale = "zh-CN";                  // CEF默认是en-US
-	int log_severity = LOGSEVERITY_DISABLE;      // 指定日志输出级别，取值[0,1,2,3,4,99]默认不输出(99)
-	CefString log_file;                          // 指定调试时的日志文件，默认为"debug.log"。如果关闭日志，则不输出日志
-	CefString resources_dir_path;                // 指定cef资源文件（ cef.pak、devtools_resources.pak）的目录，默认从程序运行目录取
-	CefString locales_dir_path;                  // 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
-	int ignore_certificate_errors;               // 是否忽略SSL证书错误
-	int remote_debugging_port;                   // 远程调试端口，取值范围[1024-65535]
+	int single_process = 1;                                 // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
+	CefString user_data_path = CefString(L"data/jwebtop");  // 用户数据保存目录
+	CefString cache_path = CefString(L"data/jwebtop");      // 浏览器缓存数据的保存目录
+	int persist_session_cookies;                            // 是否需要持久化用户cookie数据（若要设置为true，需要同时指定cache_path）
+	CefString user_agent = CefString(L"JWebTop2.0");        // HTTP请求中的user_agent,CEF默认是Chorminum的user agent
+	CefString locale = CefString(L"zh-CN");                 // CEF默认是en-US
+	int log_severity = LOGSEVERITY_DISABLE;                 // 指定日志输出级别，取值[0,1,2,3,4,99]默认不输出(99)
+	CefString log_file;                                     // 指定调试时的日志文件，默认为"debug.log"。如果关闭日志，则不输出日志
+	CefString resources_dir_path;                           // 指定cef资源文件（ cef.pak、devtools_resources.pak）的目录，默认从程序运行目录取
+	CefString locales_dir_path;                             // 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
+	int ignore_certificate_errors;                          // 是否忽略SSL证书错误
+	int remote_debugging_port;                              // 远程调试端口，取值范围[1024-65535]
 
-	int no_sandbox = 1;                          // 是否使用沙盒模式：JWebTop默认不使用。CEF默认使用。此参数在JWebTop中不可以配置为使用，否则会造成部分JWebTop JS不能使用
+	int no_sandbox = 1;                                     // 是否使用沙盒模式：JWebTop默认不使用。CEF默认使用。此参数在JWebTop中不可以配置为使用，否则会造成部分JWebTop JS不能使用
 	///// 以下cef参数暂不支持配置
 	//CefString product_version;                 // 如果指定了user_agent，此参数会被忽略,CEF默认是Chorminum的版本号
 	//int pack_loading_disabled;// 禁止从resources_dir_path和locales_dir_path读取数据，转为从CefApp::GetResourceBundleHandler()获取
