@@ -5,6 +5,10 @@ width=800
 height=500
 x=400
 y=100
-enableResize=1
+style=369819648
 enableDrag=1
 disableTransparent=1
+disableDevelop=0
+[CEF]
+single_process=1
+log_severity=0
