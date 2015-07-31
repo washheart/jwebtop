@@ -8,8 +8,9 @@
 #include "JWebTopApp.h"
 #include "JWebTop/jshandler/JWebTopJSHanlder.h"
 #include "include/base/cef_logging.h"
+#ifdef JWebTopLog
 #include "JWebTop/tests/TestUtil.h"
-
+#endif
 namespace renderer {
 	namespace {
 		// Must match the value in client_handler.cc.
@@ -40,7 +41,7 @@ namespace renderer {
 				CefRefPtr<CefV8Context> context) OVERRIDE{
 				message_router_->OnContextReleased(browser, frame, context);
 			}
-
+			 
 			virtual void OnFocusedNodeChanged(CefRefPtr<JWebTopApp> app,
 				CefRefPtr<CefBrowser> browser,
 				CefRefPtr<CefFrame> frame,

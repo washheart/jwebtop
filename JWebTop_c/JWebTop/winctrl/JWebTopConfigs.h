@@ -55,6 +55,8 @@ public:
 	//cef_color_t background_color;
 	//cef_string_t accept_language_list;// HTTP头"Accept-Language"，以逗号分隔多个与语言列表，默认为 "en-US,en"
 
+	long parentWin = 0;// 记录父窗口的HWND
+
 	JWebTopConfigs(){}
 	~JWebTopConfigs(){}
 
@@ -68,7 +70,7 @@ public:
 	// 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
 	static std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine);
 	// 从数据定义文件读取
-	static JWebTopConfigs loadConfigs(std::wstring appDefFile);
+	static JWebTopConfigs * loadConfigs(std::wstring appDefFile);
 };
 
 

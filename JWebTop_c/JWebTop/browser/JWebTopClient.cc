@@ -10,7 +10,9 @@
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
+#ifdef JWebTopLog
 #include "JWebTop/tests/TestUtil.h"
+#endif
 #include "JWebTopCommons.h"
 
 using namespace std;
@@ -27,21 +29,23 @@ extern bool g_single_process;
 extern JWebTopConfigs * tmpConfigs;
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	browser_list_.push_back(browser);// 记录下已经创建的窗口来
+#ifdef JWebTopLog
+	writeLog(L"JWebTopClient#OnAfterCreated 已缓存browser");
+#endif
 	renderBrowserWindow(browser, tmpConfigs);
 #ifdef JWebTopLog
-	writeLog("===JWebTopClient-------------------------OnAfterCreated\r\n");
-	CefWindowInfo windowInfo;
-	windowInfo.SetAsPopup(NULL, "cef_debug");
-	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), CefPoint());
+	writeLog(L"JWebTopClient#OnAfterCreated 已修饰browser");
 #endif
 
-	CefMessageRouterConfig config;
-	message_router_ = CefMessageRouterBrowserSide::Create(config);
-	// Register handlers with the router.
-	jc::CreateMessageHandlers(message_handler_set_);
-	MessageHandlerSet::const_iterator it = message_handler_set_.begin();
-	for (; it != message_handler_set_.end(); ++it)
-		message_router_->AddHandler(*(it), false);
+	if (!message_router_) {
+		CefMessageRouterConfig config;
+		message_router_ = CefMessageRouterBrowserSide::Create(config);
+		// Register handlers with the router.
+		jc::CreateMessageHandlers(message_handler_set_);
+		MessageHandlerSet::const_iterator it = message_handler_set_.begin();
+		for (; it != message_handler_set_.end(); ++it)
+			message_router_->AddHandler(*(it), false);
+	}
 }
 
 bool JWebTopClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
@@ -152,6 +156,9 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 		//showDev(handler);//打开开发者工具
 		extensionCode << "JWebTop.showDev=function(handler){JWebTop.cefQuery({m:'showDev',handler:(handler?handler:JWebTop.handler)})};" << endl;
 	}
+	// runApp(appName,handler);//运行一个app，appName为.app文件路径。
+	extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
+
 	// 页面加载后，触发JWebTopReady消息
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);

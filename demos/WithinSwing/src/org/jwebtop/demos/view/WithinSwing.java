@@ -46,6 +46,7 @@ public class WithinSwing extends JFrame {
 
 	private JWebTopBrowser listWebtopView, detailWebtopView;
 	private WithinSwingCtrl ctrl;
+	public static long frameHwnd;
 
 	public WithinSwing() {
 		this.setTitle("测试嵌入两个浏览器窗口到Swing中");
@@ -98,8 +99,11 @@ public class WithinSwing extends JFrame {
 		this.setVisible(true);
 		// 创建浏览器
 		try {
-			long handler = JWebTopNative.getInstance().createJWebTop(ctrl.getListAppFile(), JWebTopNative.getWindowHWND(this));
-			System.out.println("窗口句柄 handler = " + handler + " hex" + Long.toHexString(handler));
+			JOptionPane.showMessageDialog(this, "wait");
+			WithinSwing.frameHwnd = JWebTopNative.getWindowHWND(this);
+			System.out.println("Java窗口handler = " + WithinSwing.frameHwnd + " hex=0x" + Long.toHexString(WithinSwing.frameHwnd));
+			long handler = JWebTopNative.getInstance().createJWebTop(ctrl.getListAppFile(), WithinSwing.frameHwnd);
+			System.out.println("浏览器窗口handler = " + handler + " hex=0x" + Long.toHexString(handler));
 			ctrl.setListHandler(handler);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -128,6 +132,12 @@ public class WithinSwing extends JFrame {
 		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
 			if (JOptionPane.showConfirmDialog(this, "确认退出系统吗?", "退出系统", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 				ctrl.notifyWillClose();
+				try {
+					Thread.sleep(1000 * 3);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.exit(0);//
 			} else {
 				return;

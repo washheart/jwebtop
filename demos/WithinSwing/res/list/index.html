@@ -24,6 +24,7 @@ html,body {
 		<ul id="ul_list">
 		</ul>
 	</div>
+<script type="text/javascript" src="../AlloyDesktop.js"></script> 
 	<script type="text/javascript">
 		// 被java回调的js函数
 		function invokeByJava(jo) {
@@ -36,7 +37,7 @@ html,body {
 				removeNote(jo.value);
 				if(jo.newSel)showDetail(jo.newSel)
 			} else if (jo.method == 'willClose') {
-				AlloyDesktop.close();
+				AlloyDesktop.close();		
 			}
 		}
 		function createNoteItem(name, seled) {
@@ -45,6 +46,10 @@ html,body {
 					+ "')\">" + name + "</li>"
 		}
 		function showDetail(name) {
+			if(name==null){
+				if(first==null)return;
+				name=first;
+			}
 			var toJava = {
 				method : "showDetail",
 				value : name
@@ -76,15 +81,15 @@ html,body {
 				}
 			}
 		}
-		function afterBrowserInit() {// 直接的js代码会执行两次，所以这里需要通过
 
+		var first = null;
+		function afterBrowserInit() {// 直接的js代码会执行两次，所以这里需要通过
 			var initListData = {
 				method : "initList"
 			}
 			var jsons = AlloyDesktop.invokeJava(JSON.stringify(initListData));// 调用java让其进行初始化操作
 			var jo = eval("(" + jsons + ")")
 			var html = "";
-			var first = null;
 			// 初始化日记列表数据
 			var values = jo['value'];
 			for ( var idx in values) {
@@ -98,20 +103,11 @@ html,body {
 			}
 			document.getElementById("ul_list").innerHTML = html;
 			// 初始化日记细节浏览器
-			var toJava = {
-				method : "getDetailAppFile",
-			}
+			var toJava = {method : "javaWindowHwnd"}
+			JWebTop.javaWindowHwnd = AlloyDesktop.invokeJava(JSON.stringify(toJava));// 获取java窗口的HWND
+			toJava = {method : "getDetailAppFile"}
 			var app = AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，获取日记内容浏览器的地址
-			var detailHandler = AlloyDesktop.runApp(app, "");
-			// 注册日记细节浏览器到java端
-			var toJava = {
-				method : "setDetailHandler",
-				value : detailHandler
-			}
-			AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，为其设置内容浏览器的句柄
-			// 初始化日记数据
-			if (first != null)
-				showDetail(first);
+			AlloyDesktop.runApp(app, parseInt(JWebTop.javaWindowHwnd));			
 		}
 		addEventListener("AlloyDesktopReady", afterBrowserInit);
 	</script>

@@ -11,6 +11,7 @@
 		<textarea id="detail"
 			style="width: 100%; min-height: 400px; height: 100%">请使用“添加日记”按钮新建日记</textarea>
 	</div>
+<script type="text/javascript" src="../AlloyDesktop.js"></script> 
 	<script>
 		var curNote = null;
 		// 保存当前日记
@@ -39,6 +40,17 @@
 				AlloyDesktop.close();
 			}
 		}
+	function afterBrowserInit(){
+		// 注册日记细节浏览器到java端
+		toJava = {
+			method : "setDetailHandler",
+			value : JWebTop.handler
+		}
+		AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，为其设置内容浏览器的句柄
+		// 初始化日记数据
+		// if (first != null)showDetail(first);
+	}
+	addEventListener("AlloyDesktopReady", afterBrowserInit);
 	</script>
 </body>
 </html>

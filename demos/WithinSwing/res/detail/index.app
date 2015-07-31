@@ -1,5 +1,6 @@
 [BASE]
 url=index.html
 x=-1
-exStyle=0x00000080L
+style=369819648
+disableDevelop=0
 disableTransparent=1

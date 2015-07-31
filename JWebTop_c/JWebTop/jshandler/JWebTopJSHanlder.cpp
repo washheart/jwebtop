@@ -31,7 +31,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefV8Value> jWebTop = object->CreateObject(accessor);
 	object->SetValue("JWebTop", jWebTop, V8_PROPERTY_ATTRIBUTE_NONE);// 把创建的对象附加到V8根对象上
 
-
+	// 
 	regist(jWebTop, "getPos", new JJH_GetPos());//getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 	regist(jWebTop, "setSize", new JJH_SetSize());//setSize(x, y, handler);//设置窗口大小
 	regist(jWebTop, "getSize", new JJH_GetSize());//getSize(handler);//获得窗口大小，返回值为一object，格式如下{width:130,height:54}
@@ -49,14 +49,14 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "mini", new JJH_Mini());	          // mini(hander);//最小化窗口
 	regist(jWebTop, "restore", new JJH_Restore());	      // restore(handler);//还原窗口，对应于hide函数
 	regist(jWebTop, "setTopMost", new JJH_SetTopMost());  // setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
-
 	regist(jWebTop, "setWindowStyle", new JJH_SetWindowStyle());	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
+
 #ifdef JWebTopJNI // 只有在JWebTop_JNI项目下，下面的代码才会编译
 	regist(jWebTop, "invokeJava", new JJH_InvokeJava());	
 #endif
 
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
-	// 多进程模式要通过消息传递数据，参见JWebTopClient#OnAfterCreated
+	// 多进程模式要通过消息传递数据，参见JWebTopClient#OnLoadEnd（具体实现是JWebTopCommons#renderBrowserWindow）
 	if (g_single_process){
 		regist(jWebTop, "close", new JJH_Close());      // close(handler);// 关闭窗口
 		regist(jWebTop, "loadUrl", new JJH_LoadUrl());	//loadUrl(url, handler);//加载网页，url为网页路径
@@ -64,4 +64,6 @@ void regist(CefRefPtr<CefBrowser> browser,
 		regist(jWebTop, "reloadIgnoreCache", new JJH_ReloadIgnoreCache());	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
 		regist(jWebTop, "showDev", new JJH_ShowDev());	//showDev(handler);//打开开发者工具
 	}
+	// 以下方法只在实现JWebTopClient#OnLoadEnd实现（具体实现是JWebTopCommons#renderBrowserWindow）
+	//regist(jWebTop, "runApp", new JJH_RunApp());  //runApp(appName,handler);//运行一个app，appName为.app文件路径。
 }

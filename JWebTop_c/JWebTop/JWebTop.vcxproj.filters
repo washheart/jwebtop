@@ -68,9 +68,6 @@
     <ClInclude Include="util\StrUtil.h">
       <Filter>jwebtop\util</Filter>
     </ClInclude>
-    <ClInclude Include="tests\TestUtil.h">
-      <Filter>jwebtop\tests</Filter>
-    </ClInclude>
     <ClInclude Include="browser\JWebTopApp.h">
       <Filter>jwebtop\browser</Filter>
     </ClInclude>
@@ -112,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="json\writer.h">
       <Filter>jwebtop\json</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\TestUtil.h">
+      <Filter>jwebtop\tests</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

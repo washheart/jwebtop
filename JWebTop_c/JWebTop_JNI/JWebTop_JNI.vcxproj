@@ -63,6 +63,7 @@
     <IntDir>$(ProjectDir)$(Configuration)\mid</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>JWebTop</TargetName>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -199,6 +200,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>../../../third_party/directxsdk/files/Lib/x86;../../../third_party/platformsdk_win7/files/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -226,6 +228,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ProgramDatabaseFile>$(ProjectDir)$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <Midl>
       <DllDataFileName>dlldata.c</DllDataFileName>

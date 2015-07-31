@@ -15,12 +15,17 @@ jclass g_nativeClass;// 记录全局的本地类变量
 jmethodID g_invokeByJS;// 从C端回调Java的方法
 long g_parentWin;// 全局父窗口
 
+extern HINSTANCE g_instance;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved){
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		//HINSTANCE exe_hInstance = ::GetModuleHandle(NULL);
+		g_instance = hModule;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
+		// 是不是这里要做些清理操作？比如关闭所有浏览器
+		break;
 	case DLL_PROCESS_DETACH:
 		break;
 	}
@@ -49,7 +54,7 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
 		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
 		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
-		startJWebTop(NULL/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()));// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
+		startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin);// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
 	}
 	else{
 		// 这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以

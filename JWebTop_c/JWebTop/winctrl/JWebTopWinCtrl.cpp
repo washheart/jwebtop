@@ -2,7 +2,9 @@
 
 #include "JWebTop/browser/JWebTopCommons.h"
 #include "JWebTop/util/StrUtil.h"
+#ifdef JWebTopLog
 #include "JWebTop/tests/TestUtil.h"
+#endif
 using namespace std;
 BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
 
@@ -94,7 +96,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	{
 #ifdef JWebTopLog
 							stringstream sss;
-							sss << "mid WM_PARENTNOTIFY[wParam=" << wParam << ",lParam=" << lParam << "]" << "\r\n";
+							sss << "BrowerWndProc hWnd="<<hWnd<<" WM_PARENTNOTIFY[wParam=" << wParam << ",lParam=" << lParam << "]" << "\r\n";
 							writeLog(sss.str());
 #endif
 							UINT msg2 = LOWORD(wParam);
@@ -109,8 +111,13 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 								}
 							}
 							else if (msg2 == WM_DESTROY){
-								SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldBrowserProc);// 设置回原来的处理函数
-								BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
+								if (bwInfo == NULL){
+									DefWindowProc(hWnd, message, wParam, lParam);
+								}
+								else{
+									SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldBrowserProc);// 设置回原来的处理函数
+									BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
+								}
 							}
 	}
 		break;
@@ -128,6 +135,24 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 						  }
 	}
 		break;
+	case WM_KEYUP:{
+					  if (wParam == VK_F1){//
+						  if (bwInfo->configs.enableDebug){
+							  CefPoint(pp);
+							  pp.x = 300;
+							  pp.y = 300;
+							  CefWindowInfo windowInfo;
+							  CefBrowserSettings settings;
+							  windowInfo.SetAsPopup(NULL, "cef_debug");
+							  CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
+							  host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
+						  }
+					  }
+					  else if (wParam == VK_F11){// 
+						  createNewBrowser(NULL);
+					  }
+					  break;
+	}break;
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
@@ -202,6 +227,9 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 #endif
 }
 
+
+extern JWebTopConfigs * g_configs;
+extern JWebTopConfigs * tmpConfigs;
 namespace jw{
 	// getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 	POINT getPos(HWND hWnd){
@@ -340,5 +368,23 @@ namespace jw{
 		if (bw != NULL){
 			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
 		}
+	}
+
+	DWORD WINAPI CreateNewBrowserThread(LPVOID lpvParam){
+		createNewBrowser(tmpConfigs);
+		return 0;
+	}
+	void runApp(std::wstring appDefFile, long parentWin){
+#ifdef JWebTopLog
+		wstringstream ss;
+		ss << L"run app=" << appDefFile << L",parentWin=" << parentWin <<L"\r\n";
+		writeLog(ss.str());
+#endif
+		if (tmpConfigs != g_configs)delete tmpConfigs;
+		tmpConfigs = JWebTopConfigs::loadConfigs(appDefFile);
+		tmpConfigs->parentWin = parentWin;
+		DWORD  dwThreadId = 0; // 记录线程的id
+		//HANDLE threaHandle = // 记录线程的handler
+		CreateThread(NULL, 0, CreateNewBrowserThread, NULL, NULL, &dwThreadId);
 	}
 }

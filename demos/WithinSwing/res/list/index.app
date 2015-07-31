@@ -3,6 +3,10 @@ url=index.html
 width=500
 height=500
 x=-1
-exStyle=0x00000080L
+style=369819648
 disableTransparent=1
 disableRefresh=1
+disableDevelop=0
+[CEF]
+single_process=1
+log_severity=0
