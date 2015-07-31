@@ -6,6 +6,7 @@
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
 #include  "JWebTop/json/json.h"
 #include "JWebTop/util/StrUtil.h"
+#include "include/cef_parser.h"
 #ifdef JWebTopLog
 #include "JWebTop/tests/TestUtil.h"
 #endif
@@ -21,49 +22,71 @@ namespace jc/*jc=JWebTop Client*/{
 		virtual bool OnQuery(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id,
 			const CefString& request,// request为消息JSON对象{request:msg}的msg部分（可以扩展一个JSON工具来进行解析）【解析代码：cef_message_router.cc=》CefMessageRouterRendererSideImpl】
 			bool persistent, CefRefPtr<Callback> callback) OVERRIDE{
+			cef_json_parser_options_t options = cef_json_parser_options_t();// 解析时的配置
+			CefRefPtr<CefValue> v= CefParseJSON(request, options);          // 进行解析
+			if (v == NULL){
+				callback->Failure(1, CefString(L"错误的JSON格式"));
+				return false;
+			}
 #ifdef JWebTopLog
 			wstringstream log;
 			log << L"JWebTopCommons#Handler#OnQuery jsons=" << request.ToWString() << L"\r\n";
 			writeLog(log.str());
 #endif
-			stringstream jsons;
-			jsons << wch2chr(request.ToWString().c_str());
+		
+			//stringstream jsons;
+			//jsons << wch2chr(request.ToWString().c_str());
+			//Json::Reader reader;
+			//Json::Value value;
+			//if (!reader.parse(jsons, value))return false;
+			//string methodName = value["m"].asString();
+			CefRefPtr<CefDictionaryValue> value = v->GetDictionary();
+			wstring methodName = value->GetString("m").ToWString();
+			if (methodName == L"test"){
+				wstringstream rtn;
+				CefRefPtr<CefValue> a = value->GetValue("a");
+				rtn << L" a是字符串，值=" << a->GetString().ToWString();
 
-			Json::Reader reader;
-			Json::Value value;
-			if (!reader.parse(jsons, value))return false;
-			string methodName = value["m"].asString();
-			if (methodName == "close"){
-				Json::Value handler = value["handler"];
+				CefRefPtr<CefValue> b = value->GetValue("b");
+				rtn << L" b是数值，值=" << b->GetInt();
+				
+				CefRefPtr<CefValue> c = value->GetValue("c");
+				rtn << L" c不存在" ;
+
+				callback->Success(rtn.str());
+			}else
+			if (methodName == L"close"){
+				//CefRefPtr<CefValue> handler = value->GetValue("handler");
+				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::close((HWND)handler.asInt());
+				jw::close((HWND)handler->GetInt());
 			}
-			else if (methodName == "loadUrl"){
-				Json::Value handler = value["handler"];
+			else if (methodName == L"loadUrl"){
+				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				Json::Value url = value["url"];
+				CefRefPtr<CefValue> url = value->GetValue("url");
 				if (url == NULL)return false;
-				jw::loadUrl((HWND)handler.asInt(), chr2wch(url.asString().c_str()));
+				jw::loadUrl((HWND)handler->GetInt(), url->GetString().ToWString());
 			}
-			else if (methodName == "reload"){
-				Json::Value handler = value["handler"];
+			else if (methodName == L"reload"){
+				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::reload((HWND)handler.asInt());
+				jw::reload((HWND)handler->GetInt());
 			}
-			else if (methodName == "reloadIgnoreCache"){
-				Json::Value handler = value["handler"];
+			else if (methodName == L"reloadIgnoreCache"){
+				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::reloadIgnoreCache((HWND)handler.asInt());
+				jw::reloadIgnoreCache((HWND)handler->GetInt());
 			}
-			else if (methodName == "runApp"){
-				Json::Value app = value["app"];
-				Json::Value parentWin = value["parentWin"];
-				jw::runApp(chr2wch(app.asString().c_str()), parentWin == NULL ? 0 : parentWin.asInt());
+			else if (methodName == L"runApp"){
+				CefRefPtr<CefValue> app = value->GetValue("app");
+				CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
+				jw::runApp(app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
 			}
-			else if (methodName == "showDev"){
-				Json::Value handler = value["handler"];
+			else if (methodName == L"showDev"){
+				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false; 
-				jw::showDev((HWND)handler.asInt());
+				jw::showDev((HWND)handler->GetInt());
 			}			
 			return true;
 		}
