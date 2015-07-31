@@ -19,9 +19,6 @@
     <Filter Include="jwebtop\tests">
       <UniqueIdentifier>{83533c7e-2865-45c2-b014-6db11f2d7f63}</UniqueIdentifier>
     </Filter>
-    <Filter Include="jwebtop\json">
-      <UniqueIdentifier>{8a7db016-6c28-42a6-9fa3-90b42ece8caf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JWebTop_main.cpp">
@@ -79,36 +76,6 @@
     </ClInclude>
     <ClInclude Include="jshandler\JJH_Windows.h">
       <Filter>jwebtop\jshandler</Filter>
-    </ClInclude>
-    <ClInclude Include="json\json.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\assertions.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\autolink.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\config.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\features.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\forwards.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\reader.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\value.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\version.h">
-      <Filter>jwebtop\json</Filter>
-    </ClInclude>
-    <ClInclude Include="json\writer.h">
-      <Filter>jwebtop\json</Filter>
     </ClInclude>
     <ClInclude Include="tests\TestUtil.h">
       <Filter>jwebtop\tests</Filter>

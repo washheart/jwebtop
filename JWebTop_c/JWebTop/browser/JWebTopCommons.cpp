@@ -4,7 +4,6 @@
 #include "include/wrapper/cef_helpers.h"
 #include <string>
 #include "JWebTop/winctrl/JWebTopWinCtrl.h"
-#include  "JWebTop/json/json.h"
 #include "JWebTop/util/StrUtil.h"
 #include "include/cef_parser.h"
 #ifdef JWebTopLog
@@ -33,30 +32,9 @@ namespace jc/*jc=JWebTop Client*/{
 			log << L"JWebTopCommons#Handler#OnQuery jsons=" << request.ToWString() << L"\r\n";
 			writeLog(log.str());
 #endif
-		
-			//stringstream jsons;
-			//jsons << wch2chr(request.ToWString().c_str());
-			//Json::Reader reader;
-			//Json::Value value;
-			//if (!reader.parse(jsons, value))return false;
-			//string methodName = value["m"].asString();
-			CefRefPtr<CefDictionaryValue> value = v->GetDictionary();
-			wstring methodName = value->GetString("m").ToWString();
-			if (methodName == L"test"){
-				wstringstream rtn;
-				CefRefPtr<CefValue> a = value->GetValue("a");
-				rtn << L" a是字符串，值=" << a->GetString().ToWString();
-
-				CefRefPtr<CefValue> b = value->GetValue("b");
-				rtn << L" b是数值，值=" << b->GetInt();
-				
-				CefRefPtr<CefValue> c = value->GetValue("c");
-				rtn << L" c不存在" ;
-
-				callback->Success(rtn.str());
-			}else
+			CefRefPtr<CefDictionaryValue> value = v->GetDictionary();// 按JSON字典来获取
+			wstring methodName = value->GetString("m").ToWString();  // 取出某字符串 
 			if (methodName == L"close"){
-				//CefRefPtr<CefValue> handler = value->GetValue("handler");
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
 				jw::close((HWND)handler->GetInt());
