@@ -56,11 +56,8 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
 		startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin);// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
 	}
-	else{
-		// 这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
-		//TransparentWnd* win = new TransparentWnd();
-		//CefString appName("D:\\study\\git\\repository\\webtop_new\\Release\\demo\\music\\index.app");
-		//win->RunAppIn(appName, "", pTransparentBrowser1->GetUrl());
+	else{	 //这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
+		jw::runApp(result.ToWString(), parentWin);
 	}
 	//	delete buffer;
 }

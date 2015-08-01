@@ -1,5 +1,9 @@
 [BASE]
 url=index.html
 x=-1
-exStyle=0x00000080L
+style=369819648
 disableTransparent=0
+[CEF]
+single_process=1
+log_severity=0
+enableDrag=0

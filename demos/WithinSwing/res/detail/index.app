@@ -4,3 +4,4 @@ x=-1
 style=369819648
 disableDevelop=0
 disableTransparent=1
+enableDrag=0

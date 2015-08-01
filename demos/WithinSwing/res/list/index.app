@@ -7,6 +7,7 @@ style=369819648
 disableTransparent=1
 disableRefresh=1
 disableDevelop=0
+enableDrag=0
 [CEF]
 single_process=1
 log_severity=0
