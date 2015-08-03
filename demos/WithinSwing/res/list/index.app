@@ -1,4 +1,5 @@
 [BASE]
+name=list
 url=index.html
 width=500
 height=500

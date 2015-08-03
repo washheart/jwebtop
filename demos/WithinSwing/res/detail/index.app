@@ -1,4 +1,5 @@
 [BASE]
+name=detail
 url=index.html
 x=-1
 style=369819648
