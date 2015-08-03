@@ -110,6 +110,11 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 			break;
 		}
 	}
+#ifdef JWebTopLog
+	stringstream log;
+	log << "JWebTopClient::OnBeforeClose " << browser_list_.size();
+	writeLog(log.str());
+#endif
 	if (browser_list_.empty()) {// 如果浏览器列表已经为空，那么退出浏览器的消息循环
 		CefQuitMessageLoop();
 	}
@@ -134,13 +139,17 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	frame->LoadString(ss.str(), failedUrl);
 }
 
-void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
-	CefRefPtr<CefFrame> frame,
-	int httpStatusCode){
-	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
-	stringstream extensionCode;
+void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode){
 	CefRefPtr<CefBrowserHost> host = browser->GetHost();
 	HWND hwnd = host->GetWindowHandle();
+#ifdef JWebTopJNI
+	// 回调Java程序，告知其浏览器的hwnd
+	std::wstringstream wss;
+	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hwnd << L"}}";
+	jw::invokeJavaMethod(CefString(wss.str()));
+#endif
+	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
+	stringstream extensionCode;
 	extensionCode << "if(!JWebTop)JWebTop={};";
 	extensionCode << "JWebTop.handler=" << (LONG)hwnd << ";" << endl;
 	extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
@@ -160,8 +169,11 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
 
 	// 页面加载后，触发JWebTopReady消息
-	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
+	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
+	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);" << endl;
+	writeLog(extensionCode.str());
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+
 }
 
 void JWebTopClient::CloseAllBrowsers(bool force_close) {

@@ -59,9 +59,9 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	// if this is a sub-process, executes the appropriate logic.
 	int exit_code = CefExecuteProcess(main_args, app.get(), sandbox_info);
 #ifdef JWebTopLog 
-	std::stringstream ss;
-	ss << "exit_code ==" << exit_code << "\r\n";
-	writeLog(ss.str());
+	std::stringstream log;
+	log << "exit_code ==" << exit_code << "\r\n";
+	writeLog(log.str());
 #endif
 	if (exit_code >= 0) {
 		// The sub-process has completed so return here.

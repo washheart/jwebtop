@@ -91,10 +91,11 @@ void createNewBrowser(JWebTopConfigs * configs){
 	// 用于构建本地窗口的配置信息（注：有些信息[style、exStyle]设置了不太管用，可以在Handler的OnAfterCreated中对窗口进行修饰）
 	CefWindowInfo window_info;
 
-#ifdef JWebTopLog
-	wstringstream ss;
-	ss << L"JWebTopCommons createNewBrowser parentWin=" << tmpConfigs->parentWin << L"\r\n";
-	writeLog(ss.str());
+#ifdef JWebTopLog 
+	std::wstringstream log;
+	log << L"processId=" << GetCurrentProcessId() << L" threadId=" << GetCurrentThreadId() << " title=" << tmpConfigs->name.ToWString() << L"\r\n";
+	log << L"JWebTopCommons createNewBrowser parentWin=" << tmpConfigs->parentWin << L"\r\n";
+	writeLog(log.str());
 #endif
 #if defined(OS_WIN)
 	// On Windows we need to specify certain flags that will be passed to

@@ -219,12 +219,12 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 
-	// 回调Java程序，告知其浏览器的hwnd
-	std::wstringstream wss;
-	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
-#ifdef JWebTopJNI
-	jw::invokeJavaMethod(CefString(wss.str()));
-#endif
+//#ifdef JWebTopJNI
+//	// 回调Java程序，告知其浏览器的hwnd
+//	std::wstringstream wss;
+//	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
+//	jw::invokeJavaMethod(CefString(wss.str()));
+//#endif
 }
 
 
@@ -375,14 +375,16 @@ namespace jw{
 		return 0;
 	}
 	void runApp(std::wstring appDefFile, long parentWin){
-#ifdef JWebTopLog
-		wstringstream ss;
-		ss << L"run app=" << appDefFile << L",parentWin=" << parentWin <<L"\r\n";
-		writeLog(ss.str());
+#ifdef JWebTopLog 
+		std::wstringstream log;
+		log << L"run app=" << appDefFile << L",parentWin=" << parentWin << L"\r\n";
+		writeLog(log.str());
 #endif
 		if (tmpConfigs != g_configs)delete tmpConfigs;
 		tmpConfigs = JWebTopConfigs::loadConfigs(appDefFile);
 		tmpConfigs->parentWin = parentWin;
+
+		//createNewBrowser(tmpConfigs);
 		DWORD  dwThreadId = 0; // 记录线程的id
 		//HANDLE threaHandle = // 记录线程的handler
 		CreateThread(NULL, 0, CreateNewBrowserThread, NULL, NULL, &dwThreadId);
