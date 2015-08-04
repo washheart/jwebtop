@@ -13,7 +13,6 @@ using namespace std;
 JavaVM* g_jvm;// 保存全局的虚拟机环境
 jclass g_nativeClass;// 记录全局的本地类变量
 jmethodID g_invokeByJS;// 从C端回调Java的方法
-long g_parentWin;// 全局父窗口
 
 extern HINSTANCE g_instance;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved){
@@ -44,24 +43,50 @@ CefString jw::invokeJavaMethod(CefString json){
 	// delete tmp;
 	return result;
 }
-
+void initJvmEnv(JNIEnv * env, jclass nativeClass){
+	env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
+	g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
+	g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
+}
+//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
+//(JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin){
+//	CefString result = CefString(env->GetStringUTFChars(appfile, false));
+//	if (g_invokeByJS == NULL){// 第一次被java端调用
+//		initJvmEnv(env, nativeClass);
+//		// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
+//		startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin
+//			,NULL,NULL,NULL,-1,-1,-1,-1);
+//	}
+//	else{	 //这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
+//		jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
+//	}
+//}
 // jni方法：创建浏览器
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
-(JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin){
+(JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin
+// 一下参数会替换appfile中的形影参数
+, jstring url       // 要打开的链接地址
+, jstring title     // 窗口名称
+, jstring icon      // 窗口图标
+, jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
+, jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
+){
 	CefString result = CefString(env->GetStringUTFChars(appfile, false));
-	g_parentWin = parentWin;
 	if (g_invokeByJS == NULL){// 第一次被java端调用
-		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
-		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
-		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
-		startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin);// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
+		initJvmEnv(env, nativeClass);
+		// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
+		LPTSTR url_ = NULL;
+		if (url != NULL)url_ = chr2wch(jstringToWindows(env, url));
+		LPTSTR title_ = NULL;
+		if (title != NULL)title_ = chr2wch(jstringToWindows(env, title));
+		LPTSTR icon_ = NULL;
+		if (icon != NULL)icon_ = chr2wch(jstringToWindows(env, icon));
+		startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin, url_, title_, icon_, x, y, w, h);
 	}
 	else{	 //这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
-		jw::runApp(result.ToWString(), parentWin);
+		jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
 	}
-	//	delete buffer;
 }
-
 // jni方法：执行脚本
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
 (JNIEnv * env, jclass, jlong browserHWnd, jstring json){
@@ -92,4 +117,10 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 (JNIEnv *, jclass, jlong browserHWnd, jint x, jint y, int w, int h){
 	jw::setBound((HWND)browserHWnd, x, y, w, h);
+}
+
+// jni方法：设置新的网页地址
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
+(JNIEnv * env, jclass, jlong browserHWnd, jstring url){
+	jw::loadUrl((HWND)browserHWnd, chr2wch(jstringToWindows(env, url)));
 }

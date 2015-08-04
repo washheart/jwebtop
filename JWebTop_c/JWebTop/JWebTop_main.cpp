@@ -22,13 +22,30 @@ JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
 
 // 应用程序入口
-int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long parentWin) {
+int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long parentWin
+	// 以下参数会替换appfile中的相应参数
+	, LPTSTR url       // 要打开的链接地址
+	, LPTSTR title     // 窗口名称
+	, LPTSTR icon      // 窗口图标
+	, int x, int y     // 窗口左上角坐标,当值为-1时不启用此变量		 
+	, int w, int h     // 窗口的宽、高，当值为-1时不启用此变量	
+	) {
 	g_instance = hInstance;
 	CefMainArgs main_args(NULL); // 提供CEF命令行参数
 	CefSettings settings;             // CEF全局设置
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile));
 	if (g_configs == NULL)g_configs = tmpConfigs;
+	if (url != NULL){
+		tmpConfigs->url = CefString(url);
+	}
+	if (title != NULL)tmpConfigs->name = CefString(title);
+	if (icon != NULL)tmpConfigs->icon = CefString(icon);
+	if (x != -1)tmpConfigs->x = x;
+	if (y != -1)tmpConfigs->y = y;
+	if (w != -1)tmpConfigs->w = w;
+	if (h != -1)tmpConfigs->h = h;
+
 	tmpConfigs->parentWin = parentWin;
 	// 对CEF进行一些设置
 	settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
@@ -83,6 +100,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	int       nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-	startJWebTop(hInstance, lpCmdLine, 0);
+	startJWebTop(hInstance, lpCmdLine, 0, NULL, NULL, NULL, -1, -1, -1, -1);
 	return 0;
 }

@@ -14,7 +14,9 @@ import com.fasterxml.jackson.core.JsonToken;
  * @author washheart@163.com
  */
 public final class JWebTopNative {
-	private static native void nCreateJWebTop(String appfile, long parenHwnd);
+	// private static native void nCreateJWebTop(String appfile, long parenHwnd);
+
+	private static native void nCreateJWebTop(String appfile, long parenHwnd, String url, String title, String icon, int x, int y, int w, int h);
 
 	private static native void nExecuteJs(long broserHWnd, String json);
 
@@ -24,9 +26,9 @@ public final class JWebTopNative {
 
 	private static native void nSetBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
 
-	private final static JWebTopNative INSTANCE = new JWebTopNative();
+	private static native void nSetUrl(long browserHwnd, String url);
 
-	private long rootBrowserHwnd = 0L;
+	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
 	private final class CreateBrowserLocker {
 		long hwnd = 0L;
@@ -49,11 +51,22 @@ public final class JWebTopNative {
 	 * @return
 	 */
 	public long createJWebTop(String appfile, final long parenHwnd) throws IOException {
+		return createJWebTop(appfile, parenHwnd, null, null, null, -1, -1, -1, -1);
+	}
+
+	public long createJWebTop(String appfile, final long parenHwnd
+	// 以下参数会替换appfile中的相应参数
+			, final String url // --------要打开的链接地址
+			, final String title // ------窗口名称
+			, final String icon // -------窗口图标
+			, final int x, final int y // 窗口左上角坐标,当值为-1时不启用此变量
+			, final int w, final int h // 窗口的宽、高，当值为-1时不启用此变量
+	) throws IOException {
 		final String appfile2 = new File(appfile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
 		new Thread() {
 			@Override
 			public void run() {
-				nCreateJWebTop(appfile2, parenHwnd);
+				nCreateJWebTop(appfile2, parenHwnd, url, title, icon, x, y, w, h);
 			}
 		}.start();
 		synchronized (locker) {
@@ -87,10 +100,9 @@ public final class JWebTopNative {
 
 	String dispatch(String json) throws IOException {
 		if (json.startsWith("@")) {// 约定通过特殊标记来进行处理
-		}
-		if (rootBrowserHwnd == 0) {
+			long rootBrowserHwnd = 0;
 			JsonFactory f = new JsonFactory();
-			JsonParser p = f.createParser(json);
+			JsonParser p = f.createParser(json.substring(1));
 			JsonToken result = null;
 			while ((result = p.nextToken()) != null) {
 				if (result == JsonToken.FIELD_NAME) {
@@ -98,33 +110,25 @@ public final class JWebTopNative {
 					p.nextToken();
 					if ("hwnd".equals(field)) {
 						rootBrowserHwnd = p.getLongValue();
-						synchronized (locker) {
-							locker.hwnd = rootBrowserHwnd;
-							locker.notify();
-						}
+						break;
 					}
 				}
 			}
 			p.close();
-		} else {
 			if (waitLock) synchronized (locker) {
+				locker.hwnd = rootBrowserHwnd;
 				locker.notify();// FIXME:通知解锁的时机需要控制
 			}
-			if (jsonHandler != null) {
-				String rtn = jsonHandler.dispatcher(json);
-				System.out.println("rtn = " + rtn);
-				return rtn;
-			}
+		} else if (jsonHandler != null) {
+			String rtn = jsonHandler.dispatcher(json);
+			System.out.println("rtn = " + rtn);
+			return rtn;
 		}
 		return "";
 	}
 
 	public void setJsonHandler(JWebtopJSONDispater jsonHandler) {
 		this.jsonHandler = jsonHandler;
-	}
-
-	public long getRootBrowserHwnd() {
-		return rootBrowserHwnd;
 	}
 
 	/**
@@ -183,6 +187,10 @@ public final class JWebTopNative {
 		if (browserHwnd != 0) nSetBound(browserHwnd, xOnScreen, yOnScreen, w, h);
 	}
 
+	public static void setUrl(long browserHwnd, String url) {
+		if (browserHwnd != 0) nSetUrl(browserHwnd, url);
+	}
+
 	/**
 	 * 得到某Java控件对应的句柄HWND
 	 * 
@@ -193,5 +201,4 @@ public final class JWebTopNative {
 	public static long getWindowHWND(Component target) {
 		return ((sun.awt.windows.WComponentPeer/* 此类来自JDK，纯jre不行 */) target.getPeer()).getHWnd();
 	}
-
 }

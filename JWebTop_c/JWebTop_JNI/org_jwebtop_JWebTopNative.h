@@ -13,15 +13,30 @@ extern "C" {
 
  // dll入口函数
  BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved);
- 
-/*
+ /*
  * 对应org.jwebtop.JWebTopNative类的createJWebTop方法
  * 该方法用于创建一个浏览器窗口
  * appfile 浏览器根据此配置文件进行初始化
  * parentWin 创建的浏览器的父窗口是哪个
  */
  JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
-(JNIEnv *, jclass, jstring appfile, jlong parentWin);
+	 (JNIEnv *, jclass, jstring appfile, jlong parentWin
+	 // 以下参数会替换appfile中的相应参数
+	 , jstring url       // 要打开的链接地址
+	 , jstring title     // 窗口名称
+	 , jstring icon      // 窗口图标
+	 , jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
+	 , jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
+	 );
+
+///*
+// * 对应org.jwebtop.JWebTopNative类的createJWebTop方法
+// * 该方法用于创建一个浏览器窗口
+// * appfile 浏览器根据此配置文件进行初始化
+// * parentWin 创建的浏览器的父窗口是哪个
+// */
+// JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
+//(JNIEnv *, jclass, jstring appfile, jlong parentWin);
 
 /*
  * 对应org.jwebtop.JWebTopNative类的executeJs方法
@@ -44,6 +59,9 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 (JNIEnv *, jclass, jlong browserHWnd, jint x, jint y,int w,int h);
 
+// jni方法：设置新的网页地址
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
+(JNIEnv *, jclass, jlong browserHWnd, jstring url);
 #ifdef __cplusplus
 }
 #endif

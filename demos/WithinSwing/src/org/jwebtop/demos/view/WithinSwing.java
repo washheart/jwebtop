@@ -27,6 +27,8 @@ import org.jwebtop.demos.ctrl.WithinSwingCtrl.DetailBrowserListener;
  * @author washheart@163.com
  */
 public class WithinSwing extends JFrame {
+	protected static long RootBrowserHwnd = 0;
+
 	private static void initDll(String[] args) {
 		String dll = "JWebTop.dll";
 		File tmp = null;
@@ -73,7 +75,7 @@ public class WithinSwing extends JFrame {
 		this.listWebtopView.setBrowserHwndFeeder(new IBrowserHwndFeeder() {
 			@Override
 			public long getBrowserHwnd() {
-				return JWebTopNative.getInstance().getRootBrowserHwnd();
+				return RootBrowserHwnd;
 			}
 		});
 		this.detailWebtopView = new JWebTopBrowser();
@@ -102,9 +104,9 @@ public class WithinSwing extends JFrame {
 			JOptionPane.showMessageDialog(this, "wait");
 			WithinSwing.frameHwnd = JWebTopNative.getWindowHWND(this);
 			System.out.println("Java窗口handler = " + WithinSwing.frameHwnd + " hex=0x" + Long.toHexString(WithinSwing.frameHwnd));
-			long handler = JWebTopNative.getInstance().createJWebTop(ctrl.getListAppFile(), WithinSwing.frameHwnd);
-			System.out.println("浏览器窗口handler = " + handler + " hex=0x" + Long.toHexString(handler));
-			ctrl.setListHandler(handler);
+			RootBrowserHwnd = JWebTopNative.getInstance().createJWebTop(ctrl.getListAppFile(), WithinSwing.frameHwnd);
+			System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
+			ctrl.setListHandler(RootBrowserHwnd);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

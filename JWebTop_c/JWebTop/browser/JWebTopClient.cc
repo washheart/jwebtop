@@ -115,6 +115,7 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	log << "JWebTopClient::OnBeforeClose " << browser_list_.size();
 	writeLog(log.str());
 #endif
+
 	if (browser_list_.empty()) {// 如果浏览器列表已经为空，那么退出浏览器的消息循环
 		CefQuitMessageLoop();
 	}
@@ -145,7 +146,7 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 #ifdef JWebTopJNI
 	// 回调Java程序，告知其浏览器的hwnd
 	std::wstringstream wss;
-	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hwnd << L"}}";
+	wss << L"@{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hwnd << L"}}";
 	jw::invokeJavaMethod(CefString(wss.str()));
 #endif
 	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
