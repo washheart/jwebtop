@@ -22,7 +22,7 @@ namespace jc/*jc=JWebTop Client*/{
 			const CefString& request,// request为消息JSON对象{request:msg}的msg部分（可以扩展一个JSON工具来进行解析）【解析代码：cef_message_router.cc=》CefMessageRouterRendererSideImpl】
 			bool persistent, CefRefPtr<Callback> callback) OVERRIDE{
 			cef_json_parser_options_t options = cef_json_parser_options_t();// 解析时的配置
-			CefRefPtr<CefValue> v= CefParseJSON(request, options);          // 进行解析
+			CefRefPtr<CefValue> v = CefParseJSON(request, options);          // 进行解析
 			if (v == NULL){
 				callback->Failure(1, CefString(L"错误的JSON格式"));
 				return false;
@@ -63,9 +63,9 @@ namespace jc/*jc=JWebTop Client*/{
 			}
 			else if (methodName == L"showDev"){
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
-				if (handler == NULL)return false; 
+				if (handler == NULL)return false;
 				jw::showDev((HWND)handler->GetInt());
-			}			
+			}
 			return true;
 		}
 	};
@@ -101,6 +101,10 @@ void createNewBrowser(JWebTopConfigs * configs){
 	// On Windows we need to specify certain flags that will be passed to
 	window_info.SetAsPopup((HWND)tmpConfigs->parentWin, tmpConfigs->name);
 #endif
+	if (tmpConfigs->x != -1)window_info.x = tmpConfigs->x;
+	if (tmpConfigs->y != -1)window_info.y = tmpConfigs->y;
+	if (tmpConfigs->w != -1)window_info.width = tmpConfigs->w;
+	if (tmpConfigs->h != -1)window_info.height = tmpConfigs->h;
 	if (g_handler == NULL)g_handler = new JWebTopClient();
 	CefBrowserSettings browser_settings;
 	//window_info.window_name = UUID::Data1();// 用UUID作为窗口名称，建立窗口名与JWebTopConfigs的关联？？？

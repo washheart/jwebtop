@@ -96,7 +96,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	{
 #ifdef JWebTopLog
 							stringstream sss;
-							sss << "BrowerWndProc hWnd="<<hWnd<<" WM_PARENTNOTIFY[wParam=" << wParam << ",lParam=" << lParam << "]" << "\r\n";
+							sss << "BrowerWndProc hWnd=" << hWnd << " WM_PARENTNOTIFY[wParam=" << wParam << ",lParam=" << lParam << "]" << "\r\n";
 							writeLog(sss.str());
 #endif
 							UINT msg2 = LOWORD(wParam);
@@ -180,21 +180,25 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	if (!configs.icon.empty()){
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
-	}
-	if (configs.x != -1 || configs.y != -1 || configs.w != -1 || configs.h != -1){
-		RECT rc = winInfo.rcWindow;
-		SetWindowPos(hWnd, HWND_TOPMOST,
-			configs.x == -1 ? rc.left : configs.x, configs.y == -1 ? rc.top : configs.y,
-			configs.w == -1 ? rc.right : configs.w, configs.h == -1 ? rc.bottom : configs.h,
-			SWP_ASYNCWINDOWPOS | SWP_FRAMECHANGED | SWP_NOCOPYBITS | SWP_NOZORDER);
 		changed = true;
 	}
+	if (configs.max){// 需要按最大化的方式来显示
+		jw::max(hWnd);
+	}
+	else if (configs.parentWin != 0){// 没有指定父窗口时，在桌面正中显示窗口
+		if (configs.x == -1 || configs.y == -1){
+			RECT rc = winInfo.rcWindow;
+			jw::setCenter(hWnd
+				, configs.x == -1 ? rc.left : configs.x
+				, configs.y == -1 ? rc.top : configs.y
+				, rc.right - rc.left, rc.bottom - rc.top);
+		}
+	}
+	else if (changed){// 如果窗口风格有改变，重绘下窗口
+		RECT rc = winInfo.rcWindow;
+		SetWindowPos(hWnd, HWND_TOPMOST, rc.left, rc.top, rc.right, rc.bottom, SWP_ASYNCWINDOWPOS | SWP_FRAMECHANGED | SWP_NOCOPYBITS | SWP_NOZORDER);
+	}
 	HWND bWnd = GetNextWindow(hWnd, GW_CHILD);// 得到真实的浏览器窗口
-	//if (changed){// 如果窗口的状态发生了改变
-	//	//RECT rc;
-	//	//GetWindowRect(hWnd, &rc);// 获取窗口大小（如果窗口有边框和标题栏，则会带上的）
-	//	//MoveWindow(bWnd, 0, 0, rc.right - rc.left, rc.bottom - rc.top, true);// 这样移动之后有可能会造成浏览器的实际大小“稍稍”大于窗口可视面积，但影响不大
-	//}
 	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);
 	if (preWndProc != (LONG)JWebTop_BrowerWndProc){
 		SetWindowLongPtr(bWnd, GWLP_WNDPROC, (LONG)JWebTop_BrowerWndProc);
@@ -219,18 +223,45 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 
-//#ifdef JWebTopJNI
-//	// 回调Java程序，告知其浏览器的hwnd
-//	std::wstringstream wss;
-//	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
-//	jw::invokeJavaMethod(CefString(wss.str()));
-//#endif
+	//#ifdef JWebTopJNI
+	//	// 回调Java程序，告知其浏览器的hwnd
+	//	std::wstringstream wss;
+	//	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
+	//	jw::invokeJavaMethod(CefString(wss.str()));
+	//#endif
 }
 
 
 extern JWebTopConfigs * g_configs;
 extern JWebTopConfigs * tmpConfigs;
 namespace jw{
+	// setToCenter(handler);// 让窗口显示在屏幕正中
+	void setCenter(HWND hWnd){
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		MoveWindow(hWnd, rt.left, rt.top, rt.right - rt.left, rt.bottom - rt.top, FALSE);
+	}
+
+	// setToCenter(handler);// 让窗口显示在屏幕正中
+	void setCenter(HWND hWnd, int x, int y, int w, int h){
+		int sw = GetSystemMetrics(SM_CXFULLSCREEN);
+		int sh = GetSystemMetrics(SM_CYFULLSCREEN);// +GetSystemMetrics(SM_CYCAPTION);
+		if (sw <= w){
+			x = 0;
+			w = sw;
+		}
+		else{
+			x = (sw - w) / 2;
+		}
+		if (sh < h){
+			y = 0;
+			h = sh;
+		}
+		else{
+			y = (sh - h) / 2;
+		}
+		MoveWindow(hWnd, x, y, w, h, FALSE);
+	}
 	// getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 	POINT getPos(HWND hWnd){
 		RECT rt = getBound(hWnd);
@@ -296,7 +327,8 @@ namespace jw{
 	}
 	// max(handler);//最大化窗口
 	void max(HWND hWnd){
-		setBound(hWnd, 0, 0, GetSystemMetrics(SM_CXFULLSCREEN), GetSystemMetrics(SM_CYFULLSCREEN) + GetSystemMetrics(SM_CYCAPTION));
+		//setBound(hWnd, 0, 0, GetSystemMetrics(SM_CXFULLSCREEN), GetSystemMetrics(SM_CYFULLSCREEN) + GetSystemMetrics(SM_CYCAPTION));
+		ShowWindow(hWnd, SW_MAXIMIZE);
 	}
 	// mini(hander);//最小化窗口
 	void mini(HWND hWnd){
