@@ -30,13 +30,34 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	return TRUE;
 }
+
+JNIEnv* GetJNIEnv() {
+	JNIEnv *env = NULL;
+	if (g_jvm->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_EDETACHED &&
+		g_jvm->AttachCurrentThread((void**)&env, NULL) != JNI_OK) {
+		return NULL;
+	}
+	return env;
+}
+void DetachFromThread(bool *mustDetach) {
+	if (!g_jvm) {
+		return;
+	}
+	if (*mustDetach)
+		g_jvm->DetachCurrentThread();
+}
 // 用于回调java程序的方法（定义于jwebtop_brige.h）
 CefString jw::invokeJavaMethod(CefString json){
 	JNIEnv *env;
+	bool detachEnv = false;
 	if (g_jvm->GetEnv((void **)&env, JNI_VERSION_1_6) < 0){
-		if (g_jvm->AttachCurrentThread((void **)&env, NULL) < 0) return CefString();
+		if (g_jvm->AttachCurrentThread((void **)&env, NULL) < 0){
+			return CefString();
+		}
+		else{
+			detachEnv = true;// 如果是Attach上的env，那么需要detach
+		}
 	}
-
 	jstring sss = env->NewStringUTF(json.ToString().c_str());
 	jstring str = (jstring)env->CallStaticObjectMethod(g_nativeClass, g_invokeByJS, sss);
 	env->DeleteLocalRef(sss);
@@ -44,6 +65,7 @@ CefString jw::invokeJavaMethod(CefString json){
 	CefString result = CefString(env->GetStringUTFChars(str, false));
 	env->DeleteLocalRef(str);
 	// delete tmp;
+	if (detachEnv)g_jvm->DetachCurrentThread();
 	return result;
 }
 
