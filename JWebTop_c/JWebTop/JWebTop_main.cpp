@@ -31,7 +31,11 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	, int w, int h     // 窗口的宽、高，当值为-1时不启用此变量	
 	) {
 	g_instance = hInstance;
-	CefMainArgs main_args(NULL); // 提供CEF命令行参数
+	#ifdef JWebTopJNI
+		CefMainArgs main_args(::GetModuleHandle(NULL));
+	#else
+		CefMainArgs main_args(g_instance); // 提供CEF命令行参数
+	#endif
 	CefSettings settings;             // CEF全局设置
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile));
@@ -68,7 +72,9 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	// for sandbox support on Windows. See cef_sandbox_win.h for complete details.
 	CefScopedSandboxInfo scoped_sandbox;
 	sandbox_info = scoped_sandbox.sandbox_info();
-#endif
+#else
+	settings.no_sandbox = tmpConfigs->no_sandbox;
+#endif	
 	CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
 	// CEF applications have multiple sub-processes (render, plugin, GPU, etc)
@@ -77,16 +83,13 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	int exit_code = CefExecuteProcess(main_args, app.get(), sandbox_info);
 #ifdef JWebTopLog 
 	std::stringstream log;
-	log << "exit_code ==" << exit_code << "\r\n";
+	log << "CefExecuteProcess exit_code ==" << exit_code << "\r\n";
 	writeLog(log.str());
 #endif
 	if (exit_code >= 0) {
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-#if !defined(CEF_USE_SANDBOX)
-	settings.no_sandbox = tmpConfigs->no_sandbox;
-#endif	
 	CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
 	CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
 	CefShutdown();      // 关闭CEF

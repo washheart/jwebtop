@@ -9,7 +9,7 @@ HANDLE hFile;// 调试时用于输出日志文件
 DWORD filePos = 0;// 调试时用于输出日志文件
 void checFile(){
 	if (hFile == NULL){
-		hFile = CreateFile(L"run.log", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
+		hFile = CreateFile(L"jwebtop.log", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
 	}
 }
 void writeLog(wstring str){
