@@ -35,11 +35,11 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	, int w, int h     // 窗口的宽、高，当值为-1时不启用此变量	
 	) {
 	g_instance = hInstance;
-	#ifdef JWebTopJNI
-		CefMainArgs main_args(::GetModuleHandle(NULL));
-	#else
-		CefMainArgs main_args(g_instance); // 提供CEF命令行参数
-	#endif
+#ifdef JWebTopJNI
+	CefMainArgs main_args(::GetModuleHandle(NULL));
+#else
+	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
+#endif
 	CefSettings settings;             // CEF全局设置
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile));
@@ -69,6 +69,9 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	settings.ignore_certificate_errors = tmpConfigs->ignore_certificate_errors;// 是否忽略SSL证书错误
 	settings.remote_debugging_port = tmpConfigs->remote_debugging_port;        // 远程调试端口，取值范围[1024-65535]
 
+#ifdef JWebTopLog
+	settings.log_severity = LOGSEVERITY_VERBOSE;
+#endif
 	void* sandbox_info = NULL;
 
 #if defined(CEF_USE_SANDBOX)
@@ -79,9 +82,14 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 #else
 	settings.no_sandbox = tmpConfigs->no_sandbox;
 #endif	
+#ifdef JWebTopJNI
+	settings.single_process = 1;
 	settings.multi_threaded_message_loop = 1;
+#endif
 	CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
+
+	CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
 	// CEF applications have multiple sub-processes (render, plugin, GPU, etc)
 	// that share the same executable. This function checks the command-line and,
 	// if this is a sub-process, executes the appropriate logic.
@@ -95,27 +103,10 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-	if (settings.multi_threaded_message_loop){// 各自有独立的消息循环
-		MSG msg;
-		HACCEL	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CEFCLIENT));
-		// Run the application message loop.
-		while (GetMessage(&msg, NULL, 0, 0)) {
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-	}
-	else{
-		CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
-		CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
-		// 下面的这种是自己侦听消息循环的方式，性能比CefRunMessageLoop()略差，但是好处是能自己控制线程间的锁定（但是依然无法解决java线程与cef消息冲突的问题）
-		//while (runable){
-		//	CefDoMessageLoopWork();
-		//	Sleep(30);
-		//}
-	}
+#ifndef JWebTopJNI
+	CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
 	CefShutdown();      // 关闭CEF
+#endif
 	return 0;
 }
 
