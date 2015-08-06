@@ -108,7 +108,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 	}
 	else{
 		CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
-		//CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
+		CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
 		// 下面的这种是自己侦听消息循环的方式，性能比CefRunMessageLoop()略差，但是好处是能自己控制线程间的锁定（但是依然无法解决java线程与cef消息冲突的问题）
 		//while (runable){
 		//	CefDoMessageLoopWork();
