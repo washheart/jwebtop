@@ -10,6 +10,10 @@
 #ifdef JWebTopLog
 #include "JWebTop/tests/TestUtil.h"
 #endif
+
+
+#define IDC_CEFCLIENT                   109
+
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library is currently built with VS2013. It may not
 // link successfully with other VS versions.
@@ -75,6 +79,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 #else
 	settings.no_sandbox = tmpConfigs->no_sandbox;
 #endif	
+	settings.multi_threaded_message_loop = 1;
 	CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
 	// CEF applications have multiple sub-processes (render, plugin, GPU, etc)
@@ -90,13 +95,26 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-	CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
-	CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
-	// 下面的这种是自己侦听消息循环的方式，性能比CefRunMessageLoop()略差，但是好处是能自己控制线程间的锁定（但是依然无法解决java线程与cef消息冲突的问题）
-	//while (runable){
-	//	CefDoMessageLoopWork();
-	//	Sleep(30);
-	//}
+	if (settings.multi_threaded_message_loop){// 各自有独立的消息循环
+		MSG msg;
+		HACCEL	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CEFCLIENT));
+		// Run the application message loop.
+		while (GetMessage(&msg, NULL, 0, 0)) {
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+	}
+	else{
+		CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
+		//CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
+		// 下面的这种是自己侦听消息循环的方式，性能比CefRunMessageLoop()略差，但是好处是能自己控制线程间的锁定（但是依然无法解决java线程与cef消息冲突的问题）
+		//while (runable){
+		//	CefDoMessageLoopWork();
+		//	Sleep(30);
+		//}
+	}
 	CefShutdown();      // 关闭CEF
 	return 0;
 }
