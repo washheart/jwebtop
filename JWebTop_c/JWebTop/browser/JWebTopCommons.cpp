@@ -3,11 +3,11 @@
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
 #include <string>
-#include "JWebTop/winctrl/JWebTopWinCtrl.h"
-#include "JWebTop/util/StrUtil.h"
+#include "JWebTop/wndproc/JWebTopWndProc.h"
+#include "common/util/StrUtil.h"
 #include "include/cef_parser.h"
 #ifdef JWebTopLog
-#include "JWebTop/tests/TestUtil.h"
+#include "common/tests/TestUtil.h"
 #endif
 using namespace std;
 
@@ -37,34 +37,34 @@ namespace jc/*jc=JWebTop Client*/{
 			if (methodName == L"close"){
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::close((HWND)handler->GetInt());
+				jb::close((HWND)handler->GetInt());
 			}
 			else if (methodName == L"loadUrl"){
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
 				CefRefPtr<CefValue> url = value->GetValue("url");
 				if (url == NULL)return false;
-				jw::loadUrl((HWND)handler->GetInt(), url->GetString().ToWString());
+				jb::loadUrl((HWND)handler->GetInt(), url->GetString().ToWString());
 			}
 			else if (methodName == L"reload"){
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::reload((HWND)handler->GetInt());
+				jb::reload((HWND)handler->GetInt());
 			}
 			else if (methodName == L"reloadIgnoreCache"){
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::reloadIgnoreCache((HWND)handler->GetInt());
+				jb::reloadIgnoreCache((HWND)handler->GetInt());
 			}
 			else if (methodName == L"runApp"){
 				CefRefPtr<CefValue> app = value->GetValue("app");
 				CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
-				jw::runApp(app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
+				jb::runApp(app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
 			}
 			else if (methodName == L"showDev"){
 				CefRefPtr<CefValue> handler = value->GetValue("handler");
 				if (handler == NULL)return false;
-				jw::showDev((HWND)handler->GetInt());
+				jb::showDev((HWND)handler->GetInt());
 			}
 			return true;
 		}

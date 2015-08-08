@@ -9,7 +9,7 @@
 #include "JWebTop/jshandler/JWebTopJSHanlder.h"
 #include "include/base/cef_logging.h"
 #ifdef JWebTopLog
-#include "JWebTop/tests/TestUtil.h"
+#include "common/tests/TestUtil.h"
 #endif
 namespace renderer {
 	namespace {

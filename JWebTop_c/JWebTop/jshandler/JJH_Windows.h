@@ -5,7 +5,8 @@
 #include <string>
 #include "include/cef_app.h" 
 #include "JWebTopJSHanlder.h"
-#include "JWebTop/winctrl/JWebTopWinCtrl.h"
+#include "common/winctrl/JWebTopWinCtrl.h"
+#include "JWebTop/wndproc/JWebTopWndProc.h"
 
 // JJH=JWebTop JavaScriptHandler
 
@@ -123,7 +124,7 @@ private:
 class JJH_Close : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jw::close(getHWND(object, arguments, 0));
+		jb::close(getHWND(object, arguments, 0));
 		return true;
 	}
 private:
@@ -218,7 +219,7 @@ class JJH_LoadUrl : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 1)return false;
-		jw::loadUrl(getHWND(object, arguments, 1), arguments[0]->GetStringValue().ToWString());
+		jb::loadUrl(getHWND(object, arguments, 1), arguments[0]->GetStringValue().ToWString());
 		return true;
 	}
 private:
@@ -228,7 +229,7 @@ private:
 class JJH_Reload : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jw::reload(getHWND(object, arguments, 0));
+		jb::reload(getHWND(object, arguments, 0));
 		return true;
 	}
 private:
@@ -239,7 +240,7 @@ private:
 class JJH_ReloadIgnoreCache : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jw::reloadIgnoreCache(getHWND(object, arguments, 0));
+		jb::reloadIgnoreCache(getHWND(object, arguments, 0));
 		return true;
 	}
 private:
@@ -249,7 +250,7 @@ private:
 class JJH_ShowDev : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jw::showDev(getHWND(object, arguments, 0));
+		jb::showDev(getHWND(object, arguments, 0));
 		return true;
 	}
 private:

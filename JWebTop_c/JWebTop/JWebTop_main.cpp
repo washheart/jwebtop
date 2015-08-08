@@ -6,9 +6,9 @@
 
 #include "browser/JWebTopApp.h"
 #include "include/cef_sandbox_win.h"
-#include "JWebTop/winctrl/JWebTopConfigs.h"
+#include "JWebTop/config/JWebTopConfigs.h"
 #ifdef JWebTopLog
-#include "JWebTop/tests/TestUtil.h"
+#include "common/tests/TestUtil.h"
 #endif
 
 

@@ -2,7 +2,7 @@
 #include "TestUtil.h"
 #include <Windows.h>
 #include <string>
-#include "JWebTop/util/StrUtil.h"
+#include "common/util/StrUtil.h"
 using namespace std;
 
 HANDLE hFile;// 调试时用于输出日志文件

@@ -167,7 +167,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>Xcopy  "$(ProjectDir)tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y</Command>
+      <Command>Xcopy  "$(SolutionDir)common\tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">
@@ -227,27 +227,29 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\tests\TestUtil.cpp" />
+    <ClCompile Include="..\common\util\StrUtil.cpp" />
+    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
     <ClCompile Include="browser\JWebTopApp.cpp" />
     <ClCompile Include="browser\JWebTopCommons.cpp" />
     <ClCompile Include="browser\JWebTopClient.cc" />
     <ClCompile Include="browser\JWebTopRenderer.cc" />
+    <ClCompile Include="config\JWebTopConfigs.cpp" />
     <ClCompile Include="jshandler\JWebTopJSHanlder.cpp" />
     <ClCompile Include="JWebTop_main.cpp" />
-    <ClCompile Include="tests\TestUtil.cpp" />
-    <ClCompile Include="util\StrUtil.cpp" />
-    <ClCompile Include="winctrl\JWebTopConfigs.cpp" />
-    <ClCompile Include="winctrl\JWebTopWinCtrl.cpp" />
+    <ClCompile Include="wndproc\JWebTopWndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\tests\TestUtil.h" />
+    <ClInclude Include="..\common\util\StrUtil.h" />
+    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
     <ClInclude Include="browser\JWebTopApp.h" />
     <ClInclude Include="browser\JWebTopCommons.h" />
     <ClInclude Include="browser\JWebTopClient.h" />
+    <ClInclude Include="config\JWebTopConfigs.h" />
     <ClInclude Include="jshandler\JJH_Windows.h" />
     <ClInclude Include="jshandler\JWebTopJSHanlder.h" />
-    <ClInclude Include="tests\TestUtil.h" />
-    <ClInclude Include="util\StrUtil.h" />
-    <ClInclude Include="winctrl\JWebTopConfigs.h" />
-    <ClInclude Include="winctrl\JWebTopWinCtrl.h" />
+    <ClInclude Include="wndproc\JWebTopWndProc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,7 +8,7 @@
 #include <set>
 #include "include/cef_client.h"
 #include "include/wrapper/cef_message_router.h"
-#include "JWebTop/winctrl/JWebTopConfigs.h"
+#include "JWebTop/config/JWebTopConfigs.h"
 
 class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
