@@ -142,17 +142,11 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode){
 	CefRefPtr<CefBrowserHost> host = browser->GetHost();
-	HWND hwnd = host->GetWindowHandle();
-#ifdef JWebTopJNI
-	// 回调Java程序，告知其浏览器的hwnd
-	std::wstringstream wss;
-	wss << L"@{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hwnd << L"}}";
-	jw::invokeJavaMethod(CefString(wss.str()));
-#endif
+	HWND hWnd = host->GetWindowHandle();
 	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
 	stringstream extensionCode;
 	extensionCode << "if(!JWebTop)JWebTop={};";
-	extensionCode << "JWebTop.handler=" << (LONG)hwnd << ";" << endl;
+	extensionCode << "JWebTop.handler=" << (LONG)hWnd << ";" << endl;
 	extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
 	if (!g_single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
 		// close(handler);// 关闭窗口

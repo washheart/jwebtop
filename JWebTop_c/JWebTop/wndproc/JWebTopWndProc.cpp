@@ -1,11 +1,15 @@
 #include "JWebTopWndProc.h"
 
 #include "JWebTop/browser/JWebTopCommons.h"
+
+#include "common/JWebTopMsg.h"
 #include "common/util/StrUtil.h"
+#include "common/process/MultiProcess.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
+
 using namespace std;
 BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
 
@@ -27,11 +31,15 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 	}
 	return NULL;
 }
+
 // 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
 LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
+	case WM_COPYDATA:{
+						 return onWmCopyData(bwInfo, hWnd, message, wParam, lParam);
+	}
 	case WM_SIZE:
 	{
 					stringstream js_event;
@@ -138,7 +146,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 		break;
 	case WM_KEYUP:{
 					  if (wParam == VK_F1){//
-						  if (bwInfo->configs.enableDebug){
+						  //if (bwInfo->configs.enableDebug){
 							  CefPoint(pp);
 							  pp.x = 300;
 							  pp.y = 300;
@@ -147,7 +155,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 							  windowInfo.SetAsPopup(NULL, "cef_debug");
 							  CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
 							  host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
-						  }
+						  //}
 					  }
 					  else if (wParam == VK_F11){// 
 						  createNewBrowser(NULL);
@@ -157,7 +165,40 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
-
+// 处理WM_COPYDATA消息:jwebTop回调java函数
+LRESULT onWmCopyData(BrowserWindowInfo * bwInfo, HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+	COPYDATASTRUCT* copyData = (COPYDATASTRUCT*)lParam;
+	//LPTSTR lpStr = new TCHAR[32];
+	CefString msg;
+	DWORD msgId;
+	switch (copyData->dwData)
+	{
+	case WM_COPYDATA_MINI:{
+							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
+							  msgId = mpMsg->msgId;
+							  msg=CefString(mpMsg->msg);
+							  break;
+	}
+	case WM_COPYDATA_LARGE:{
+							   MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
+							   msgId = mpMsg->msgId;
+							   msg=CefString(mpMsg->msg);
+							   break;
+	}
+	default:
+		break;
+	}
+	if (msgId == JWEBTOP_MSG_EXECJS){
+		bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
+		return true;
+	}
+	else if (msgId == JWEBTOP_MSG_LOADURL){
+		//jb::loadUrl(hWnd, msg);
+		bwInfo->browser->GetMainFrame()->LoadURL(msg);
+		return true;
+	}
+	return	excuteJSON(msg);
+}
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
 	JWebTopConfigs configs = (*p_configs);
@@ -214,28 +255,35 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		bwInfo->configs = configs;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
+		if (configs.msgWin != 0) {
+			bwInfo->msgWin = (HWND)configs.msgWin;
+			std::wstringstream wss;
+			wss << L"@{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
+			jb::sendJWebTopProcessMsg(browser->GetHost()->GetWindowHandle(), 0, LPTSTR(wss.str().c_str()));
+		}
 	}
 #ifdef JWebTopLog
 	stringstream ss;
 	ss << "hWnd===" << hWnd << ",bWnd=" << bWnd << ",rWnd=<<" << GetNextWindow(bWnd, GW_CHILD) //
-		<< ",pWnd=" << ::GetAncestor(browser->GetHost()->GetWindowHandle(), GA_ROOT)
-		<< ",aWnd1=" << ::GetAncestor(hWnd, GA_ROOT)
-		<< ",aWnd2=" << ::GetAncestor(bWnd, GA_ROOT)
+		<< ",parentWin=" << configs.parentWin
+		<< ",msgWin=" << configs.msgWin
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 
-	//#ifdef JWebTopJNI
-	//	// 回调Java程序，告知其浏览器的hwnd
-	//	std::wstringstream wss;
-	//	wss << L"{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
-	//	jw::invokeJavaMethod(CefString(wss.str()));
-	//#endif
 }
+
 
 
 extern JWebTopConfigs * g_configs;
 extern JWebTopConfigs * tmpConfigs;
 namespace jb{
+	BOOL sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw == NULL)return false;
+		if (bw->msgWin == 0)return false;
+		return sendProcessMsg(bw->msgWin, msgId, msg);
+	}
+
 	//close(handler);// 关闭窗口
 	void close(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);

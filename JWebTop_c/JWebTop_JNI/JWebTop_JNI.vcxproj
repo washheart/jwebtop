@@ -430,41 +430,23 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\JWebTop\browser\JWebTopApp.h" />
-    <ClInclude Include="..\JWebTop\browser\JWebTopClient.h" />
-    <ClInclude Include="..\JWebTop\browser\JWebTopCommons.h" />
-    <ClInclude Include="..\JWebTop\jshandler\JJH_Windows.h" />
-    <ClInclude Include="..\JWebTop\jshandler\JWebTopJSHanlder.h" />
-    <ClInclude Include="..\JWebTop\json\assertions.h" />
-    <ClInclude Include="..\JWebTop\json\autolink.h" />
-    <ClInclude Include="..\JWebTop\json\config.h" />
-    <ClInclude Include="..\JWebTop\json\features.h" />
-    <ClInclude Include="..\JWebTop\json\forwards.h" />
-    <ClInclude Include="..\JWebTop\json\json.h" />
-    <ClInclude Include="..\JWebTop\json\reader.h" />
-    <ClInclude Include="..\JWebTop\json\value.h" />
-    <ClInclude Include="..\JWebTop\json\version.h" />
-    <ClInclude Include="..\JWebTop\json\writer.h" />
-    <ClInclude Include="..\JWebTop\tests\TestUtil.h" />
-    <ClInclude Include="..\JWebTop\util\StrUtil.h" />
-    <ClInclude Include="..\JWebTop\winctrl\JWebTopConfigs.h" />
-    <ClInclude Include="..\JWebTop\winctrl\JWebTopWinCtrl.h" />
+    <ClInclude Include="..\common\process\MultiProcess.h" />
+    <ClInclude Include="..\common\tests\TestUtil.h" />
+    <ClInclude Include="..\common\util\StrUtil.h" />
+    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
     <ClInclude Include="javautils.h" />
     <ClInclude Include="jwebtop_brige.h" />
+    <ClInclude Include="msgwin\MsgWin.h" />
     <ClInclude Include="org_jwebtop_JWebTopNative.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\JWebTop\browser\JWebTopApp.cpp" />
-    <ClCompile Include="..\JWebTop\browser\JWebTopClient.cc" />
-    <ClCompile Include="..\JWebTop\browser\JWebTopCommons.cpp" />
-    <ClCompile Include="..\JWebTop\browser\JWebTopRenderer.cc" />
-    <ClCompile Include="..\JWebTop\jshandler\JWebTopJSHanlder.cpp" />
-    <ClCompile Include="..\JWebTop\JWebTop_main.cpp" />
-    <ClCompile Include="..\JWebTop\tests\TestUtil.cpp" />
-    <ClCompile Include="..\JWebTop\util\StrUtil.cpp" />
-    <ClCompile Include="..\JWebTop\winctrl\JWebTopConfigs.cpp" />
-    <ClCompile Include="..\JWebTop\winctrl\JWebTopWinCtrl.cpp" />
+    <ClCompile Include="..\common\process\MultiProcess.cpp" />
+    <ClCompile Include="..\common\tests\TestUtil.cpp" />
+    <ClCompile Include="..\common\util\StrUtil.cpp" />
+    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
+    <ClCompile Include="javautils.cpp" />
     <ClCompile Include="jwebtop.cpp" />
+    <ClCompile Include="msgwin\MsgWin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="jni_jdk1_6_24\jawt.h" />

@@ -28,6 +28,9 @@
     <Filter Include="jwebtop\wndproc">
       <UniqueIdentifier>{a5a0abef-2d58-4034-adb1-b568f42e7dc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\process">
+      <UniqueIdentifier>{40726deb-62ab-4982-af06-1c4f6d9054cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JWebTop_main.cpp">
@@ -63,6 +66,9 @@
     <ClCompile Include="wndproc\JWebTopWndProc.cpp">
       <Filter>jwebtop\wndproc</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\process\MultiProcess.cpp">
+      <Filter>common\process</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -94,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="wndproc\JWebTopWndProc.h">
       <Filter>jwebtop\wndproc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\process\MultiProcess.h">
+      <Filter>common\process</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\JWebTopMsg.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

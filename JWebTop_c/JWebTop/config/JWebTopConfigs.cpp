@@ -1,4 +1,11 @@
 #include "JWebTopConfigs.h"
+
+#include <Windows.h>
+#include <ShellAPI.h> 
+#include <iostream> 
+#include <sstream> 
+#include <strsafe.h>
+#include "common/util/StrUtil.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -104,5 +111,36 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	configs->locales_dir_path = CefString(locales_dir_path_);// 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
 	configs->ignore_certificate_errors = GetPrivateProfileInt(L"CEF", L"ignore_certificate_errors", configs->ignore_certificate_errors, appDefFile.data());             // 是否忽略SSL证书错误
 	configs->remote_debugging_port = GetPrivateProfileInt(L"CEF", L"remote_debugging_port", configs->remote_debugging_port, appDefFile.data());                 // 远程调试端口，取值范围[1024-65535]
+	return configs;
+}
+
+
+// 从命令行读取
+JWebTopConfigs * JWebTopConfigs::parseCmdLine(LPTSTR szCmdLine){
+	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0){
+		return new JWebTopConfigs();// 没有指定命令行参数时返回默认配置
+	}
+	if (szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
+		return JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(szCmdLine));
+	}
+	int argc = 0;
+	LPTSTR * args = CommandLineToArgvW(szCmdLine, &argc);
+	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile(args[7]));
+	//// args[0]===特殊符号“:”
+	configs->msgWin = atol(wch2chr(args[1]));
+	configs->parentWin = atol(wch2chr(args[2]));
+	int tmpi = atoi(wch2chr(args[3]));
+	if (tmpi != -1)configs->x = tmpi;
+	tmpi = atoi(wch2chr(args[4]));
+	if (tmpi != -1)configs->y =tmpi;
+	tmpi = atoi(wch2chr(args[5]));
+	if (tmpi != -1)configs->w = tmpi;
+	tmpi = atoi(wch2chr(args[6]));
+	if (tmpi != -1)configs->h = tmpi;
+	LPTSTR  url = args[8];
+	if (url[0] != ':')configs->url = CefString(url);
+	url = args[9];
+	if (url[0] != ':')configs->icon = CefString(url);
+	if (argc > 10)configs->name = CefString(args[10]);
 	return configs;
 }

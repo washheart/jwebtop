@@ -12,6 +12,57 @@
 using namespace std;
 
 const char kTestMessageName[] = "close";
+bool excuteJSON(const CefString& request){
+	cef_json_parser_options_t options = cef_json_parser_options_t();// 解析时的配置
+	CefRefPtr<CefValue> v = CefParseJSON(request, options);          // 进行解析
+	if (v == NULL){
+		//callback->Failure(1, CefString(L"错误的JSON格式"));
+		return false;
+	}
+#ifdef JWebTopLog
+	wstringstream log;
+	log << L"JWebTopCommons#Handler#OnQuery jsons=" << request.ToWString() << L"\r\n";
+	writeLog(log.str());
+#endif
+	CefRefPtr<CefDictionaryValue> value = v->GetDictionary();// 按JSON字典来获取
+	wstring methodName = value->GetString("m").ToWString();  // 取出某字符串 
+	 if (methodName == L"loadUrl"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		CefRefPtr<CefValue> url = value->GetValue("url");
+		if (url == NULL)return false;
+		jb::loadUrl((HWND)handler->GetInt(), url->GetString().ToWString());
+	}
+	else if (methodName == L"reload"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jb::reload((HWND)handler->GetInt());
+	}
+	else if (methodName == L"reloadIgnoreCache"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jb::reloadIgnoreCache((HWND)handler->GetInt());
+	}
+	else if (methodName == L"runApp"){
+		CefRefPtr<CefValue> app = value->GetValue("app");
+		CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
+		jb::runApp(app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
+	}
+	else if(methodName == L"close"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jb::close((HWND)handler->GetInt());
+	}
+	else if (methodName == L"showDev"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jb::showDev((HWND)handler->GetInt());
+	}
+	else{
+		return false;
+	}
+	return true;
+}
 namespace jc/*jc=JWebTop Client*/{
 	class Handler : public CefMessageRouterBrowserSide::Handler {
 	public:
@@ -21,52 +72,8 @@ namespace jc/*jc=JWebTop Client*/{
 		virtual bool OnQuery(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id,
 			const CefString& request,// request为消息JSON对象{request:msg}的msg部分（可以扩展一个JSON工具来进行解析）【解析代码：cef_message_router.cc=》CefMessageRouterRendererSideImpl】
 			bool persistent, CefRefPtr<Callback> callback) OVERRIDE{
-			cef_json_parser_options_t options = cef_json_parser_options_t();// 解析时的配置
-			CefRefPtr<CefValue> v = CefParseJSON(request, options);          // 进行解析
-			if (v == NULL){
-				callback->Failure(1, CefString(L"错误的JSON格式"));
-				return false;
-			}
-#ifdef JWebTopLog
-			wstringstream log;
-			log << L"JWebTopCommons#Handler#OnQuery jsons=" << request.ToWString() << L"\r\n";
-			writeLog(log.str());
-#endif
-			CefRefPtr<CefDictionaryValue> value = v->GetDictionary();// 按JSON字典来获取
-			wstring methodName = value->GetString("m").ToWString();  // 取出某字符串 
-			if (methodName == L"close"){
-				CefRefPtr<CefValue> handler = value->GetValue("handler");
-				if (handler == NULL)return false;
-				jb::close((HWND)handler->GetInt());
-			}
-			else if (methodName == L"loadUrl"){
-				CefRefPtr<CefValue> handler = value->GetValue("handler");
-				if (handler == NULL)return false;
-				CefRefPtr<CefValue> url = value->GetValue("url");
-				if (url == NULL)return false;
-				jb::loadUrl((HWND)handler->GetInt(), url->GetString().ToWString());
-			}
-			else if (methodName == L"reload"){
-				CefRefPtr<CefValue> handler = value->GetValue("handler");
-				if (handler == NULL)return false;
-				jb::reload((HWND)handler->GetInt());
-			}
-			else if (methodName == L"reloadIgnoreCache"){
-				CefRefPtr<CefValue> handler = value->GetValue("handler");
-				if (handler == NULL)return false;
-				jb::reloadIgnoreCache((HWND)handler->GetInt());
-			}
-			else if (methodName == L"runApp"){
-				CefRefPtr<CefValue> app = value->GetValue("app");
-				CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
-				jb::runApp(app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
-			}
-			else if (methodName == L"showDev"){
-				CefRefPtr<CefValue> handler = value->GetValue("handler");
-				if (handler == NULL)return false;
-				jb::showDev((HWND)handler->GetInt());
-			}
-			return true;
+
+			return excuteJSON(request);
 		}
 	};
 	void CreateMessageHandlers(MessageHandlerSet& handlers) {

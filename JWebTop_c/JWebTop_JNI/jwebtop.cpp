@@ -1,26 +1,30 @@
 // JNI主体实现
 #include "jni_jdk1_6_24\jni.h"
+#include <Shlwapi.h>
+
+#include "common/JWebTopMsg.h"
+#include "common/util/StrUtil.h"
+#include "common/process/MultiProcess.h"
+#include "common/winctrl/JWebTopWinCtrl.h"
+
 #include "org_jwebtop_JWebTopNative.h"
 #include "jwebtop_brige.h"
 #include "javautils.h"
-#include  "JWebTop/winctrl/JWebTopWinCtrl.h"
-
+#include "msgwin/MsgWin.h"
 typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 typedef BOOL(WINAPI *lpfnSetLayeredWindowAttributes)(HWND hWnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
-
 using namespace std;
-
-JavaVM* g_jvm;// 保存全局的虚拟机环境
+extern JavaVM* g_jvm;// 保存全局的虚拟机环境
 jclass g_nativeClass;// 记录全局的本地类变量
 jmethodID g_invokeByJS;// 从C端回调Java的方法
 
-extern HINSTANCE g_instance;
+//extern HINSTANCE g_instance;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved){
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
 		//HINSTANCE exe_hInstance = ::GetModuleHandle(NULL);
-		g_instance = hModule;
+		//g_instance = hModule;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 		// 是不是这里要做些清理操作？比如关闭所有浏览器
@@ -31,23 +35,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	return TRUE;
 }
 
-JNIEnv* GetJNIEnv() {
-	JNIEnv *env = NULL;
-	if (g_jvm->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_EDETACHED &&
-		g_jvm->AttachCurrentThread((void**)&env, NULL) != JNI_OK) {
-		return NULL;
-	}
-	return env;
-}
-void DetachFromThread(bool *mustDetach) {
-	if (!g_jvm) {
-		return;
-	}
-	if (*mustDetach)
-		g_jvm->DetachCurrentThread();
-}
+
 // 用于回调java程序的方法（定义于jwebtop_brige.h）
-CefString jw::invokeJavaMethod(CefString json){
+CefString invokeJavaMethod(CefString json){
 	JNIEnv *env;
 	bool detachEnv = false;
 	if (g_jvm->GetEnv((void **)&env, JNI_VERSION_1_6) < 0){
@@ -68,7 +58,63 @@ CefString jw::invokeJavaMethod(CefString json){
 	if (detachEnv)g_jvm->DetachCurrentThread();
 	return result;
 }
+// 处理WM_COPYDATA消息:jwebTop回调java函数
+LRESULT onWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+	COPYDATASTRUCT* copyData = (COPYDATASTRUCT*)lParam;
+	switch (copyData->dwData)
+	{
+	case WM_COPYDATA_MINI:{
+							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
+							  //MessageBox(hWnd, LPTSTR(mpMsg->msg), L"主进程窗口", MB_OK);
+							  invokeJavaMethod(CefString(mpMsg->msg));
+							  break;
+	}
+	case WM_COPYDATA_LARGE:{
+							   MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
+							   //MessageBox(hWnd, LPTSTR(mpMsg->msg), L"主进程窗口", MB_OK);
+							   invokeJavaMethod(CefString(mpMsg->msg));
+							   break;
+	}
+	case WM_COPYDATA_HWND:{
+							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
+							  //subHwnd = (HWND)atol(wch2chr(mpMsg->msg));
+							  invokeJavaMethod(CefString(mpMsg->msg));
+							  break;
+	}
+	default:
+		break;
+	}
+	return 0;
+}
 
+HWND msgWinHWnd;
+// 用于createWin进行回调
+void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
+	msgWinHWnd = hWnd;
+	LPTSTR exe = L"D:\\c\\jwebtop\\JWebTop_c\\JWebTop\\Release\\JWebTop.exe";
+	wstringstream cmd;
+	cmd << L": ";// 标记为特殊命令
+	cmd << (long)hWnd << " ";// 追加msgWin的HWND
+	cmd << szCmdLine;// 其他命令行参数
+	createSubProcess(exe, LPTSTR(cmd.str().c_str()));
+}
+void appendCMd(JNIEnv * env, wstring * cmd, jstring url){
+	if (url != NULL){
+		LPTSTR s = chr2wch(jstringToWindows(env, url));
+		if (s[0] == L'"'){// 如果url中已以双引号开头，那么这里就不再添加双引号
+			cmd->append(L" ");
+			cmd->append(s);
+		}
+		else{
+			cmd->append(L" \"");
+			cmd->append(s);
+			cmd->append(L"\"");
+		}
+	}
+	else{
+		cmd->append(L" :");// 冒号作为特殊符号不会出现在文件路径中
+	}
+}
 // jni方法：创建浏览器
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 (JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin
@@ -79,22 +125,27 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 , jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
 , jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
 ){
-	CefString result = CefString(env->GetStringUTFChars(appfile, false));
+	//if (appfile == NULL)return -1;
+	wstringstream cmd;
+	cmd << " " << parentWin;
+	cmd << " " << x << " " << y << " " << w << " " << h;// xywh不可能是null，只可能是-1，所以优先传递
+	wstring cmds = cmd.str();
+	appendCMd(env, &cmds, appfile);
+	appendCMd(env, &cmds, url);
+	appendCMd(env, &cmds, icon);
+	if (title != NULL){// title放最后
+		cmds.append(L" ").append(chr2wch(jstringToWindows(env, title)));
+	}
 	if (g_invokeByJS == NULL){// 第一次被java端调用
 		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
 		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
 		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
 		// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
-		LPTSTR url_ = NULL;
-		if (url != NULL)url_ = chr2wch(jstringToWindows(env, url));
-		LPTSTR title_ = NULL;
-		if (title != NULL)title_ = chr2wch(jstringToWindows(env, title));
-		LPTSTR icon_ = NULL;
-		if (icon != NULL)icon_ = chr2wch(jstringToWindows(env, icon));
-		startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin, url_, title_, icon_, x, y, w, h);
+		createWin(::GetModuleHandle(NULL), LPTSTR(cmds.c_str()));// createWin会开启新的线程
+		//startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin, url_, title_, icon_, x, y, w, h);
 	}
 	else{	 //这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
-		jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
+		//jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
 	}
 }
 // jni方法：执行脚本
@@ -107,7 +158,8 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
 	js += tmp;
 	env->ReleaseStringUTFChars(json, tmp);
 	js += ")";
-	jw::ExecJS((HWND)browserHWnd, js);
+	//jw::ExecJS((HWND)browserHWnd, js);
+	sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_EXECJS, chr2wch(js.c_str()));
 }
 
 
@@ -132,5 +184,6 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 // jni方法：设置新的网页地址
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
 (JNIEnv * env, jclass, jlong browserHWnd, jstring url){
-	jw::loadUrl((HWND)browserHWnd, chr2wch(jstringToWindows(env, url)));
+	sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_LOADURL, chr2wch(jstringToWindows(env, url)));
+	//jw::loadUrl((HWND)browserHWnd, chr2wch(jstringToWindows(env, url)));
 }

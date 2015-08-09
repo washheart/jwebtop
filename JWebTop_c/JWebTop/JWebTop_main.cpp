@@ -26,41 +26,24 @@ JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
 
 // 应用程序入口
-int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long parentWin
-	// 以下参数会替换appfile中的相应参数
-	, LPTSTR url       // 要打开的链接地址
-	, LPTSTR title     // 窗口名称
-	, LPTSTR icon      // 窗口图标
-	, int x, int y     // 窗口左上角坐标,当值为-1时不启用此变量		 
-	, int w, int h     // 窗口的宽、高，当值为-1时不启用此变量	
-	) {
+int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	g_instance = hInstance;
-#ifdef JWebTopJNI
-	CefMainArgs main_args(::GetModuleHandle(NULL));
-#else
-	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
-#endif
+//#ifdef JWebTopJNI
+//	CefMainArgs main_args(::GetModuleHandle(NULL));
+//#else
+	CefMainArgs main_args; // 提供CEF命令行参数
+//#endif
 	CefSettings settings;             // CEF全局设置
 	// 读取程序配置信息
-	tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile));
+	tmpConfigs = JWebTopConfigs::parseCmdLine(lpCmdLine);
 	if (g_configs == NULL)g_configs = tmpConfigs;
-	if (url != NULL){
-		tmpConfigs->url = CefString(url);
-	}
-	if (title != NULL)tmpConfigs->name = CefString(title);
-	if (icon != NULL)tmpConfigs->icon = CefString(icon);
-	if (x != -1)tmpConfigs->x = x;
-	if (y != -1)tmpConfigs->y = y;
-	if (w != -1)tmpConfigs->w = w;
-	if (h != -1)tmpConfigs->h = h;
-
-	tmpConfigs->parentWin = parentWin;
+	
 	// 对CEF进行一些设置
 	settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
 	CefString(&settings.user_data_path) = tmpConfigs->user_data_path;          // 用户数据保存目录
-	CefString(&settings.cache_path) = tmpConfigs->cache_path;                 // 浏览器缓存数据的保存目录
+	CefString(&settings.cache_path) = tmpConfigs->cache_path;                  // 浏览器缓存数据的保存目录
 	settings.persist_session_cookies = tmpConfigs->persist_session_cookies;    // 是否需要持久化用户cookie数据（若要设置为true，需要同时指定cache_path）
-	CefString(&settings.user_agent) = tmpConfigs->user_agent;                 // HTTP请求中的user_agent,CEF默认是Chorminum的user agent
+	CefString(&settings.user_agent) = tmpConfigs->user_agent;                  // HTTP请求中的user_agent,CEF默认是Chorminum的user agent
 	CefString(&settings.locale) = tmpConfigs->locale;                          // CEF默认是en-US
 	settings.log_severity = cef_log_severity_t(tmpConfigs->log_severity);      // 指定日志输出级别，默认不输出(disable),其他取值：verbose,info,warning,error,error-report
 	CefString(&settings.log_file) = tmpConfigs->log_file;                      // 指定调试时的日志文件，默认为"debug.log"。如果关闭日志，则不输出日志
@@ -82,10 +65,10 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 #else
 	settings.no_sandbox = tmpConfigs->no_sandbox;
 #endif	
-#ifdef JWebTopJNI
-	settings.single_process = 1;
-	settings.multi_threaded_message_loop = 1;
-#endif
+//#ifdef JWebTopJNI
+//	settings.single_process = 1;
+//	settings.multi_threaded_message_loop = 1;
+//#endif
 	CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
 
@@ -103,10 +86,10 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR appDefFile, long 
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-#ifndef JWebTopJNI
+//#ifndef JWebTopJNI
 	CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
 	CefShutdown();      // 关闭CEF
-#endif
+//#endif
 	return 0;
 }
 
@@ -117,6 +100,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	int       nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-	startJWebTop(hInstance, lpCmdLine, 0, NULL, NULL, NULL, -1, -1, -1, -1);
+	startJWebTop(hInstance, lpCmdLine);
 	return 0;
 }

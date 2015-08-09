@@ -7,43 +7,46 @@
     <Filter Include="jwebtop">
       <UniqueIdentifier>{6836dc99-0bc0-444c-81ab-70df4acf0458}</UniqueIdentifier>
     </Filter>
-    <Filter Include="JWebTop.exe">
-      <UniqueIdentifier>{6fdb2cfa-726a-413f-b0b2-e2c1d570c40b}</UniqueIdentifier>
+    <Filter Include="msgwin">
+      <UniqueIdentifier>{12bbe271-798d-49a1-9349-e2dca9f760b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{21a2dd2a-6a09-4b06-b719-871a589ca764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\tests">
+      <UniqueIdentifier>{1674c460-35f0-41e9-97b7-a0ebcd98c3ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\util">
+      <UniqueIdentifier>{a0aa33d1-f2d6-46be-adf4-154abe89a82f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\winctrl">
+      <UniqueIdentifier>{15f36faf-7805-45cc-8f6b-506d271052b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\process">
+      <UniqueIdentifier>{d10347c3-20ce-4dbb-afc5-6cff4058f243}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="jwebtop.cpp">
       <Filter>jwebtop</Filter>
     </ClCompile>
-    <ClCompile Include="..\JWebTop\JWebTop_main.cpp">
-      <Filter>JWebTop.exe</Filter>
+    <ClCompile Include="msgwin\MsgWin.cpp">
+      <Filter>msgwin</Filter>
     </ClCompile>
-    <ClCompile Include="..\JWebTop\winctrl\JWebTopConfigs.cpp">
-      <Filter>JWebTop.exe</Filter>
+    <ClCompile Include="..\common\tests\TestUtil.cpp">
+      <Filter>common\tests</Filter>
     </ClCompile>
-    <ClCompile Include="..\JWebTop\winctrl\JWebTopWinCtrl.cpp">
-      <Filter>JWebTop.exe</Filter>
+    <ClCompile Include="..\common\util\StrUtil.cpp">
+      <Filter>common\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\JWebTop\util\StrUtil.cpp">
-      <Filter>JWebTop.exe</Filter>
+    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp">
+      <Filter>common\winctrl</Filter>
     </ClCompile>
-    <ClCompile Include="..\JWebTop\tests\TestUtil.cpp">
-      <Filter>JWebTop.exe</Filter>
+    <ClCompile Include="..\common\process\MultiProcess.cpp">
+      <Filter>common\process</Filter>
     </ClCompile>
-    <ClCompile Include="..\JWebTop\jshandler\JWebTopJSHanlder.cpp">
-      <Filter>JWebTop.exe</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JWebTop\browser\JWebTopApp.cpp">
-      <Filter>JWebTop.exe</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JWebTop\browser\JWebTopClient.cc">
-      <Filter>JWebTop.exe</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JWebTop\browser\JWebTopCommons.cpp">
-      <Filter>JWebTop.exe</Filter>
-    </ClCompile>
-    <ClCompile Include="..\JWebTop\browser\JWebTopRenderer.cc">
-      <Filter>JWebTop.exe</Filter>
+    <ClCompile Include="javautils.cpp">
+      <Filter>jwebtop</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,62 +71,20 @@
     <ClInclude Include="jwebtop_brige.h">
       <Filter>jwebtop</Filter>
     </ClInclude>
-    <ClInclude Include="..\JWebTop\winctrl\JWebTopConfigs.h">
-      <Filter>JWebTop.exe</Filter>
+    <ClInclude Include="msgwin\MsgWin.h">
+      <Filter>msgwin</Filter>
     </ClInclude>
-    <ClInclude Include="..\JWebTop\winctrl\JWebTopWinCtrl.h">
-      <Filter>JWebTop.exe</Filter>
+    <ClInclude Include="..\common\tests\TestUtil.h">
+      <Filter>common\tests</Filter>
     </ClInclude>
-    <ClInclude Include="..\JWebTop\util\StrUtil.h">
-      <Filter>JWebTop.exe</Filter>
+    <ClInclude Include="..\common\util\StrUtil.h">
+      <Filter>common\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\JWebTop\tests\TestUtil.h">
-      <Filter>JWebTop.exe</Filter>
+    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h">
+      <Filter>common\winctrl</Filter>
     </ClInclude>
-    <ClInclude Include="..\JWebTop\json\assertions.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\autolink.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\config.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\features.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\forwards.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\json.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\reader.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\value.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\version.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\json\writer.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\jshandler\JJH_Windows.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\jshandler\JWebTopJSHanlder.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\browser\JWebTopApp.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\browser\JWebTopClient.h">
-      <Filter>JWebTop.exe</Filter>
-    </ClInclude>
-    <ClInclude Include="..\JWebTop\browser\JWebTopCommons.h">
-      <Filter>JWebTop.exe</Filter>
+    <ClInclude Include="..\common\process\MultiProcess.h">
+      <Filter>common\process</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

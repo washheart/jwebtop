@@ -12,8 +12,9 @@
 class DEBUG_Handler : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler); };
 class BrowserWindowInfo{
 public:
-	HWND hWnd;
-	HWND bWnd;
+	HWND hWnd;      // CEF浏览器的外部窗口
+	HWND bWnd;      // CEF内部浏览器窗口
+	HWND msgWin;    // 用户跨进程通信的远程进程窗口（只有通过DLL调用JWebTop时才有此参数） 
 
 	LONG oldMainProc;                   // 浏览器所在主窗口之前的消息处理函数
 	LONG oldBrowserProc;                // 浏览器窗口之前的消息处理函数
@@ -24,6 +25,8 @@ public:
 	LONG dragX, dragY;
 };
 typedef std::map<HWND, BrowserWindowInfo*> BrowserWindowInfoMap;// 定义一个存储BrowserWindowInfo的Map
+// 处理WM_COPYDATA消息
+LRESULT onWmCopyData(BrowserWindowInfo * bwInfo, HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 // 对CEF浏览器窗口的消息进行拦截
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -66,6 +69,7 @@ namespace jb{
 
 	void runApp(std::wstring appDefFile, long parentWin);
 
+	BOOL sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg);
 #ifdef JWebTopJNI // 只有在JWebTop_JNI项目下，下面的代码才会编译
 	CefString invokeJavaMethod(CefString json);// 用途：从JS调用Java代码。用法：invokeJava(jsonstring);
 #endif
