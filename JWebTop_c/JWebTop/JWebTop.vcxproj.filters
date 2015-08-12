@@ -31,6 +31,9 @@
     <Filter Include="common\process">
       <UniqueIdentifier>{40726deb-62ab-4982-af06-1c4f6d9054cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\task">
+      <UniqueIdentifier>{2eb9f872-8eee-4b82-aa36-7cfc5aebefd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JWebTop_main.cpp">
@@ -69,6 +72,9 @@
     <ClCompile Include="..\common\process\MultiProcess.cpp">
       <Filter>common\process</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\task\Task.cpp">
+      <Filter>common\task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -106,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="..\common\JWebTopMsg.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\task\Task.h">
+      <Filter>common\task</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

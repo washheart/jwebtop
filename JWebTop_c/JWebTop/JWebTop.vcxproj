@@ -228,6 +228,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\process\MultiProcess.cpp" />
+    <ClCompile Include="..\common\task\Task.cpp" />
     <ClCompile Include="..\common\tests\TestUtil.cpp" />
     <ClCompile Include="..\common\util\StrUtil.cpp" />
     <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
@@ -243,6 +244,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\JWebTopMsg.h" />
     <ClInclude Include="..\common\process\MultiProcess.h" />
+    <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\tests\TestUtil.h" />
     <ClInclude Include="..\common\util\StrUtil.h" />
     <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
