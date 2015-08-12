@@ -1,6 +1,7 @@
 #include "StrUtil.h"
-#include "windows.h"
-#include <string>
+#include <windows.h> 
+#include <ObjBase.h>
+
 using namespace std;
 
 wstring&   replace_allW(wstring&   str,const   wstring&   old_value,const   wstring&   new_value)   
@@ -186,4 +187,37 @@ char* wch2chr(wchar_t* wp)
 	WideCharToMultiByte(CP_ACP, 0, wp, wlen, m_char, len, NULL, NULL);
 	m_char[len] = 0;
 	return m_char;
+}
+
+
+char* GenerateGuid()
+{
+	char* guidBuf;
+	guidBuf = (char *)malloc(64);
+	GUID guid;
+	CoInitialize(NULL);
+	if (S_OK == CoCreateGuid(&guid))
+	{
+		_snprintf(guidBuf, 64, "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+			guid.Data1, guid.Data2, guid.Data3,
+			guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
+			guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+	}
+	CoUninitialize();
+	return guidBuf;
+}
+
+string GenerateGuidA()
+{
+	char* guidBuf = GenerateGuid();
+	string guid(guidBuf);
+	delete guidBuf;
+	return guid;
+}
+
+wstring GenerateGuidW(){
+	char* guidBuf = GenerateGuid();
+	wstring guid(chr2wch(guidBuf));
+	delete guidBuf;
+	return guid;
 }

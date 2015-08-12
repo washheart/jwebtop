@@ -20,4 +20,8 @@ wchar_t* chr2wch(char* tmp);
 char* wch2chr(const wchar_t* wp);
 // 将wchar_t转换为char
 char* wch2chr(wchar_t* wp);
+
+// 生成唯一性字符串
+std::string GenerateGuidA();
+std::wstring GenerateGuidW();
 #endif
