@@ -75,6 +75,9 @@
     <ClCompile Include="..\common\task\Task.cpp">
       <Filter>common\task</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\JWebTopMsg.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">

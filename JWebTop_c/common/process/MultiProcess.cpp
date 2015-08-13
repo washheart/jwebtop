@@ -4,6 +4,7 @@
 #include <string>
 #include <strsafe.h>
 
+// 创建一个新进程，返回的数据为进程中主线程的id
 DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine){
 	STARTUPINFO sui;
 	ZeroMemory(&sui, sizeof(STARTUPINFO)); // 对一个内存区清零，最好用ZeroMemory, 它的速度要快于memset
@@ -30,12 +31,13 @@ DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine){
 	//		CloseHandle(pi.hThread);  // 子进程的线程句柄，windows中进程就是一个线程的容器，每个进程至少有一个线程在执行
 	//		return pi.dwThreadId;
 	//	}
-
 	//}
 	return 0;
 }
 
-
+// 想指定窗口发送WM_COPYDATA消息。
+// WM_COPYDATA可以跨进程发送，不过此方法是同步方法，对于耗时任务接收到消息的进程应开启新线程处理。
+// 在JWebTop中对于接收的WM_COPYDATA消息都是开启新线程处理
 BOOL sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
 	COPYDATASTRUCT copyData;
 	int len = lstrlen(msg);

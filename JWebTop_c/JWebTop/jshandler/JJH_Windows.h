@@ -257,17 +257,27 @@ private:
 	IMPLEMENT_REFCOUNTING(JJH_ShowDev);
 };
 
-#ifdef JWebTopJNI // 只有在JWebTop_JNI项目下，下面的代码才会编译
-//invokeJava(jsonstring);// 从JS调用Java代码
-class JJH_InvokeJava : public CefV8Handler {
+//JJH_InvokeRemote_Wait(jsonstring,[handler]);// 从JS调用远程进程代码
+class JJH_InvokeRemote_Wait: public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 1)return false;
-		retval = CefV8Value::CreateString(jw::invokeJavaMethod(arguments[0]->GetStringValue()));
+		retval = CefV8Value::CreateString(jb::invokeRemote_Wait(getHWND(object, arguments, 1),arguments[0]->GetStringValue()));
 		return true;
 	}
 private:
-	IMPLEMENT_REFCOUNTING(JJH_InvokeJava);
+	IMPLEMENT_REFCOUNTING(JJH_InvokeRemote_Wait);
 };
-#endif
+
+//JJH_InvokeRemote_NoWait(jsonstring,[handler]);// 从JS调用远程进程代码
+class JJH_InvokeRemote_NoWait : public CefV8Handler {
+public:
+	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		if (arguments.size() < 1)return false;
+		jb::invokeRemote_NoWait(getHWND(object, arguments, 1), arguments[0]->GetStringValue());
+		return true;
+	}
+private:
+	IMPLEMENT_REFCOUNTING(JJH_InvokeRemote_NoWait);
+};
 #endif

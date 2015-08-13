@@ -54,6 +54,9 @@
     <ClCompile Include="..\common\task\Task.cpp">
       <Filter>common\task</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\JWebTopMsg.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="jni_jdk1_6_24\jawt.h">
@@ -94,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="..\common\task\Task.h">
       <Filter>common\task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\JWebTopMsg.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

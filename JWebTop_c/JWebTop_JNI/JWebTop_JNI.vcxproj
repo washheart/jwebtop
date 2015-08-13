@@ -181,8 +181,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4100;4127;4244;4512;4701;4702;4996</DisableSpecificWarnings>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <MinimalRebuild>false</MinimalRebuild>
@@ -430,6 +429,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\JWebTopMsg.h" />
     <ClInclude Include="..\common\process\MultiProcess.h" />
     <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\tests\TestUtil.h" />
@@ -441,6 +441,7 @@
     <ClInclude Include="org_jwebtop_JWebTopNative.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\JWebTopMsg.cpp" />
     <ClCompile Include="..\common\process\MultiProcess.cpp" />
     <ClCompile Include="..\common\task\Task.cpp" />
     <ClCompile Include="..\common\tests\TestUtil.cpp" />

@@ -10,7 +10,8 @@
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
-
+#include "common/JWebTopMsg.h"
+#include "common/task/Task.h"
 
 #define IDC_CEFCLIENT                   109
 
@@ -28,16 +29,11 @@ JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	g_instance = hInstance;
-//#ifdef JWebTopJNI
-//	CefMainArgs main_args(::GetModuleHandle(NULL));
-//#else
-	CefMainArgs main_args; // 提供CEF命令行参数
-//#endif
-	CefSettings settings;             // CEF全局设置
+	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
+	CefSettings settings;              // CEF全局设置
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::parseCmdLine(lpCmdLine);
 	if (g_configs == NULL)g_configs = tmpConfigs;
-	
 	// 对CEF进行一些设置
 	settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
 	CefString(&settings.user_data_path) = tmpConfigs->user_data_path;          // 用户数据保存目录

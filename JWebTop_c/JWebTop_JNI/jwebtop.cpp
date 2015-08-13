@@ -1,7 +1,7 @@
 // JNI主体实现
 #include "jni_jdk1_6_24\jni.h"
 #include <Shlwapi.h>
-
+#include "common/task/Task.h"
 #include "common/JWebTopMsg.h"
 #include "common/util/StrUtil.h"
 #include "common/process/MultiProcess.h"
@@ -34,59 +34,77 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	return TRUE;
 }
-
-
 // 用于回调java程序的方法（定义于jwebtop_brige.h）
-CefString invokeJavaMethod(CefString json){
+wstring invoke_Wait(DWORD msgId, wstring json){
 	JNIEnv *env;
 	bool detachEnv = false;
 	if (g_jvm->GetEnv((void **)&env, JNI_VERSION_1_6) < 0){
 		if (g_jvm->AttachCurrentThread((void **)&env, NULL) < 0){
-			return CefString();
+			return wstring();
 		}
 		else{
 			detachEnv = true;// 如果是Attach上的env，那么需要detach
 		}
 	}
-	jstring sss = env->NewStringUTF(json.ToString().c_str());
+	/*jchar s;
+	jstring sss =env->NewString(json.c_str, json.size());*/
+	//char* jsonChars = wch2chr(json.c_str());
+	jstring sss = env->NewStringUTF(CefString(json).ToString().c_str());
 	jstring str = (jstring)env->CallStaticObjectMethod(g_nativeClass, g_invokeByJS, sss);
 	env->DeleteLocalRef(sss);
-	// char * tmp = jstringToWindows(env, str);	
-	CefString result = CefString(env->GetStringUTFChars(str, false));
+	char * tmp = jstringToWindows(env, str);
+	CefString result(env->GetStringUTFChars(str, false));
 	env->DeleteLocalRef(str);
-	// delete tmp;
+	free(tmp);
 	if (detachEnv)g_jvm->DetachCurrentThread();
-	return result;
+	return result.ToWString();
+}
+
+void thread_executeWmCopyData(HWND hWnd, DWORD msgId, wstring json){
+if (msgId == JWEBTOP_MSG_RESULT_RETURN){// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
+		wstring taskId, result;
+		long remoteHWnd = 0;
+		jw::parseMessageJSON(json, remoteHWnd, ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
+		jw::task::putTaskResult(taskId, result);						   // 通知等待线程，远程任务已完成，结果已去取回
+	}
+	else if (msgId == JWEBTOP_MSG_EXECUTE_WAIT){// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+		wstring remoteTaskId, taskInfo;
+		long remoteHWnd = 0;
+		jw::parseMessageJSON(json, remoteHWnd, ref(remoteTaskId), ref(taskInfo));        // 从任务信息中解析出任务id和任务描述
+		wstring result = invoke_Wait(msgId, taskInfo); 		         // 取回执行结果
+		wstring wrapped = jw::wrapAsTaskJSON((long)hWnd, std::ref(remoteTaskId), std::ref(result));      // 包装结果任务
+		sendProcessMsg((HWND)remoteHWnd, JWEBTOP_MSG_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+	}
+	else{// 其他情况按远程发来的无需等待任务执行
+		invoke_Wait(msgId, json);
+	}
 }
 // 处理WM_COPYDATA消息:jwebTop回调java函数
 LRESULT onWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	COPYDATASTRUCT* copyData = (COPYDATASTRUCT*)lParam;
+	wstring msg;
+	DWORD msgId;
 	switch (copyData->dwData)
 	{
 	case WM_COPYDATA_MINI:{
 							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
-							  //MessageBox(hWnd, LPTSTR(mpMsg->msg), L"主进程窗口", MB_OK);
-							  invokeJavaMethod(CefString(mpMsg->msg));
+							  msgId = mpMsg->msgId;
+							  msg = wstring(mpMsg->msg);
 							  break;
 	}
 	case WM_COPYDATA_LARGE:{
 							   MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
-							   //MessageBox(hWnd, LPTSTR(mpMsg->msg), L"主进程窗口", MB_OK);
-							   invokeJavaMethod(CefString(mpMsg->msg));
+							   msgId = mpMsg->msgId;
+							   msg = wstring(mpMsg->msg);
 							   break;
-	}
-	case WM_COPYDATA_HWND:{
-							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
-							  //subHwnd = (HWND)atol(wch2chr(mpMsg->msg));
-							  invokeJavaMethod(CefString(mpMsg->msg));
-							  break;
 	}
 	default:
 		break;
 	}
+	std::thread t(thread_executeWmCopyData, hWnd, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
+	t.detach();// 从当前线程分离
 	return 0;
 }
-
 HWND msgWinHWnd;
 // 用于createWin进行回调
 void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
@@ -161,7 +179,6 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
 	//jw::ExecJS((HWND)browserHWnd, js);
 	sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_EXECJS, chr2wch(js.c_str()));
 }
-
 
 // jni方法：设置窗口大小
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize

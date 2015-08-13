@@ -13,8 +13,7 @@ using namespace std;
 
 const char kTestMessageName[] = "close";
 bool excuteJSON(const CefString& request){
-	cef_json_parser_options_t options = cef_json_parser_options_t();// 解析时的配置
-	CefRefPtr<CefValue> v = CefParseJSON(request, options);          // 进行解析
+	CefRefPtr<CefValue> v = CefParseJSON(request, JSON_PARSER_RFC);          // 进行解析
 	if (v == NULL){
 		//callback->Failure(1, CefString(L"错误的JSON格式"));
 		return false;

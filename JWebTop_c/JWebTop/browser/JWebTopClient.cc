@@ -162,11 +162,11 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	}
 	// runApp(appName,handler);//运行一个app，appName为.app文件路径。
 	extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
+	extensionCode << "JWebTop.invokeJava=JWebTop.JJH_InvokeRemote_Wait;" << endl;
 
 	// 页面加载后，触发JWebTopReady消息
 	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);" << endl;
-	writeLog(extensionCode.str());
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 
 }

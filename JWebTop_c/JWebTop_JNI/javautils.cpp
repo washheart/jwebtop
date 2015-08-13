@@ -1,6 +1,5 @@
 #include "javautils.h"
 
-
 JavaVM* g_jvm;// 保存全局的虚拟机环境
 
 JNIEnv* GetJNIEnv() {
@@ -11,6 +10,7 @@ JNIEnv* GetJNIEnv() {
 	}
 	return env;
 }
+
 void DetachFromThread(bool *mustDetach) {
 	if (!g_jvm) {
 		return;

@@ -6,12 +6,111 @@
 #include "common/util/StrUtil.h"
 #include "common/process/MultiProcess.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
+#include "common/task/Task.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
 
 using namespace std;
 BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
+
+extern JWebTopConfigs * g_configs;
+extern JWebTopConfigs * tmpConfigs;
+
+BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
+	BrowserWindowInfoMap::iterator it = BrowserWindowInfos.find(hWnd);
+	if (BrowserWindowInfos.end() != it) {
+		return it->second;
+	}
+	return NULL;
+}
+
+namespace jb{
+	BOOL sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw == NULL)return false;
+		if (bw->msgWin == 0)return false;
+		return sendProcessMsg(bw->msgWin, msgId, msg);
+	}
+
+	CefString invokeRemote_Wait(HWND hWnd, CefString json){
+		wstring taskId = jw::task::createTaskId();			         // 生成任务id
+		jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+		// taskId附加到json字符串上
+		wstring newjson = json.ToWString();
+		wstring wrapped = jw::wrapAsTaskJSON((long)hWnd, std::ref(taskId), std::ref(newjson));
+		sendJWebTopProcessMsg(hWnd, JWEBTOP_MSG_EXECUTE_WAIT, LPTSTR(wrapped.c_str())); // 发送任务到远程进程
+		lock->wait();		             		 		             // 等待任务完成
+		wstring result = lock->result;   		 		             // 取回执行结果
+		return CefString(result);	// 返回数据
+	}
+
+	void invokeRemote_NoWait(HWND hWnd, CefString json){
+		sendJWebTopProcessMsg(hWnd, JWEBTOP_MSG_EXECUTE_RETURN, LPTSTR(json.ToWString().c_str())); // 发送任务到远程进程
+	}
+	//close(handler);// 关闭窗口
+	void close(HWND hWnd){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL)bw->browser->GetHost()->CloseBrowser(true);
+	}
+
+	//loadUrl(url, handler);//加载网页，url为网页路径
+	void loadUrl(HWND hWnd, std::wstring url){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL)bw->browser->GetMainFrame()->LoadURL(url);
+	}
+	//reload(handler);//重新加载当前页面
+	void reload(HWND hWnd){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL)bw->browser->Reload();
+	}
+	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
+	void reloadIgnoreCache(HWND hWnd){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL)bw->browser->ReloadIgnoreCache();
+	}
+	//showDev(handler);//打开开发者工具
+	void showDev(HWND hWnd){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL){
+			CefWindowInfo windowInfo;
+			windowInfo.SetAsPopup(NULL, "cef_debug");
+			bw->browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), CefPoint());
+		}
+	}
+
+	void ExecJS(HWND hWnd, string js){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL){
+			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
+		}
+	}
+	void ExecJS(HWND hWnd, wstring js){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL){
+			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
+		}
+	}
+
+	void runApp(std::wstring appDefFile, long parentWin){
+#ifdef JWebTopLog 
+		std::wstringstream log;
+		log << L"run app=" << appDefFile << L",parentWin=" << parentWin << L"\r\n";
+		writeLog(log.str());
+#endif
+		if (tmpConfigs != g_configs)delete tmpConfigs;
+		tmpConfigs = JWebTopConfigs::loadConfigs(appDefFile);
+		tmpConfigs->parentWin = parentWin;
+
+		createNewBrowser(tmpConfigs);
+		//DWORD  dwThreadId = 0; // 记录线程的id
+		//LPTSTR str = L"abcd";
+		//HANDLE threadHandle = // 记录线程的handler
+		//	CreateThread(NULL, 0, CreateNewBrowserThread, (void *)(&str), NULL, &dwThreadId);
+		//Sleep(200);
+		//CloseHandle(threadHandle);
+	}
+}
 
 HICON GetIcon(CefString url, CefString path){
 	if (path.ToWString().find(L":") == -1){// 如果指定的路径是相对路径
@@ -23,15 +122,6 @@ HICON GetIcon(CefString url, CefString path){
 	}
 	return (HICON)::LoadImage(NULL, path.ToWString().data(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 }
-
-BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
-	BrowserWindowInfoMap::iterator it = BrowserWindowInfos.find(hWnd);
-	if (BrowserWindowInfos.end() != it) {
-		return it->second;
-	}
-	return NULL;
-}
-
 // 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
 LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
@@ -197,7 +287,35 @@ LRESULT onWmCopyData(BrowserWindowInfo * bwInfo, HWND hWnd, UINT message, WPARAM
 		bwInfo->browser->GetMainFrame()->LoadURL(msg);
 		return true;
 	}
-	return	excuteJSON(msg);
+	else{
+		std::thread t(thread_executeWmCopyData, hWnd, msgId, msg.ToWString());// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
+		t.detach();// 从当前线程分离
+		return	true;
+	}
+}
+void thread_executeWmCopyData(HWND hWnd, DWORD msgId, wstring json){
+	if (msgId == JWEBTOP_MSG_EXECUTE_RETURN){
+		excuteJSON(json);
+	}
+	else if (msgId == JWEBTOP_MSG_RESULT_RETURN){// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
+		wstring taskId, result;
+		long remoteHWnd;
+		jw::parseMessageJSON(json, remoteHWnd, ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
+		jw::task::putTaskResult(taskId, result);	   					   // 通知等待线程，远程任务已完成，结果已去取回
+	}
+	else if (msgId == JWEBTOP_MSG_EXECUTE_WAIT){// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+		wstring remoteTaskId, taskInfo;
+		long remoteHWnd;
+		jw::parseMessageJSON(json, remoteHWnd, ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
+		wstring taskId = jw::task::createTaskId();			         // 生成任务id
+		jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+		//BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+		//bwInfo->browser->SendProcessMessage(pid,taskInfo);			 // 发送任务到render进程
+		lock->wait();		             		 		             // 等待任务完成
+		wstring result = lock->result;   		 		             // 取回执行结果
+		wstring wrapped = jw::wrapAsTaskJSON(remoteHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
+		jb::sendJWebTopProcessMsg(hWnd, JWEBTOP_MSG_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+	}
 }
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
@@ -259,7 +377,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 			bwInfo->msgWin = (HWND)configs.msgWin;
 			std::wstringstream wss;
 			wss << L"@{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
-			jb::sendJWebTopProcessMsg(browser->GetHost()->GetWindowHandle(), 0, LPTSTR(wss.str().c_str()));
+			jb::sendJWebTopProcessMsg(hWnd, 0, LPTSTR(wss.str().c_str()));
 		}
 	}
 #ifdef JWebTopLog
@@ -270,81 +388,4 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 
-}
-
-
-
-extern JWebTopConfigs * g_configs;
-extern JWebTopConfigs * tmpConfigs;
-namespace jb{
-	BOOL sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw == NULL)return false;
-		if (bw->msgWin == 0)return false;
-		return sendProcessMsg(bw->msgWin, msgId, msg);
-	}
-
-	//close(handler);// 关闭窗口
-	void close(HWND hWnd){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL)bw->browser->GetHost()->CloseBrowser(true);
-	}
-
-	//loadUrl(url, handler);//加载网页，url为网页路径
-	void loadUrl(HWND hWnd, std::wstring url){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL)bw->browser->GetMainFrame()->LoadURL(url);
-	}
-	//reload(handler);//重新加载当前页面
-	void reload(HWND hWnd){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL)bw->browser->Reload();
-	}
-	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
-	void reloadIgnoreCache(HWND hWnd){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL)bw->browser->ReloadIgnoreCache();
-	}
-	//showDev(handler);//打开开发者工具
-	void showDev(HWND hWnd){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL){
-			CefWindowInfo windowInfo;
-			windowInfo.SetAsPopup(NULL, "cef_debug");
-			bw->browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), CefPoint());
-		}
-	}
-
-	void ExecJS(HWND hWnd, string js){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL){
-			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
-		}
-	}
-	void ExecJS(HWND hWnd, wstring js){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL){
-			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
-		}
-	}
-
-	DWORD WINAPI CreateNewBrowserThread(LPVOID lpvParam){
-		createNewBrowser(tmpConfigs);
-		return 0;
-	}
-	void runApp(std::wstring appDefFile, long parentWin){
-#ifdef JWebTopLog 
-		std::wstringstream log;
-		log << L"run app=" << appDefFile << L",parentWin=" << parentWin << L"\r\n";
-		writeLog(log.str());
-#endif
-		if (tmpConfigs != g_configs)delete tmpConfigs;
-		tmpConfigs = JWebTopConfigs::loadConfigs(appDefFile);
-		tmpConfigs->parentWin = parentWin;
-
-		//createNewBrowser(tmpConfigs);
-		DWORD  dwThreadId = 0; // 记录线程的id
-		//HANDLE threaHandle = // 记录线程的handler
-		CreateThread(NULL, 0, CreateNewBrowserThread, NULL, NULL, &dwThreadId);
-	}
 }
