@@ -39,10 +39,15 @@ namespace jb{
 		// taskId附加到json字符串上
 		wstring newjson = json.ToWString();
 		wstring wrapped = jw::wrapAsTaskJSON((long)hWnd, std::ref(taskId), std::ref(newjson));
-		sendJWebTopProcessMsg(hWnd, JWEBTOP_MSG_EXECUTE_WAIT, LPTSTR(wrapped.c_str())); // 发送任务到远程进程
-		lock->wait();		             		 		             // 等待任务完成
-		wstring result = lock->result;   		 		             // 取回执行结果
-		return CefString(result);	// 返回数据
+		if (sendJWebTopProcessMsg(hWnd, JWEBTOP_MSG_EXECUTE_WAIT, LPTSTR(wrapped.c_str()))){ // 发送任务到远程进程
+			lock->wait();		             		 		             // 等待任务完成
+			wstring result = lock->result;   		 		             // 取回执行结果
+			return CefString(result);									 // 返回数据
+		}
+		else{
+			jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
+			return CefString();											// 返回数据：注意这里是空字符串
+		}
 	}
 
 	void invokeRemote_NoWait(HWND hWnd, CefString json){
