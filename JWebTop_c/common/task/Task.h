@@ -6,9 +6,10 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
+
+using namespace std;
 namespace jw{
 	namespace task{
-		using namespace std;
 
 		// 锁、任务执行结果包装类
 		class ProcessMsgLock

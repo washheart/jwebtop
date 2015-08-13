@@ -1,9 +1,9 @@
 #include "Task.h"
-
 #include <sstream>
+
+using namespace std;
 namespace jw{
 	namespace task{
-		using namespace std;
 		WaitTaskMap WaitTasks; // 保存所有已创建的任务信息	
 		mutex mapLock;         // 所有针对map的操作都要锁定 
 		ProcessMsgLock * getTask(wstring taskId){
