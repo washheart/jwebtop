@@ -103,7 +103,7 @@ LRESULT onWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	}
 	std::thread t(thread_executeWmCopyData, hWnd, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
 	t.detach();// 从当前线程分离
-	return 0;
+	return JWEBTOP_MSG_SUCCESS;
 }
 HWND msgWinHWnd;
 // 用于createWin进行回调

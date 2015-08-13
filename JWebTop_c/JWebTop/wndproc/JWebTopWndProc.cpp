@@ -26,7 +26,7 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 }
 
 namespace jb{
-	BOOL sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
+	bool sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
 		if (bw == NULL)return false;
 		if (bw->msgWin == 0)return false;
@@ -97,7 +97,7 @@ namespace jb{
 		}
 	}
 
-	void runApp(std::wstring appDefFile, long parentWin){
+	void runApp(HWND hWnd, std::wstring appDefFile, long parentWin){
 #ifdef JWebTopLog 
 		std::wstringstream log;
 		log << L"run app=" << appDefFile << L",parentWin=" << parentWin << L"\r\n";
@@ -106,7 +106,10 @@ namespace jb{
 		if (tmpConfigs != g_configs)delete tmpConfigs;
 		tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
 		tmpConfigs->parentWin = parentWin;
-
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw != NULL&&bw->msgWin != 0){
+			tmpConfigs->msgWin = (long)bw->msgWin;// 指定通信用的消息窗口
+		}
 		createNewBrowser(tmpConfigs);
 		//DWORD  dwThreadId = 0; // 记录线程的id
 		//LPTSTR str = L"abcd";
@@ -285,17 +288,17 @@ LRESULT onWmCopyData(BrowserWindowInfo * bwInfo, HWND hWnd, UINT message, WPARAM
 	}
 	if (msgId == JWEBTOP_MSG_EXECJS){
 		bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
-		return true;
+		return JWEBTOP_MSG_SUCCESS;
 	}
 	else if (msgId == JWEBTOP_MSG_LOADURL){
 		//jb::loadUrl(hWnd, msg);
 		bwInfo->browser->GetMainFrame()->LoadURL(msg);
-		return true;
+		return JWEBTOP_MSG_SUCCESS;
 	}
 	else{
 		std::thread t(thread_executeWmCopyData, hWnd, msgId, msg.ToWString());// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
 		t.detach();// 从当前线程分离
-		return	true;
+		return JWEBTOP_MSG_SUCCESS;
 	}
 }
 void thread_executeWmCopyData(HWND hWnd, DWORD msgId, wstring json){

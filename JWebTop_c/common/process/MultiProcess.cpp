@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <string>
 #include <strsafe.h>
+#include "common/JWebTopMsg.h"
 
 // 创建一个新进程，返回的数据为进程中主线程的id
 DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine){
@@ -38,10 +39,10 @@ DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine){
 // 想指定窗口发送WM_COPYDATA消息。
 // WM_COPYDATA可以跨进程发送，不过此方法是同步方法，对于耗时任务接收到消息的进程应开启新线程处理。
 // 在JWebTop中对于接收的WM_COPYDATA消息都是开启新线程处理
-BOOL sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
+bool sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
 	COPYDATASTRUCT copyData;
 	int len = lstrlen(msg);
-	if (len > MPMSG_LARGE_LEN)return false;
+	if (len > MPMSG_LARGE_LEN) return false;         // 太大了（超过65535）不给发了		
 	if (len > MPMSG_MINI_LEN){
 		MPMSG_LARGE mpMsg;
 		copyData.dwData = WM_COPYDATA_LARGE;         // 表示是大数据
@@ -49,7 +50,7 @@ BOOL sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
 		copyData.lpData = &mpMsg;                    // 待发送的数据结构
 		mpMsg.msgId = msgId;
 		StringCbCopy(mpMsg.msg, sizeof(mpMsg.msg), msg);
-		return ::SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData);
+		return ::SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData) == JWEBTOP_MSG_SUCCESS;
 	}
 	else{
 		MPMSG_MINI mpMsg;
@@ -59,6 +60,6 @@ BOOL sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
 		mpMsg.msgId = msgId;
 		if (msgId == WM_COPYDATA_HWND)copyData.dwData = WM_COPYDATA_HWND;
 		StringCbCopy(mpMsg.msg, sizeof(mpMsg.msg), msg);
-		return ::SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData);
+		return ::SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData) == JWEBTOP_MSG_SUCCESS;
 	}
 }

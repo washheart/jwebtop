@@ -51,7 +51,7 @@ namespace jb{
 	void ExecJS(HWND hWnd, std::string js);
 	void ExecJS(HWND hWnd, std::wstring js);
 
-	void runApp(std::wstring appDefFile, long parentWin);
+	void runApp(HWND hWnd, std::wstring appDefFile, long parentWin);
 
 
 	// 调用另外的进程并等待

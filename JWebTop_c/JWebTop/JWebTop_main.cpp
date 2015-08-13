@@ -29,6 +29,7 @@ JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	g_instance = hInstance;
+	MessageBox(NULL, L"33", L"333", 0);
 	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
 	CefSettings settings;              // CEF全局设置
 	// 读取程序配置信息

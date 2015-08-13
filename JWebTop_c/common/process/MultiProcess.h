@@ -29,6 +29,6 @@ DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine);
 // hWnd  :接收消息的窗口的句柄
 // msgId :大于MPMSG_USER的数值
 // msg   :待发送的字符串消息
-BOOL sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg);
+bool sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg);
 
 #endif

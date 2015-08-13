@@ -46,9 +46,11 @@ bool excuteJSON(const CefString& request){
 		jb::reloadIgnoreCache((HWND)handler->GetInt());
 	}
 	else if (methodName == L"runApp"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler"); 
+		if (handler == NULL)return false;
 		CefRefPtr<CefValue> app = value->GetValue("app");
 		CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
-		jb::runApp(app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
+		jb::runApp((HWND)handler->GetInt(), app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
 	}
 	else if(methodName == L"close"){
 		CefRefPtr<CefValue> handler = value->GetValue("handler");
