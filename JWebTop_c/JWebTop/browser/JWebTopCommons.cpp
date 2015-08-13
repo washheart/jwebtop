@@ -1,11 +1,14 @@
 #include "JWebTopCommons.h"
+#include <string>
 #include "JWebTopClient.h"
+#include "include/cef_app.h"
+#include "include/cef_parser.h"
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
-#include <string>
 #include "JWebTop/wndproc/JWebTopWndProc.h"
+
 #include "common/util/StrUtil.h"
-#include "include/cef_parser.h"
+#include "common/task/Task.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -77,6 +80,11 @@ namespace jc/*jc=JWebTop Client*/{
 	};
 	void CreateMessageHandlers(MessageHandlerSet& handlers) {
 		handlers.insert(new Handler());
+	}
+
+	void exitCef(){
+		jw::task::unlockAndClearAll();
+		CefQuitMessageLoop();
 	}
 }
 

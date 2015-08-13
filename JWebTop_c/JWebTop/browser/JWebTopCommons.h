@@ -13,5 +13,7 @@ bool excuteJSON(const CefString& request);
 namespace jc/*jc=JWebTop Client*/{
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;
 	void CreateMessageHandlers(MessageHandlerSet& handlers);
+
+	void exitCef();
 }
 #endif

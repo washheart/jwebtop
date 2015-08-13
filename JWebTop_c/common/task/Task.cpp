@@ -69,5 +69,17 @@ namespace jw{
 				mapLock.unlock();
 			}
 		}
+
+		// 把所有锁都给解锁：此方法当且仅当在进程退出时执行
+		void unlockAndClearAll(){
+			WaitTaskMap::iterator it = WaitTasks.begin();
+			while (WaitTasks.end() != it) {
+				try{// 通过try-catch保证每次解锁失败不影响其他的解锁
+					it->second->notify();
+				}catch (...){}
+				++it;
+			}
+			WaitTasks.clear();
+		}
 	}
 }

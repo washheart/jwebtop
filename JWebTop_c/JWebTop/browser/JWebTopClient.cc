@@ -117,7 +117,7 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 #endif
 
 	if (browser_list_.empty()) {// 如果浏览器列表已经为空，那么退出浏览器的消息循环
-		CefQuitMessageLoop();
+		jc::exitCef();
 	}
 }
 

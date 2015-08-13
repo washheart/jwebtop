@@ -47,6 +47,9 @@ namespace jw{
 
 		// 将任务执行结果保存进来，保存后会调用notify通知等待的程序：一般是在另外一个线程中调用
 		bool putTaskResult(wstring taskId, wstring taskResult);
+
+		// 把所有锁都给解锁：此方法当且仅当在进程退出时执行
+		void unlockAndClearAll();
 	}
 }
 #endif
