@@ -29,7 +29,6 @@ JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	g_instance = hInstance;
-	MessageBox(NULL, L"33", L"333", 0);
 	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
 	CefSettings settings;              // CEF全局设置
 	// 读取程序配置信息
@@ -62,10 +61,6 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 #else
 	settings.no_sandbox = tmpConfigs->no_sandbox;
 #endif	
-//#ifdef JWebTopJNI
-//	settings.single_process = 1;
-//	settings.multi_threaded_message_loop = 1;
-//#endif
 	CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
 
@@ -83,10 +78,8 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-//#ifndef JWebTopJNI
 	CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
 	CefShutdown();      // 关闭CEF
-//#endif
 	return 0;
 }
 

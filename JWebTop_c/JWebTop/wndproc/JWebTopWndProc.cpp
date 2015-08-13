@@ -96,7 +96,9 @@ namespace jb{
 			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
 		}
 	}
-
+	void CreateNewBrowserThread(){
+		createNewBrowser(tmpConfigs);
+	}
 	void runApp(HWND hWnd, std::wstring appDefFile, long parentWin){
 #ifdef JWebTopLog 
 		std::wstringstream log;
@@ -110,13 +112,15 @@ namespace jb{
 		if (bw != NULL&&bw->msgWin != 0){
 			tmpConfigs->msgWin = (long)bw->msgWin;// 指定通信用的消息窗口
 		}
-		createNewBrowser(tmpConfigs);
+		/*createNewBrowser(tmpConfigs);*/
 		//DWORD  dwThreadId = 0; // 记录线程的id
-		//LPTSTR str = L"abcd";
+		////LPTSTR str = L"abcd";
 		//HANDLE threadHandle = // 记录线程的handler
-		//	CreateThread(NULL, 0, CreateNewBrowserThread, (void *)(&str), NULL, &dwThreadId);
-		//Sleep(200);
+		//CreateThread(NULL, 0, CreateNewBrowserThread, NULL, NULL, &dwThreadId);
+		////Sleep(200);
 		//CloseHandle(threadHandle);
+		thread t(CreateNewBrowserThread);
+		t.detach();
 	}
 }
 
