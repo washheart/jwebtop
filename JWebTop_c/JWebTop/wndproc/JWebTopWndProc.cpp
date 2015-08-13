@@ -99,7 +99,7 @@ namespace jb{
 		writeLog(log.str());
 #endif
 		if (tmpConfigs != g_configs)delete tmpConfigs;
-		tmpConfigs = JWebTopConfigs::loadConfigs(appDefFile);
+		tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
 		tmpConfigs->parentWin = parentWin;
 
 		createNewBrowser(tmpConfigs);

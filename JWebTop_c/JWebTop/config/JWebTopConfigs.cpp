@@ -41,12 +41,12 @@ std::wstring JWebTopConfigs::GetExePath(){
 // 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
 std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine){
 	if (lpCmdLine == NULL || lstrlen(lpCmdLine) == 0){// 未指定启动文件，检查下是否通过启动参数指定了appDefFile
-		return GetExePath() + L"index.app";// 取程序所在目录下的index.app文件;
+		return JWebTopConfigs::GetExePath() + L"index.app";// 取程序所在目录下的index.app文件;
 	}
 	else{// 取启动参数作为appDefFile路径
 		std::wstring tmp(lpCmdLine);
 		if (tmp.find(L":") == -1){// 如果指定的路径是相对路径
-			return GetExePath() + lpCmdLine;
+			return JWebTopConfigs::GetExePath() + lpCmdLine;
 		}
 		return wstring(lpCmdLine);
 	}
@@ -116,10 +116,7 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 
 // 从命令行读取
 JWebTopConfigs * JWebTopConfigs::parseCmdLine(LPTSTR szCmdLine){
-	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0){
-		szCmdLine = LPTSTR(JWebTopConfigs::getAppDefFile(szCmdLine).c_str());// 没有指定命令行参数时按默认配置文件查找
-	}
-	if (szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
+	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0 || szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
 		return JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(szCmdLine));
 	}
 	int argc = 0;
