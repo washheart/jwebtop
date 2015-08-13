@@ -114,11 +114,10 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	return configs;
 }
 
-
 // 从命令行读取
 JWebTopConfigs * JWebTopConfigs::parseCmdLine(LPTSTR szCmdLine){
 	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0){
-		return new JWebTopConfigs();// 没有指定命令行参数时返回默认配置
+		szCmdLine = LPTSTR(JWebTopConfigs::getAppDefFile(szCmdLine).c_str());// 没有指定命令行参数时按默认配置文件查找
 	}
 	if (szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
 		return JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(szCmdLine));
