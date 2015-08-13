@@ -16,17 +16,20 @@ namespace jw{
 		private:
 			mutex lock;
 			condition_variable g_queuecheck;
+			bool notified=false;// 用来标记是否已通知过（防止解锁通知在等待之前就发来，也为了在对象消耗时进行解锁）
 		public:
 			wstring result;
 			ProcessMsgLock(){}
-			~ProcessMsgLock(){};
+			~ProcessMsgLock(){ if (!notified)notify(); };
 			void wait(){
+				if (notified)return;
 				unique_lock<mutex> locker(lock);
 				g_queuecheck.wait(locker);
 			}
 			void notify(){
 				unique_lock<mutex> locker(lock);
 				g_queuecheck.notify_all();
+				notified = true;
 			}
 		};
 
