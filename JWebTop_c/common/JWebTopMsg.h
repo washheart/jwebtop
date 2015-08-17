@@ -7,13 +7,17 @@
 
 #define JWEBTOP_MSG_SUCCESS         (WM_USER+321)	    // 表示消息成功被接收进程收到
 
-#define JWEBTOP_MSG_EXECJS			(MPMSG_USER+1)    // JWebTop进程与DLL通信时的消息值：执行JS脚本
-#define JWEBTOP_MSG_EXECJSON		(MPMSG_USER+2)    // JWebTop进程与DLL通信时的消息值：执行JSON
+//#define JWEBTOP_MSG_EXECJS			(MPMSG_USER+1)    // JWebTop进程与DLL通信时的消息值：执行JS脚本
+//#define JWEBTOP_MSG_EXECJSON		(MPMSG_USER+2)    // JWebTop进程与DLL通信时的消息值：执行JSON
 #define JWEBTOP_MSG_LOADURL			(MPMSG_USER+11)   // 定义MPMSG_MINI和MPMSG_LARGE中msgId的起始值
-
-#define JWEBTOP_MSG_EXECUTE_WAIT	(MPMSG_USER+201)  // 需要执行并等待的任务 
-#define JWEBTOP_MSG_EXECUTE_RETURN	(MPMSG_USER+202)  // 
-#define JWEBTOP_MSG_RESULT_RETURN	(MPMSG_USER+203)  
+// JWM=JWEBTOP_MSG
+#define JWM_JS_EXECUTE_WAIT		(MPMSG_USER+201)  // DLL调用CEF端：需要执行并等待的JS任务 
+#define JWM_JS_EXECUTE_RETURN	(MPMSG_USER+202)  // 
+#define JWM_JSON_EXECUTE_WAIT	(MPMSG_USER+211)  // DLL调用CEF端：需要执行并等待的JSON任务 
+#define JWM_JSON_EXECUTE_RETURN	(MPMSG_USER+212)  // 
+#define JWM_DLL_EXECUTE_WAIT	(MPMSG_USER+221)  // CEF调用DLL端：需要执行并等待的任务 
+#define JWM_DLL_EXECUTE_RETURN	(MPMSG_USER+222)  // CEF调用DLL端：需要执行但CEF无需等待的任务 
+#define JWM_RESULT_RETURN	(MPMSG_USER+231)  
 namespace jw{
 	// 从传入的JSON字符串(jsonString)中解析出任务id(taskId)和具体的JSON字符串(parsedJO)，已经回复消息的窗口句柄
 	// jsonString的结构如下：{"id":"task id string","hWnd":123456,"jo":"parsed json string"}

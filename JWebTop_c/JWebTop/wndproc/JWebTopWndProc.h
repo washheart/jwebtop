@@ -19,8 +19,9 @@ public:
 	LONG oldMainProc;                   // 浏览器所在主窗口之前的消息处理函数
 	LONG oldBrowserProc;                // 浏览器窗口之前的消息处理函数
 	CefRefPtr<CefBrowser> browser;      // 窗口关联到的浏览器
-	JWebTopConfigs  configs;            // 窗口相关的一些配置信息
+	//JWebTopConfigs  configs;            // 窗口相关的一些配置信息
 
+	bool enableDrag;
 	bool isDraging;                     // 是否正在拖动窗口
 	LONG dragX, dragY;
 };

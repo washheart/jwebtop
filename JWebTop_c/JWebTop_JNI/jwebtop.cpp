@@ -61,19 +61,19 @@ wstring invoke_Wait(DWORD msgId, wstring json){
 }
 
 void thread_executeWmCopyData(HWND hWnd, DWORD msgId, wstring json){
-if (msgId == JWEBTOP_MSG_RESULT_RETURN){// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
+	if (msgId == JWM_RESULT_RETURN){// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
 		wstring taskId, result;
 		long remoteHWnd = 0;
 		jw::parseMessageJSON(json, remoteHWnd, ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
 		jw::task::putTaskResult(taskId, result);						   // 通知等待线程，远程任务已完成，结果已去取回
 	}
-	else if (msgId == JWEBTOP_MSG_EXECUTE_WAIT){// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+	else if (msgId == JWM_DLL_EXECUTE_WAIT){// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 		wstring remoteTaskId, taskInfo;
 		long remoteHWnd = 0;
 		jw::parseMessageJSON(json, remoteHWnd, ref(remoteTaskId), ref(taskInfo));        // 从任务信息中解析出任务id和任务描述
 		wstring result = invoke_Wait(msgId, taskInfo); 		         // 取回执行结果
-		wstring wrapped = jw::wrapAsTaskJSON((long)hWnd, std::ref(remoteTaskId), std::ref(result));      // 包装结果任务
-		sendProcessMsg((HWND)remoteHWnd, JWEBTOP_MSG_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+		wstring wrapped = jw::wrapAsTaskJSON((long)hWnd, ref(remoteTaskId),ref(result));      // 包装结果任务
+		sendProcessMsg((HWND)remoteHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
 	}
 	else{// 其他情况按远程发来的无需等待任务执行
 		invoke_Wait(msgId, json);
@@ -89,13 +89,13 @@ LRESULT onWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	case WM_COPYDATA_MINI:{
 							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
 							  msgId = mpMsg->msgId;
-							  msg = wstring(mpMsg->msg);
+							  msg = wstring(LPTSTR(mpMsg->msg));
 							  break;
 	}
 	case WM_COPYDATA_LARGE:{
 							   MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
 							   msgId = mpMsg->msgId;
-							   msg = wstring(mpMsg->msg);
+							   msg = wstring(LPTSTR(mpMsg->msg));
 							   break;
 	}
 	default:
@@ -110,6 +110,7 @@ HWND msgWinHWnd;
 void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
 	msgWinHWnd = hWnd;
 	LPTSTR exe = L"D:\\c\\jwebtop\\JWebTop_c\\JWebTop\\Release\\JWebTop.exe";
+	//LPTSTR exe = L"JWebTop.exe";
 	wstringstream cmd;
 	cmd << L": ";// 标记为特殊命令
 	cmd << (long)hWnd << " ";// 追加msgWin的HWND
@@ -166,7 +167,7 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 		//jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
 	}
 }
-// jni方法：执行脚本
+// jni方法：执行脚本且不等待返回结果
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
 (JNIEnv * env, jclass, jlong browserHWnd, jstring json){
 	string js;
@@ -177,7 +178,7 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
 	env->ReleaseStringUTFChars(json, tmp);
 	js += ")";
 	//jw::ExecJS((HWND)browserHWnd, js);
-	sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_EXECJS, chr2wch(js.c_str()));
+	sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, chr2wch(js.c_str()));
 }
 
 // jni方法：设置窗口大小
