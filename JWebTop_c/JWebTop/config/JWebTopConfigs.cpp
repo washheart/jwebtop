@@ -123,15 +123,15 @@ JWebTopConfigs * JWebTopConfigs::parseCmdLine(LPTSTR szCmdLine){
 	LPTSTR * args = CommandLineToArgvW(szCmdLine, &argc);
 	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile(args[7]));
 	//// args[0]===ÌØÊâ·ûºÅ¡°:¡±
-	configs->msgWin = atol(wch2chr(args[1]));
-	configs->parentWin = atol(wch2chr(args[2]));
-	int tmpi = atoi(wch2chr(args[3]));
+	configs->msgWin = jw::parseLong(args[1]);
+	configs->parentWin = jw::parseLong(args[2]);
+	int tmpi = jw::parseInt(args[3]);
 	if (tmpi != -1)configs->x = tmpi;
-	tmpi = atoi(wch2chr(args[4]));
+	tmpi = jw::parseInt(args[4]);
 	if (tmpi != -1)configs->y =tmpi;
-	tmpi = atoi(wch2chr(args[5]));
+	tmpi = jw::parseInt(args[5]);
 	if (tmpi != -1)configs->w = tmpi;
-	tmpi = atoi(wch2chr(args[6]));
+	tmpi = jw::parseInt(args[6]);
 	if (tmpi != -1)configs->h = tmpi;
 	LPTSTR  url = args[8];
 	if (url[0] != ':')configs->url = CefString(url);

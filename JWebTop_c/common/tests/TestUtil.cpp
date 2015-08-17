@@ -14,7 +14,7 @@ void checFile(){
 }
 void writeLog(wstring str){
 	checFile();
-	std::string s = wch2chr(str.c_str());
+	std::string s = jw::w2s(str);
 	WriteFile(hFile, s.c_str(), s.size(), &filePos, NULL);
 	FlushFileBuffers(hFile);
 }

@@ -132,7 +132,7 @@ HICON GetIcon(CefString url, CefString path){
 	if (path.ToWString().find(L":") == -1){// 如果指定的路径是相对路径
 		wstring _path;
 		_path = url.ToWString();
-		replace_allW(_path, L"\\", L"/");
+		jw::replace_allW(_path, L"\\", L"/");
 		_path = _path.substr(0, _path.find_last_of('/') + 1);
 		path = _path.append(path);
 	}
