@@ -12,6 +12,8 @@
 #endif
 #include "common/JWebTopMsg.h"
 #include "common/task/Task.h"
+#include <strsafe.h>
+#include "common/util/StrUtil.h"
 
 #define IDC_CEFCLIENT                   109
 
@@ -25,9 +27,20 @@ bool g_single_process;
 HINSTANCE g_instance;
 JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
+//LONG ApplicationCrashHandler(EXCEPTION_POINTERS *pException)
+//{
+//	// 在这里添加处理程序崩溃情况的代码  
+//	// 现在很多软件都是弹出一个发送错误报告的对话框  
 
+//	// 这里以弹出一个错误对话框并退出程序为例子  
+//	//  
+//	//FatalAppExit(-1,  _T("*** Unhandled Exception! ***"));  
+//
+//	return EXCEPTION_EXECUTE_HANDLER;
+//}
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
+	//SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ApplicationCrashHandler);
 	g_instance = hInstance;
 	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
 	CefSettings settings;              // CEF全局设置
@@ -48,6 +61,8 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	settings.ignore_certificate_errors = tmpConfigs->ignore_certificate_errors;// 是否忽略SSL证书错误
 	settings.remote_debugging_port = tmpConfigs->remote_debugging_port;        // 远程调试端口，取值范围[1024-65535]
 
+	//settings.single_process = 1;
+	//settings.multi_threaded_message_loop = 0;
 #ifdef JWebTopLog
 	settings.log_severity = LOGSEVERITY_VERBOSE;
 #endif
@@ -78,11 +93,23 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-	CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
+	if (settings.multi_threaded_message_loop == 1){// 如果是被DLL调用，这种方式只能建立一个文件
+		HACCEL hAccelTable;
+		hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CEFCLIENT));
+		MSG msg;
+		while (GetMessage(&msg, NULL, 0, 0)) {
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+	}
+	else{
+		CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
+	}
 	CefShutdown();      // 关闭CEF
 	return 0;
 }
-
 // 应用程序入口
 int APIENTRY wWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
