@@ -1,5 +1,6 @@
 #include "StrUtil.h"
 #include <windows.h> 
+#include <time.h>
 #include <ObjBase.h>
 
 using namespace std;
@@ -14,7 +15,16 @@ wstring&   replace_allW(wstring&   str,const   wstring&   old_value,const   wstr
 	}   
 	return   str;   
 }
-
+wstring&   replace_all(wstring&   str, const   wstring&   old_value, const   wstring&   new_value)
+{
+	while (true)   {
+		string::size_type   pos(0);
+		if ((pos = str.find(old_value)) != string::npos)
+			str.replace(pos, old_value.length(), new_value);
+		else   break;
+	}
+	return   str;
+}
 string&   replace_all(string&   str,const   string&   old_value,const   string&   new_value)   
 {   
 	while(true)   {   
@@ -220,4 +230,11 @@ wstring GenerateGuidW(){
 	wstring guid(chr2wch(guidBuf));
 	delete guidBuf;
 	return guid;
+}
+
+string getDateTime(){
+	time_t t = time(0);
+	char tmp2[20];// 到9999-12-31的情况下都是19的字符，所以20长的数组就可以了。
+	strftime(tmp2, sizeof(tmp2), "%Y_%m_%d %X", localtime(&t));
+	return string(tmp2);
 }
