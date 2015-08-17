@@ -3,18 +3,36 @@
 #include <Windows.h>
 #include <string>
 #include <strsafe.h>
+#include "common/util/StrUtil.h"
 #include "common/JWebTopMsg.h"
 
 // 创建一个新进程，返回的数据为进程中主线程的id
 DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine){
+	std::wstring cmd;
+	if (subProcess[0] == L'"'){// 如果url中已以双引号开头，那么这里就不再添加双引号
+		cmd.append(subProcess);
+	}
+	else{// 把子进程用双引号包含起来，避免恶意程序问题
+		cmd.append(L"\"");
+		cmd.append(subProcess);
+		cmd.append(L"\"");
+	}
+	cmd+= L" "; cmd += szCmdLine;// 追加一个空格在命令行参数的前面，否则新进程的szCmdLine会取不到参数
+
 	STARTUPINFO sui;
 	ZeroMemory(&sui, sizeof(STARTUPINFO)); // 对一个内存区清零，最好用ZeroMemory, 它的速度要快于memset
 	sui.cb = sizeof(STARTUPINFO);
-	sui.dwFlags = STARTF_USESTDHANDLES;
+	//sui.dwFlags = STARTF_USESTDHANDLES;
 
 	PROCESS_INFORMATION pi; // 保存了所创建子进程的信息
-	std::wstring cmd = L" "; cmd += szCmdLine;// 追加一个空格在命令行参数的前面，否则新进程的szCmdLine会取不到参数
-	if (CreateProcess(subProcess, LPTSTR(cmd.c_str()), NULL, NULL, TRUE, 0, NULL, NULL, &sui, &pi))
+	//DWORD dwCreationFlags = DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP;
+	DWORD dwCreationFlags = CREATE_NEW_PROCESS_GROUP;
+	if (CreateProcess(NULL, LPTSTR(cmd.c_str()), // 第一个参数置空，可执行文件和命令行放到一起避免恶意程序问题
+		NULL, NULL, FALSE,//句柄不继承 
+		dwCreationFlags, //使用正常优先级 
+		NULL, //使用父进程的环境变量 
+		NULL, //指定工作目录 
+		&sui, &pi))
 	{
 		CloseHandle(pi.hProcess); // 子进程的进程句柄
 		CloseHandle(pi.hThread);  // 子进程的线程句柄，windows中进程就是一个线程的容器，每个进程至少有一个线程在执行
