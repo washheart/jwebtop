@@ -7,7 +7,6 @@
 #include "common/winctrl/JWebTopWinCtrl.h"
 
 #include "org_jwebtop_JWebTopNative.h"
-#include "jwebtop_brige.h"
 #include "javautils.h"
 #include "common/msgwin/MsgWin.h"
 typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
@@ -30,7 +29,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		// 是不是这里要做些清理操作？比如关闭所有浏览器
 		break;
 	case DLL_PROCESS_DETACH:
-		jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT, L"");
+		//jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT, L"");// 进程异常结束时走不到此处，所以这里没用
 		break;
 	}
 	return TRUE;
