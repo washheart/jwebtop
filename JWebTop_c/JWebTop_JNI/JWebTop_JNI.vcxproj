@@ -257,8 +257,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4100;4127;4244;4512;4701;4702;4996</DisableSpecificWarnings>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <MinimalRebuild>true</MinimalRebuild>
@@ -283,7 +282,7 @@
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;..\Release\jsoncpp.lib;dbghelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;dbghelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/safeseh /dynamicbase /ignore:4199 /ignore:4221 /nxcompat %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>
@@ -430,6 +429,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\common\JWebTopMsg.h" />
+    <ClInclude Include="..\common\msgwin\MsgWin.h" />
     <ClInclude Include="..\common\process\MultiProcess.h" />
     <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\tests\TestUtil.h" />
@@ -437,11 +437,11 @@
     <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
     <ClInclude Include="javautils.h" />
     <ClInclude Include="jwebtop_brige.h" />
-    <ClInclude Include="msgwin\MsgWin.h" />
     <ClInclude Include="org_jwebtop_JWebTopNative.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\JWebTopMsg.cpp" />
+    <ClCompile Include="..\common\msgwin\MsgWin.cpp" />
     <ClCompile Include="..\common\process\MultiProcess.cpp" />
     <ClCompile Include="..\common\task\Task.cpp" />
     <ClCompile Include="..\common\tests\TestUtil.cpp" />
@@ -449,7 +449,6 @@
     <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
     <ClCompile Include="javautils.cpp" />
     <ClCompile Include="jwebtop.cpp" />
-    <ClCompile Include="msgwin\MsgWin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="jni_jdk1_6_24\jawt.h" />

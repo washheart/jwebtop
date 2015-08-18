@@ -229,12 +229,10 @@ namespace jw{
 		strftime(tmp2, sizeof(tmp2), "%Y_%m_%d %X", localtime(&t));
 		return string(tmp2);
 	}
-	long parseLong(LPTSTR str){
-		wstring ws(str);
+	long parseLong(const wstring &ws){
 		return atol(jw::w2s(ws).c_str());
 	}
-	int parseInt(LPTSTR str){
-		wstring ws(str);
+	int parseInt(const wstring &ws){
 		return atoi(jw::w2s(ws).c_str());
 	}
 }

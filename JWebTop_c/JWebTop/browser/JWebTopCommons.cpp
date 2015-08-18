@@ -76,17 +76,11 @@ namespace jc/*jc=JWebTop Client*/{
 		virtual bool OnQuery(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int64 query_id,
 			const CefString& request,// request为消息JSON对象{request:msg}的msg部分（可以扩展一个JSON工具来进行解析）【解析代码：cef_message_router.cc=》CefMessageRouterRendererSideImpl】
 			bool persistent, CefRefPtr<Callback> callback) OVERRIDE{
-
 			return excuteJSON(request);
 		}
 	};
 	void CreateMessageHandlers(MessageHandlerSet& handlers) {
 		handlers.insert(new Handler());
-	}
-
-	void exitCef(){
-		jw::task::unlockAndClearAll();
-		CefQuitMessageLoop();
 	}
 }
 

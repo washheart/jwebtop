@@ -7,9 +7,6 @@
     <Filter Include="jwebtop">
       <UniqueIdentifier>{6836dc99-0bc0-444c-81ab-70df4acf0458}</UniqueIdentifier>
     </Filter>
-    <Filter Include="msgwin">
-      <UniqueIdentifier>{12bbe271-798d-49a1-9349-e2dca9f760b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="common">
       <UniqueIdentifier>{21a2dd2a-6a09-4b06-b719-871a589ca764}</UniqueIdentifier>
     </Filter>
@@ -28,13 +25,13 @@
     <Filter Include="common\task">
       <UniqueIdentifier>{4fbb2432-a9bc-4cb5-849a-11c2d762f1cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\msgwin">
+      <UniqueIdentifier>{12bbe271-798d-49a1-9349-e2dca9f760b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="jwebtop.cpp">
       <Filter>jwebtop</Filter>
-    </ClCompile>
-    <ClCompile Include="msgwin\MsgWin.cpp">
-      <Filter>msgwin</Filter>
     </ClCompile>
     <ClCompile Include="..\common\tests\TestUtil.cpp">
       <Filter>common\tests</Filter>
@@ -56,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="..\common\JWebTopMsg.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\msgwin\MsgWin.cpp">
+      <Filter>common\msgwin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,9 +80,6 @@
     <ClInclude Include="jwebtop_brige.h">
       <Filter>jwebtop</Filter>
     </ClInclude>
-    <ClInclude Include="msgwin\MsgWin.h">
-      <Filter>msgwin</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\tests\TestUtil.h">
       <Filter>common\tests</Filter>
     </ClInclude>
@@ -100,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="..\common\JWebTopMsg.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\msgwin\MsgWin.h">
+      <Filter>common\msgwin</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

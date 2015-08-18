@@ -14,7 +14,7 @@ class BrowserWindowInfo{
 public:
 	HWND hWnd;      // CEF浏览器的外部窗口
 	HWND bWnd;      // CEF内部浏览器窗口
-	HWND msgWin;    // 用户跨进程通信的远程进程窗口（只有通过DLL调用JWebTop时才有此参数） 
+	//HWND msgWin;    // 用户跨进程通信的远程进程窗口（只有通过DLL调用JWebTop时才有此参数） 
 
 	LONG oldMainProc;                   // 浏览器所在主窗口之前的消息处理函数
 	LONG oldBrowserProc;                // 浏览器窗口之前的消息处理函数

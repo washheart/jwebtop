@@ -115,12 +115,7 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	log << "JWebTopClient::OnBeforeClose " << browser_list_.size();
 	writeLog(log.str());
 #endif
-
-	if (browser_list_.empty()) {// 如果浏览器列表已经为空，那么退出浏览器的消息循环
-		jc::exitCef();
-	}
 }
-
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	ErrorCode errorCode,

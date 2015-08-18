@@ -3,7 +3,6 @@
 // can be found in the LICENSE file.
 
 #include <windows.h>
-
 #include "browser/JWebTopApp.h"
 #include "include/cef_sandbox_win.h"
 #include "JWebTop/config/JWebTopConfigs.h"
@@ -12,10 +11,9 @@
 #endif
 #include "common/JWebTopMsg.h"
 #include "common/task/Task.h"
-#include <strsafe.h>
 #include "common/util/StrUtil.h"
-
-#define IDC_CEFCLIENT                   109
+#include "common/msgwin/MsgWin.h"
+#include "browser/JWebTopClient.h"
 
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library is currently built with VS2013. It may not
@@ -24,25 +22,31 @@
 #endif
 
 bool g_single_process;
-HINSTANCE g_instance;
 JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
-//LONG ApplicationCrashHandler(EXCEPTION_POINTERS *pException)
-//{
-//	// 在这里添加处理程序崩溃情况的代码  
-//	// 现在很多软件都是弹出一个发送错误报告的对话框  
+extern HWND g_LocalWinHWnd ;  // 本地创建的消息窗口HWND
+extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
+extern CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
+void waitRemoteProcessTerminate(){
+	try{
+		DWORD lpdwProcessId;
+		GetWindowThreadProcessId(g_RemoteWinHWnd, &lpdwProcessId);
+		//HANDLE hHandle = GetProcessHandleFromHwnd(g_RemoteWinHWnd);// 此函数的头文件不确定是哪个(Header: Use LoadLibrary and GetProcAddress.  Library: Use Oleacc.dll.)
+		HANDLE hHandle = OpenProcess(PROCESS_ALL_ACCESS, false, lpdwProcessId);
+		wstringstream wss;
+		wss << L"获取进程句柄，pId=" << lpdwProcessId << "，Handle=" << (long)hHandle << ",lastErr=" << GetLastError() << "\r\n";
+		writeLog(wss.str());
+		WaitForSingleObject(hHandle, INFINITE);
+	}
+	catch (...){
+		writeLog(L"发生了异常.............\t\n");
+	}
+	jw::sendProcessMsg(g_LocalWinHWnd, WM_COPYDATA_EXIT, L"");// 通知本进程主窗口，程序需要关闭
+}
 
-//	// 这里以弹出一个错误对话框并退出程序为例子  
-//	//  
-//	//FatalAppExit(-1,  _T("*** Unhandled Exception! ***"));  
-//
-//	return EXCEPTION_EXECUTE_HANDLER;
-//}
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
-	//SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ApplicationCrashHandler);
-	g_instance = hInstance;
-	CefMainArgs main_args(g_instance); // 提供CEF命令行参数
+	CefMainArgs main_args(hInstance);  // 提供CEF命令行参数
 	CefSettings settings;              // CEF全局设置
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::parseCmdLine(lpCmdLine);
@@ -62,7 +66,12 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	settings.remote_debugging_port = tmpConfigs->remote_debugging_port;        // 远程调试端口，取值范围[1024-65535]
 
 	//settings.single_process = 1;
-	//settings.multi_threaded_message_loop = 0;
+	if (tmpConfigs->msgWin != 0){
+		g_RemoteWinHWnd = (HWND)tmpConfigs->msgWin;
+		std::thread waitRemoteProcessThread(waitRemoteProcessTerminate);
+		waitRemoteProcessThread.detach();// 在独立线程中等待远程进程的结束消息
+		settings.multi_threaded_message_loop = 1;
+	}
 #ifdef JWebTopLog
 	settings.log_severity = LOGSEVERITY_VERBOSE;
 #endif
@@ -78,7 +87,6 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 #endif	
 	CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
-
 	CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
 	// CEF applications have multiple sub-processes (render, plugin, GPU, etc)
 	// that share the same executable. This function checks the command-line and,
@@ -93,22 +101,27 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		// The sub-process has completed so return here.
 		return exit_code;
 	}
-	if (settings.multi_threaded_message_loop == 1){// 如果是被DLL调用，这种方式只能建立一个文件
-		HACCEL hAccelTable;
-		hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CEFCLIENT));
-		MSG msg;
-		while (GetMessage(&msg, NULL, 0, 0)) {
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
+	if (settings.multi_threaded_message_loop == 1){// 如果是被DLL调用，这种方式只能建立一个进程		
+		jw::createWin(hInstance, lpCmdLine);// 创建隐藏窗口并阻塞当前线程
+		// 在MsgWin中PostQuitMessage(0)之后，下面的代码根本没有机会执行了？？？进程直接退出
+		g_handler->CloseAllBrowsers(true);
+		CefQuitMessageLoop();
 	}
 	else{
 		CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用
 	}
+	jw::task::unlockAndClearAll();
 	CefShutdown();      // 关闭CEF
 	return 0;
+}
+
+// 处理消息窗口的WM_COPYDATA消息
+void jw::msgwin_thread_executeWmCopyData(DWORD msgId, std::wstring msg){
+	// 暂时不需要做任何处理
+}
+// 用于createWin进行回调
+void jw::onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
+	// 暂时不需要做任何处理
 }
 // 应用程序入口
 int APIENTRY wWinMain(HINSTANCE hInstance,

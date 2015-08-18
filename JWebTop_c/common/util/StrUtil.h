@@ -36,7 +36,7 @@ namespace jw{
 	// 获取当前的日期和时间，格式：yyyy-mm-dd hh:MM:ss
 	std::string getDateTime();
 
-	long parseLong(LPTSTR str);
-	int parseInt(LPTSTR str);
+	long parseLong(const wstring &ws);
+	int parseInt(const wstring &ws);
 }
 #endif

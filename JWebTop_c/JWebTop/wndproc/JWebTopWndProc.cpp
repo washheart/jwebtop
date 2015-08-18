@@ -25,27 +25,24 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 	return NULL;
 }
 
+extern HWND g_RemoteWinHWnd;
 namespace jb{
 	bool sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
 		if (bw == NULL)return false;
-		if (bw->msgWin == 0)return false;
-		return sendProcessMsg(bw->msgWin, msgId, msg);
+		if (g_RemoteWinHWnd == NULL)return false;
+		return jw::sendProcessMsg(g_RemoteWinHWnd, msgId, msg);
 	}
 
-	CefString invokeRemote_Wait(HWND hWnd, CefString json){
+	CefString invokeRemote_Wait(HWND browserHWnd, CefString json){
 		wstring taskId = jw::task::createTaskId();			         // 生成任务id
 		// taskId附加到json字符串上
 		wstring newjson = json.ToWString();
-		wstring wrapped = jw::wrapAsTaskJSON((long)hWnd, std::ref(taskId), std::ref(newjson));
+		wstring wrapped = jw::wrapAsTaskJSON((long)browserHWnd, std::ref(taskId), std::ref(newjson));
 		jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-			writeLog(L"任务ID："+taskId+L"，JSON：");			
-			writeLog(wrapped.c_str());	writeLog("\r\n");
-		if (sendJWebTopProcessMsg(hWnd, JWM_DLL_EXECUTE_WAIT, LPTSTR(wrapped.c_str()))){ // 发送任务到远程进程
+		if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, LPTSTR(wrapped.c_str()))){ // 发送任务到远程进程
 			lock->wait();		             		 		             // 等待任务完成
 			wstring result = lock->result;   		 		             // 取回执行结果
-			writeLog(L"任务ID：" + taskId + L"，result：");
-			writeLog(   result);	writeLog("\r\n");
 			return CefString(result);									 // 返回数据
 		}
 		else{
@@ -54,8 +51,8 @@ namespace jb{
 		}
 	}
 
-	void invokeRemote_NoWait(HWND hWnd, CefString json){
-		sendJWebTopProcessMsg(hWnd, JWM_DLL_EXECUTE_RETURN, LPTSTR(json.ToWString().c_str())); // 发送任务到远程进程
+	void invokeRemote_NoWait(HWND browserHWnd, CefString json){
+		sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, LPTSTR(json.ToWString().c_str())); // 发送任务到远程进程
 	}
 	//close(handler);// 关闭窗口
 	void close(HWND hWnd){
@@ -112,10 +109,6 @@ namespace jb{
 		//if (tmpConfigs != g_configs)delete tmpConfigs;
 		tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
 		tmpConfigs->parentWin = parentWin;
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL&&bw->msgWin != 0){
-			tmpConfigs->msgWin = (long)bw->msgWin;// 指定通信用的消息窗口
-		}
 		/*createNewBrowser(tmpConfigs);*/
 		//DWORD  dwThreadId = 0; // 记录线程的id
 		////LPTSTR str = L"abcd";
@@ -126,6 +119,51 @@ namespace jb{
 		thread t(CreateNewBrowserThread);
 		t.detach();
 	}
+
+
+	void browserwin_thread_executeWmCopyData(HWND browserHWnd, DWORD msgId, wstring msg){
+		BrowserWindowInfo * bwInfo = getBrowserWindowInfo(browserHWnd);
+		switch (msgId)
+		{
+		case JWM_RESULT_RETURN:// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
+		{
+								   wstring taskId, result;
+								   long remoteHWnd;
+								   jw::parseMessageJSON(msg, ref(remoteHWnd), ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
+								   jw::task::putTaskResult(taskId, result);	   					   // 通知等待线程，远程任务已完成，结果已去取回
+								   break;
+		}
+		case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+		case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+		{
+									 wstring remoteTaskId, taskInfo;
+									 long remoteHWnd;
+									 jw::parseMessageJSON(msg, ref(remoteHWnd), ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
+									 wstring taskId = jw::task::createTaskId();			         // 生成任务id
+									 jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+									 // FIXME：区分发送是JWM_JS_EXECUTE_WAIT和JWM_JSON_EXECUTE_WAIT
+									 //BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+									 //bwInfo->browser->SendProcessMessage(pid,taskInfo);			 // 发送任务到render进程
+									 lock->wait();		             		 		             // 等待任务完成
+									 wstring result = lock->result;   		 		             // 取回执行结果
+									 wstring wrapped = jw::wrapAsTaskJSON((long)browserHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
+									 jb::sendJWebTopProcessMsg(browserHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+									 break;
+		}
+		case JWM_JSON_EXECUTE_RETURN:
+			excuteJSON(msg);
+			break;
+		case JWM_JS_EXECUTE_RETURN:
+			bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
+			break;
+		case JWEBTOP_MSG_LOADURL:
+			bwInfo->browser->GetMainFrame()->LoadURL(msg);
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 
 HICON GetIcon(CefString url, CefString path){
@@ -138,13 +176,22 @@ HICON GetIcon(CefString url, CefString path){
 	}
 	return (HICON)::LoadImage(NULL, path.ToWString().data(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 }
+LRESULT onBrowserWinWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+	wstring msg;
+	DWORD msgId = 0;
+	jw::parseProcessMsg(lParam, ref(msgId), ref(msg));
+	std::thread t(jb::browserwin_thread_executeWmCopyData, hWnd, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
+	t.detach();// 从当前线程分离
+	return JWEBTOP_MSG_SUCCESS;
+}
 // 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
 LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
 	case WM_COPYDATA:{
-						 return onWmCopyData(bwInfo, hWnd, message, wParam, lParam);
+						 return	 onBrowserWinWmCopyData(hWnd, message, wParam, lParam);
+
 	}
 	case WM_SIZE:
 	{
@@ -253,14 +300,14 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_KEYUP:{
 					  if (wParam == VK_F1){//
 						  //if (bwInfo->configs.enableDebug){
-							  CefPoint(pp);
-							  pp.x = 300;
-							  pp.y = 300;
-							  CefWindowInfo windowInfo;
-							  CefBrowserSettings settings;
-							  windowInfo.SetAsPopup(NULL, "cef_debug");
-							  CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
-							  host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
+						  CefPoint(pp);
+						  pp.x = 300;
+						  pp.y = 300;
+						  CefWindowInfo windowInfo;
+						  CefBrowserSettings settings;
+						  windowInfo.SetAsPopup(NULL, "cef_debug");
+						  CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
+						  host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
 						  //}
 					  }
 					  else if (wParam == VK_F11){// 
@@ -271,97 +318,13 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
-// 处理WM_COPYDATA消息:jwebTop回调java函数
-LRESULT onWmCopyData(BrowserWindowInfo * bwInfo, HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
-	COPYDATASTRUCT* copyData = (COPYDATASTRUCT*)lParam;
-	//LPTSTR lpStr = new TCHAR[32];
-	wstring msg;
-	DWORD msgId;
-	switch (copyData->dwData)
-	{
-	case WM_COPYDATA_MINI:{
-							  MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
-							  msgId = mpMsg->msgId;
-							  msg = wstring(mpMsg->msg);
-							  break;
-	}
-	case WM_COPYDATA_LARGE:{
-							   MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
-							   msgId = mpMsg->msgId;
-							   msg = wstring(mpMsg->msg);
-							   break;
-	}
-	default:
-		break;
-	}
-	std::thread t(thread_executeWmCopyData, hWnd, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
-	t.detach();// 从当前线程分离
-	return JWEBTOP_MSG_SUCCESS;
-}
-void thread_executeWmCopyData(HWND hWnd, DWORD msgId, wstring msg){
-	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
-	switch (msgId)
-	{
-	case JWM_RESULT_RETURN:// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
-	{
-							   wstring taskId, result;
-							   long remoteHWnd;
-							   jw::parseMessageJSON(msg, remoteHWnd, ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
-							   jw::task::putTaskResult(taskId, result);	   					   // 通知等待线程，远程任务已完成，结果已去取回
-							   break;
-	}
-	case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-	{
-								   wstring remoteTaskId, taskInfo;
-								   long remoteHWnd;
-								   jw::parseMessageJSON(msg, remoteHWnd, ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
-								   wstring taskId = jw::task::createTaskId();			         // 生成任务id
-								   jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-								   //BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
-								   //bwInfo->browser->SendProcessMessage(pid,taskInfo);			 // 发送任务到render进程
-								   lock->wait();		             		 		             // 等待任务完成
-								   wstring result = lock->result;   		 		             // 取回执行结果
-								   wstring wrapped = jw::wrapAsTaskJSON(remoteHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
-								   jb::sendJWebTopProcessMsg(hWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
-								   break;
-	}
-	case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-	{
-								   wstring remoteTaskId, taskInfo;
-								   long remoteHWnd;
-								   jw::parseMessageJSON(msg, remoteHWnd, ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
-								   wstring taskId = jw::task::createTaskId();			         // 生成任务id
-								   jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-								   //BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
-								   //bwInfo->browser->SendProcessMessage(pid,taskInfo);			 // 发送任务到render进程
-								   lock->wait();		             		 		             // 等待任务完成
-								   wstring result = lock->result;   		 		             // 取回执行结果
-								   wstring wrapped = jw::wrapAsTaskJSON(remoteHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
-								   jb::sendJWebTopProcessMsg(hWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
-								   break;
-	}
-	case JWM_JSON_EXECUTE_RETURN:
-		excuteJSON(msg);
-		break;
-	case JWM_JS_EXECUTE_RETURN:
-		bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
-		break;
-	case JWEBTOP_MSG_LOADURL:
-		bwInfo->browser->GetMainFrame()->LoadURL(msg);
-		break;
-	default:
-		break;
-	}
-	
-}
+
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
-	JWebTopConfigs configs = (*p_configs);	
-	writeLog(L"renderBrowserWindow=====configs==\r\n");
+	JWebTopConfigs configs = (*p_configs);
 	HWND hWnd = browser->GetHost()->GetWindowHandle();// 浏览器所在窗口的handle
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
-	writeLog(L"renderBrowserWindow=====winInfo==\r\n");
 	bool changed = false;
 	//根据配置信息对窗口重新进行装饰(url、title在createBrower时处理了）
 	if (configs.dwStyle != 0){
@@ -370,23 +333,19 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		SetWindowLong(hWnd, GWL_STYLE, dwStyle);//设置成新的样式
 		changed = true;
 	}
-	writeLog(L"renderBrowserWindow=====dwStyle==\r\n");
 	if (configs.dwExStyle != 0){
 		DWORD  dwExStyle = winInfo.dwExStyle;
 		dwExStyle &= configs.dwExStyle;//按位与将旧扩展样式去掉  
 		SetWindowLong(hWnd, GWL_EXSTYLE, dwExStyle);//设置新的扩展样式  
 		changed = true;
 	}
-	writeLog(L"renderBrowserWindow=====dwExStyle==\r\n");
 	if (!configs.icon.empty()){
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
 		changed = true;
 	}
-	writeLog(L"renderBrowserWindow=====icon==\r\n");
 	if (configs.max){// 需要按最大化的方式来显示
 		jw::max(hWnd);
-	writeLog(L"renderBrowserWindow=====dwStyle==\r\n");
 	}
 	else if (configs.parentWin != 0){// 没有指定父窗口时，在桌面正中显示窗口
 		if (configs.x == -1 || configs.y == -1){
@@ -395,20 +354,16 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 				, configs.x == -1 ? rc.left : configs.x
 				, configs.y == -1 ? rc.top : configs.y
 				, rc.right - rc.left, rc.bottom - rc.top);
-			writeLog(L"renderBrowserWindow=====move==\r\n");
 		}
 	}
 	else if (changed){// 如果窗口风格有改变，重绘下窗口
 		RECT rc = winInfo.rcWindow;
 		SetWindowPos(hWnd, HWND_TOPMOST, rc.left, rc.top, rc.right, rc.bottom, SWP_ASYNCWINDOWPOS | SWP_FRAMECHANGED | SWP_NOCOPYBITS | SWP_NOZORDER);
-		writeLog(L"renderBrowserWindow=====changed==\r\n");
 	}
 	HWND bWnd = GetNextWindow(hWnd, GW_CHILD);// 得到真实的浏览器窗口
-	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);		
-	writeLog(L"renderBrowserWindow=====preWndProc==\r\n");
+	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);
 	if (preWndProc != (LONG)JWebTop_BrowerWndProc){
 		SetWindowLongPtr(bWnd, GWLP_WNDPROC, (LONG)JWebTop_BrowerWndProc);
-		writeLog(L"renderBrowserWindow=====JWebTop_BrowerWndProc==\r\n");
 		BrowserWindowInfo * bwInfo = new BrowserWindowInfo();
 		bwInfo->hWnd = hWnd;
 		bwInfo->bWnd = bWnd;
@@ -416,19 +371,14 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		preWndProc = GetWindowLongPtr(hWnd, GWLP_WNDPROC);
 		bwInfo->oldMainProc = preWndProc;
 		SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)JWebTop_WindowWndProc);// 替换主窗口的消息处理函数
-		writeLog(L"renderBrowserWindow=====JWebTop_WindowWndProc==\r\n");
 		bwInfo->browser = browser;
 		bwInfo->enableDrag = configs.enableDrag;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
-		writeLog(L"renderBrowserWindow=====insert map==\r\n");
 		if (configs.msgWin != 0) {
-			bwInfo->msgWin = (HWND)configs.msgWin;
 			std::wstringstream wss;
 			wss << L"@{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
-			writeLog(L"renderBrowserWindow=====浏览器已创建==\r\n");
 			jb::sendJWebTopProcessMsg(hWnd, 0, LPTSTR(wss.str().c_str()));
-			writeLog(L"renderBrowserWindow=====wait 浏览器已创建==\r\n");
 		}
 	}
 #ifdef JWebTopLog
