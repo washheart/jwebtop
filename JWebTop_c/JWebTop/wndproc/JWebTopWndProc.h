@@ -58,5 +58,7 @@ namespace jb{
 	// 调用另外的进程并等待
 	CefString invokeRemote_Wait(HWND hWnd, CefString json);
 	void invokeRemote_NoWait(HWND hWnd, CefString json);
+
+	bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, LPTSTR msg);
 }
 #endif

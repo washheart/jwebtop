@@ -77,9 +77,6 @@
     <ClInclude Include="javautils.h">
       <Filter>jwebtop</Filter>
     </ClInclude>
-    <ClInclude Include="jwebtop_brige.h">
-      <Filter>jwebtop</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\tests\TestUtil.h">
       <Filter>common\tests</Filter>
     </ClInclude>

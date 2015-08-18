@@ -436,7 +436,6 @@
     <ClInclude Include="..\common\util\StrUtil.h" />
     <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
     <ClInclude Include="javautils.h" />
-    <ClInclude Include="jwebtop_brige.h" />
     <ClInclude Include="org_jwebtop_JWebTopNative.h" />
   </ItemGroup>
   <ItemGroup>

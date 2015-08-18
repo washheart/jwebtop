@@ -27,8 +27,8 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 
 extern HWND g_RemoteWinHWnd;
 namespace jb{
-	bool sendJWebTopProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+	bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, LPTSTR msg){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
 		if (bw == NULL)return false;
 		if (g_RemoteWinHWnd == NULL)return false;
 		return jw::sendProcessMsg(g_RemoteWinHWnd, msgId, msg);
@@ -122,7 +122,7 @@ namespace jb{
 
 
 	void browserwin_thread_executeWmCopyData(HWND browserHWnd, DWORD msgId, wstring msg){
-		BrowserWindowInfo * bwInfo = getBrowserWindowInfo(browserHWnd);
+		BrowserWindowInfo * bwInfo = getBrowserWindowInfo(browserHWnd);		
 		switch (msgId)
 		{
 		case JWM_RESULT_RETURN:// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
@@ -136,18 +136,12 @@ namespace jb{
 		case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 		case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 		{
-									 wstring remoteTaskId, taskInfo;
-									 long remoteHWnd;
-									 jw::parseMessageJSON(msg, ref(remoteHWnd), ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
-									 wstring taskId = jw::task::createTaskId();			         // 生成任务id
-									 jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-									 // FIXME：区分发送是JWM_JS_EXECUTE_WAIT和JWM_JSON_EXECUTE_WAIT
-									 //BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
-									 //bwInfo->browser->SendProcessMessage(pid,taskInfo);			 // 发送任务到render进程
-									 lock->wait();		             		 		             // 等待任务完成
-									 wstring result = lock->result;   		 		             // 取回执行结果
-									 wstring wrapped = jw::wrapAsTaskJSON((long)browserHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
-									 jb::sendJWebTopProcessMsg(browserHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+
+									 CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create("waitjs");
+									 CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
+									 args->SetInt(0, msgId);
+									 args->SetString(1, msg);
+									 bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg);// 直接发送到render进程去执行
 									 break;
 		}
 		case JWM_JSON_EXECUTE_RETURN:
