@@ -79,6 +79,12 @@ public class TestJWebTop {
 			}
 		}));
 		final JWebTopNative webtop = JWebTopNative.getInstance();
+		webtop.setJsonHandler(new JWebtopJSONDispater() {
+			@Override
+			public String dispatcher(String json) {
+				return "{\"a\":1,javaconvert:\"" + json + "\",b:2}";
+			}
+		});
 		final JWebTopBrowser jwebtop = new JWebTopBrowser();
 		toolPanel.add(new JButton(new AbstractAction("创建浏览器") {
 			@Override
@@ -103,7 +109,7 @@ public class TestJWebTop {
 						String json = txtJson.getText().trim();
 						System.out.println("准备执行JS脚本 = " + json);
 						// System.out.println("      执行结果=" + JWebTopNative.executeJs(0L, script));
-						JWebTopNative.executeJs(RootBrowserHwnd, json);
+						JWebTopNative.executeJSON_NoWait(RootBrowserHwnd, json);
 					}
 				}.start();
 			}

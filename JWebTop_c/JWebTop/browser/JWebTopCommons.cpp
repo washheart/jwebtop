@@ -13,7 +13,6 @@
 #include "common/tests/TestUtil.h"
 #endif
 using namespace std;
-
 const char kTestMessageName[] = "close";
 bool excuteJSON(const CefString& request){
 	CefRefPtr<CefValue> v = CefParseJSON(request, JSON_PARSER_RFC);          // 进行解析
@@ -21,7 +20,7 @@ bool excuteJSON(const CefString& request){
 		//callback->Failure(1, CefString(L"错误的JSON格式"));
 		return false;
 	}
-#ifdef JWebTopLog
+#ifdef JWebTopLog 
 	wstringstream log;
 	log << L"JWebTopCommons#Handler#OnQuery jsons=" << request.ToWString() << L"\r\n";
 	writeLog(log.str());

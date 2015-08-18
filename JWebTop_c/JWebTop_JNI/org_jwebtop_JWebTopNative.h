@@ -44,8 +44,14 @@ extern "C" {
  * browserHWnd 要执行js的浏览器，browserHWnd在浏览器创建后通过回调方式传递给java程序    
  * json 需要执行的js脚本，这里是一个json字符串
  */
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
-(JNIEnv *, jclass, jlong browserHWnd, jstring json);
+ JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSWait
+(JNIEnv *, jclass, jlong browserHWnd, jstring script);
+ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSNoWait
+	 (JNIEnv *, jclass, jlong browserHWnd, jstring script);
+ JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
+	 (JNIEnv *, jclass, jlong browserHWnd, jstring json);
+ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONNoWait
+	 (JNIEnv *, jclass, jlong browserHWnd, jstring json);
 
 // jni方法：设置窗口大小
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
@@ -59,9 +65,9 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 (JNIEnv *, jclass, jlong browserHWnd, jint x, jint y,int w,int h);
 
-// jni方法：设置新的网页地址
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
-(JNIEnv *, jclass, jlong browserHWnd, jstring url);
+//// jni方法：设置新的网页地址
+//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
+//(JNIEnv *, jclass, jlong browserHWnd, jstring url);
 
 // jni方法：退出JWebTop进程
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit

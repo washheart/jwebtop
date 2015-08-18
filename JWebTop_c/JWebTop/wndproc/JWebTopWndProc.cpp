@@ -145,19 +145,16 @@ namespace jb{
 									 break;
 		}
 		case JWM_JSON_EXECUTE_RETURN:
-			excuteJSON(msg);
+			msg = L"invokeByDLL(" + msg + L")";// 包装json为js调用 
+			bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
 			break;
 		case JWM_JS_EXECUTE_RETURN:
 			bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
-			break;
-		case JWEBTOP_MSG_LOADURL:
-			bwInfo->browser->GetMainFrame()->LoadURL(msg);
 			break;
 		default:
 			break;
 		}
 	}
-
 }
 
 HICON GetIcon(CefString url, CefString path){

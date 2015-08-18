@@ -20,6 +20,8 @@ import org.jwebtop.JWebTopNative;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl.DetailBrowserListener;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * 测试嵌入浏览器到Swing窗口的例子<br/>
  * 左侧是一个列表浏览器窗口，右侧是一个列表详细说明浏览器窗口
@@ -65,6 +67,27 @@ public class WithinSwing extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				delNote();
+			}
+		}));
+		toolPanel.add(new JButton(new AbstractAction("调用JS并等待") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String js = "testInvoke('java字符串')";
+				System.out.println("js = " + js);
+				String value = JWebTopNative.executeJS_Wait(RootBrowserHwnd, js);
+				System.out.println("value = " + value);
+			}
+		}));
+		toolPanel.add(new JButton(new AbstractAction("调用JSON并等待") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JSONObject rtn = new JSONObject();
+				rtn.put("method", "showDetail");
+				rtn.put("value", "java在调用JSON并等待");
+				String json = rtn.toJSONString();
+				System.out.println("json = " + json);
+				String value = JWebTopNative.executeJSON_Wait(RootBrowserHwnd, json);
+				System.out.println("value = " + value);
 			}
 		}));
 		JSplitPane mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -134,12 +157,7 @@ public class WithinSwing extends JFrame {
 		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
 			if (JOptionPane.showConfirmDialog(this, "确认退出系统吗?", "退出系统", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 				ctrl.notifyWillClose();
-				try {
-					Thread.sleep(1000 * 3);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				JWebTopNative.getInstance().exit();
 				System.exit(0);//
 			} else {
 				return;

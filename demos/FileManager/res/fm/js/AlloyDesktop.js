@@ -1,5 +1,6 @@
 // 兼容之前的AlloyDesktop函数和事件
 addEventListener("JWebTopReady",function(){	
+	JWebTop.invokeJava=JWebTop.invokeRemote_Wait
 	AlloyDesktop=JWebTop;
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
 });

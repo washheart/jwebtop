@@ -1,6 +1,7 @@
 // 兼容之前的AlloyDesktop函数和事件
 addEventListener("JWebTopReady",function(){	
-	AlloyDesktop=JWebTop;
+	JWebTop.invokeJava=JWebTop.invokeRemote_Wait;
+	AlloyDesktop=JWebTop;	
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
 });
 addEventListener("JWebTopResize",function(v){	
@@ -11,3 +12,12 @@ addEventListener("JWebTopMove",function(v){
 	var e = new CustomEvent('AlloyDesktopWindowMove',v);
 	dispatchEvent(e);
 });
+function invokeByDLL(jsonValue){
+	 // alert(jsonValue);
+	 invokeByJava(jsonValue);
+	return "已经调用了js代码invokeByDLL————"+jsonValue.value;
+}
+
+function testInvoke(str){
+	return "已经调用了js代码————"+str;
+}

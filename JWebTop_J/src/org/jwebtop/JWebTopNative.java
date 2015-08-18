@@ -14,11 +14,17 @@ import com.fasterxml.jackson.core.JsonToken;
  * @author washheart@163.com
  */
 public final class JWebTopNative {
-	// private static native void nCreateJWebTop(String appfile, long parenHwnd);
+	private static native void nExit();
 
 	private static native void nCreateJWebTop(String appfile, long parenHwnd, String url, String title, String icon, int x, int y, int w, int h);
 
-	private static native void nExecuteJs(long broserHWnd, String json);
+	private static native String nExecuteJSONWait(long browserHWnd, String jsonstring);
+
+	private static native void nExecuteJSONNoWait(long browserHWnd, String jsonstring);
+
+	private static native String nExecuteJSWait(long browserHWnd, String script);
+
+	private static native void nExecuteJSNoWait(long browserHWnd, String script);
 
 	private static native void nSetSize(long browserHwnd, int w, int h);
 
@@ -26,7 +32,7 @@ public final class JWebTopNative {
 
 	private static native void nSetBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
 
-	private static native void nSetUrl(long browserHwnd, String url);
+	// private static native void nSetUrl(long browserHwnd, String url);
 
 	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
@@ -63,16 +69,22 @@ public final class JWebTopNative {
 			, final int w, final int h // 窗口的宽、高，当值为-1时不启用此变量
 	) throws IOException {
 		final String appfile2 = new File(appfile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
-		new Thread() {
+		Runnable creator = new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("准备调用JNI");
 				nCreateJWebTop(appfile2, parenHwnd, url, title, icon, x, y, w, h);
 			}
-		}.start();
+		};
+		// SwingUtilities.invokeLater(creator);// 如果是在UI中调用此方法，那么这里会陷入无限等待，因为当前线程会锁死在lock的等待上
+		new Thread(creator).start();
+		System.out.println("已调用创建浏览器方法=");
 		synchronized (locker) {
 			try {
 				waitLock = true;
+				System.out.println("已调用创建浏览器方法，waitLock=" + waitLock);
 				locker.wait();
+				System.out.println("已调用创建浏览器方法，waitLock=------------");
 				waitLock = false;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -87,22 +99,60 @@ public final class JWebTopNative {
 		return createJWebTop(appfile, 0);
 	}
 
+	// 关闭JWebTop的进程
+	public void exit() {
+		nExit();
+	}
+
 	/**
-	 * 执行js。<br/>
-	 * 这里发送是包装的JSON数据，而不是具体的js方法，返回的也是JSON数据
+	 * 执行js，发送后等待数据的返回。<br/>
+	 * 这里发送是包装的JSON数据，其调用JS脚本中的invokeByDLL(jsonvalue)方法
 	 * 
-	 * @param json
+	 * @param jsonstring
+	 * @return 返回是JSON字符串数据
+	 */
+	public static String executeJSON_Wait(long browserHWnd, String jsonstring) {
+		return nExecuteJSONWait(browserHWnd, jsonstring);
+	}
+
+	/**
+	 * 执行js，但不等待数据的返回。<br/>
+	 * 这里发送是包装的JSON数据，其调用JS脚本中的invokeByDLL(jsonvalue)方法
+	 * 
+	 * @param jsonstring
+	 */
+	public static void executeJSON_NoWait(long browserHWnd, String jsonstring) {
+		nExecuteJSONNoWait(browserHWnd, jsonstring);
+	}
+
+	/**
+	 * 执行js，并等待数据的返回。<br/>
+	 * 推荐使用executeJSON_Wait方法，以减少字符串转换的问题
+	 * 
+	 * @param script
+	 * @return 返回是字符串数据
+	 */
+	public static String executeJS_Wait(long browserHWnd, String script) {
+		return nExecuteJSWait(browserHWnd, script);
+	}
+
+	/**
+	 * 执行js，但不等待数据的返回。 <br/>
+	 * 推荐使用executeJSON_NoWait方法，以减少字符串转换的问题
+	 * 
+	 * @param script
 	 * @return
 	 */
-	public static void executeJs(long browserHWnd, String script) {
-		nExecuteJs(browserHWnd, script);
+	public static void executeJS_NoWait(long browserHWnd, String script) {
+		nExecuteJSNoWait(browserHWnd, script);
 	}
 
 	String dispatch(String json) throws IOException {
 		if (json.startsWith("@")) {// 约定通过特殊标记来进行处理
+			json = json.substring(1);
 			long rootBrowserHwnd = 0;
 			JsonFactory f = new JsonFactory();
-			JsonParser p = f.createParser(json.substring(1));
+			JsonParser p = f.createParser(json);
 			JsonToken result = null;
 			while ((result = p.nextToken()) != null) {
 				if (result == JsonToken.FIELD_NAME) {
@@ -115,14 +165,14 @@ public final class JWebTopNative {
 				}
 			}
 			p.close();
+			System.out.println("waitLock=" + waitLock + "\t " + rootBrowserHwnd);
 			if (waitLock) synchronized (locker) {
 				locker.hwnd = rootBrowserHwnd;
 				locker.notify();// FIXME:通知解锁的时机需要控制
 			}
-		} else if (jsonHandler != null) {
-			String rtn = jsonHandler.dispatcher(json);
-			System.out.println("rtn = " + rtn);
-			return rtn;
+		}
+		if (jsonHandler != null) {
+			return jsonHandler.dispatcher(json);
 		}
 		return "";
 	}
@@ -139,12 +189,7 @@ public final class JWebTopNative {
 	 */
 	private static String invokeByJS(String json) {
 		try {
-			// StringBuilder sb = new StringBuilder(json);
 			System.out.println("从dll端发起的调用 = " + json);
-			// INSTANCE.dispatch(json);
-			// sb.reverse();
-			// System.out.println("\t\t准备返回的结果 = " + sb);
-			// return sb.toString();
 			return INSTANCE.dispatch(json);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -160,6 +205,7 @@ public final class JWebTopNative {
 	 * @param h
 	 */
 	public static void setSize(long browserHwnd, int w, int h) {
+		// System.out.println("browserHwnd = " + browserHwnd + " =[w=" + w + ",h=" + h + "]");
 		if (browserHwnd != 0) nSetSize(browserHwnd, w, h);
 	}
 
@@ -187,9 +233,9 @@ public final class JWebTopNative {
 		if (browserHwnd != 0) nSetBound(browserHwnd, xOnScreen, yOnScreen, w, h);
 	}
 
-	public static void setUrl(long browserHwnd, String url) {
-		if (browserHwnd != 0) nSetUrl(browserHwnd, url);
-	}
+	// public static void setUrl(long browserHwnd, String url) {
+	// if (browserHwnd != 0) nSetUrl(browserHwnd, url);
+	// }
 
 	/**
 	 * 得到某Java控件对应的句柄HWND

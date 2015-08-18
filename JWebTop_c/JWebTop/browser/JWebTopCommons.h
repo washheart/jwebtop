@@ -8,12 +8,8 @@
 // 新建一个浏览器窗口
 void createNewBrowser(JWebTopConfigs * configs);
 
-bool excuteJSON(const CefString& request);
-
 namespace jc/*jc=JWebTop Client*/{
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;
 	void CreateMessageHandlers(MessageHandlerSet& handlers);
-
-	//void exitCef();
 }
 #endif

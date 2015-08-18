@@ -137,20 +137,56 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 		//jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
 	}
 }
-// jni方法：执行脚本且不等待返回结果
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJs
-(JNIEnv * env, jclass, jlong browserHWnd, jstring json){
-	string js;
-	// js.clear();	// 可以考虑讲js作为一个全局变量，每次使用前/后都clear一下，这样效率是否更高？
-	js = "invokeByJava(";
-	const char * tmp = env->GetStringUTFChars(json, false);
-	js += tmp;
-	env->ReleaseStringUTFChars(json, tmp);
-	js += ")";
-	//jw::ExecJS((HWND)browserHWnd, js);
-	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, LPTSTR(jw::s2w(js).c_str()));
+
+jstring exeRemoteAndWait(JNIEnv * env, jlong browserHWnd, string msg, DWORD msgId){
+	wstring taskId = jw::task::createTaskId();			         // 生成任务id
+	// taskId附加到json字符串上
+	wstring newmsg = jw::s2w(msg);
+	wstring wrapped = jw::wrapAsTaskJSON((long)browserHWnd, std::ref(taskId), std::ref(newmsg));
+	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+	if (jw::sendProcessMsg((HWND)browserHWnd, msgId, LPTSTR(wrapped.c_str()))){ // 发送任务到远程进程
+		lock->wait();		             		 		             // 等待任务完成
+		wstring result = lock->result;   		 		             // 取回执行结果
+		jstring sss = env->NewStringUTF(CefString(result).ToString().c_str());
+		return sss;									 // 返回数据
+	}
+	else{
+		jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
+		return NULL;											// 返回数据：注意这里是空字符串
+	}
+}
+JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSWait
+(JNIEnv * env, jclass, jlong browserHWnd, jstring script){
+	const char * tmp = env->GetStringUTFChars(script, false);
+	string js(tmp);
+	env->ReleaseStringUTFChars(script, tmp);
+	return exeRemoteAndWait(env,browserHWnd,js,JWM_JS_EXECUTE_WAIT);
 }
 
+JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
+(JNIEnv * env, jclass, jlong browserHWnd, jstring json){
+	const char * tmp = env->GetStringUTFChars(json, false);
+	string js(tmp);
+	env->ReleaseStringUTFChars(json, tmp);
+	return exeRemoteAndWait(env, browserHWnd, js, JWM_JSON_EXECUTE_WAIT);
+}
+
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSNoWait
+(JNIEnv * env, jclass, jlong browserHWnd, jstring script){
+	const char * tmp = env->GetStringUTFChars(script, false);
+	string js(tmp);
+	env->ReleaseStringUTFChars(script, tmp);
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_JS_EXECUTE_RETURN, LPTSTR(jw::s2w(js).c_str()));
+}
+
+// jni方法：执行脚本且不等待返回结果
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONNoWait
+(JNIEnv * env, jclass, jlong browserHWnd, jstring json){
+	const char * tmp = env->GetStringUTFChars(json, false);
+	string js(tmp);
+	env->ReleaseStringUTFChars(json, tmp);
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, LPTSTR(jw::s2w(js).c_str()));
+}
 // jni方法：设置窗口大小
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
 (JNIEnv * env, jclass, jlong browserHWnd, jint w, jint h){
@@ -169,12 +205,12 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 	jw::setBound((HWND)browserHWnd, x, y, w, h);
 }
 
-// jni方法：设置新的网页地址
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
-(JNIEnv * env, jclass, jlong browserHWnd, jstring url){	
-	jw::sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_LOADURL, LPTSTR(jw::s2w(jstringToWindows(env, url)).c_str()));
-	//jw::loadUrl((HWND)browserHWnd, chr2wch(jstringToWindows(env, url)));
-}
+//// jni方法：设置新的网页地址
+//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
+//(JNIEnv * env, jclass, jlong browserHWnd, jstring url){	
+//	jw::sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_LOADURL, LPTSTR(jw::s2w(jstringToWindows(env, url)).c_str()));
+//	//jw::loadUrl((HWND)browserHWnd, chr2wch(jstringToWindows(env, url)));
+//}
 
 // jni方法：退出JWebTop进程
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit

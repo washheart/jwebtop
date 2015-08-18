@@ -128,7 +128,7 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		}
 		rtn.put("value", detail);
 		rtn.put("note", note);
-		JWebTopNative.executeJs(detailHandler, rtn.toJSONString());
+		JWebTopNative.executeJSON_NoWait(detailHandler, rtn.toJSONString());
 	}
 
 	public String getListAppFile() {
@@ -195,7 +195,7 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		JSONObject jo = new JSONObject();
 		jo.put("method", "noteAdded");
 		jo.put("value", name);
-		JWebTopNative.executeJs(listHandler, jo.toJSONString());
+		JWebTopNative.executeJSON_NoWait(listHandler, jo.toJSONString());
 	}
 
 	public void delNote() {
@@ -213,7 +213,7 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		} else {
 			showDetail(null);
 		}
-		JWebTopNative.executeJs(listHandler, jo.toJSONString());
+		JWebTopNative.executeJSON_NoWait(listHandler, jo.toJSONString());
 	}
 
 	public void saveNote(String note, String content) {
@@ -237,8 +237,8 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		JSONObject jo = new JSONObject();
 		jo.put("method", "willClose");
 		String json = jo.toJSONString();
-		JWebTopNative.executeJs(detailHandler, json);
-		JWebTopNative.executeJs(listHandler, json);
+		JWebTopNative.executeJSON_NoWait(detailHandler, json);
+		JWebTopNative.executeJSON_NoWait(listHandler, json);
 	}
 
 	public static void main(String[] args) {
