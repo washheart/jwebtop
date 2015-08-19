@@ -25,7 +25,6 @@ JWebTopClient::~JWebTopClient() {
 }
 
 extern CefSettings settings;              // CEF全局设置
-extern bool g_single_process;
 // 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
 extern JWebTopConfigs * tmpConfigs;
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
@@ -148,7 +147,7 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	extensionCode << "if(!JWebTop)JWebTop={};";
 	extensionCode << "JWebTop.handler=" << (LONG)hWnd << ";" << endl;
 	extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
-	if (!g_single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
+	if (!settings.single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
 		// close(handler);// 关闭窗口
 		extensionCode << "JWebTop.close=function(handler){JWebTop.cefQuery({m:'close',handler:(handler?handler:JWebTop.handler)})};" << endl;
 		//loadUrl(url, handler);//加载网页，url为网页路径

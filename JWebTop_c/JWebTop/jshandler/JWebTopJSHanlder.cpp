@@ -20,7 +20,7 @@ void regist(const CefRefPtr<CefV8Value> jWebTop, const CefString& fn, CefRefPtr<
 	jWebTop->SetValue(fn, CefV8Value::CreateFunction(fn, handler), V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
-extern  bool g_single_process;
+CefSettings settings;              // CEF全局设置
 void regist(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	CefRefPtr<CefV8Context> context){
@@ -56,7 +56,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
 	// 多进程模式要通过消息传递数据，参见JWebTopClient#OnLoadEnd（具体实现是JWebTopCommons#renderBrowserWindow）
-	if (g_single_process){
+	if (settings.single_process){
 		regist(jWebTop, "close", new JJH_Close());      // close(handler);// 关闭窗口
 		regist(jWebTop, "loadUrl", new JJH_LoadUrl());	//loadUrl(url, handler);//加载网页，url为网页路径
 		regist(jWebTop, "reload", new JJH_Reload());	//reload(handler);//重新加载当前页面

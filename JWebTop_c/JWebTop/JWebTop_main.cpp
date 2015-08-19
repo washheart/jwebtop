@@ -9,9 +9,7 @@
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
-#include "common/JWebTopMsg.h"
 #include "common/task/Task.h"
-#include "common/util/StrUtil.h"
 #include "common/msgwin/MsgWin.h"
 #include "browser/JWebTopClient.h"
 #include "dllex/JWebTop_DLLEx.h"
@@ -21,10 +19,8 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-bool g_single_process;
 JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
-extern HWND g_LocalWinHWnd;  // 本地创建的消息窗口HWND
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
 extern CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
 CefSettings settings;              // CEF全局设置
