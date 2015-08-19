@@ -20,7 +20,7 @@ void regist(const CefRefPtr<CefV8Value> jWebTop, const CefString& fn, CefRefPtr<
 	jWebTop->SetValue(fn, CefV8Value::CreateFunction(fn, handler), V8_PROPERTY_ATTRIBUTE_NONE);
 }
 
-CefSettings settings;              // CEF全局设置
+extern CefSettings settings;              // CEF全局设置
 void regist(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	CefRefPtr<CefV8Context> context){
