@@ -14,7 +14,7 @@
 #include "common/util/StrUtil.h"
 #include "common/msgwin/MsgWin.h"
 #include "browser/JWebTopClient.h"
-
+#include "dllex/JWebTop_DLLEx.h"
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library is currently built with VS2013. It may not
 // link successfully with other VS versions.
@@ -27,24 +27,8 @@ JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
 extern HWND g_LocalWinHWnd;  // 本地创建的消息窗口HWND
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
 extern CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
-void waitRemoteProcessTerminate(){
-	try{
-		DWORD lpdwProcessId;
-		GetWindowThreadProcessId(g_RemoteWinHWnd, &lpdwProcessId);
-		//HANDLE hHandle = GetProcessHandleFromHwnd(g_RemoteWinHWnd);// 此函数的头文件不确定是哪个(Header: Use LoadLibrary and GetProcAddress.  Library: Use Oleacc.dll.)
-		HANDLE hHandle = OpenProcess(PROCESS_ALL_ACCESS, false, lpdwProcessId);
-		wstringstream wss;
-		wss << L"获取进程句柄，pId=" << lpdwProcessId << "，Handle=" << (long)hHandle << ",lastErr=" << GetLastError() << "\r\n";
-		writeLog(wss.str());
-		WaitForSingleObject(hHandle, INFINITE);
-	}
-	catch (...){
-		writeLog(L"发生了异常.............\t\n");
-	}
-	jw::sendProcessMsg(g_LocalWinHWnd, WM_COPYDATA_EXIT, L"");// 通知本进程主窗口，程序需要关闭
-}
-
 CefSettings settings;              // CEF全局设置
+
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	CefMainArgs main_args(hInstance);  // 提供CEF命令行参数
@@ -68,8 +52,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	//settings.single_process = 1;
 	if (tmpConfigs->msgWin != 0){
 		g_RemoteWinHWnd = (HWND)tmpConfigs->msgWin;
-		std::thread waitRemoteProcessThread(waitRemoteProcessTerminate);
-		waitRemoteProcessThread.detach();// 在独立线程中等待远程进程的结束消息
+		jw::dllex::waitForRemoteProcessTerminate();// 创建一个线程用来监听远程进程是否终止以便结束当前程序
 		settings.multi_threaded_message_loop = 1;
 	}
 #ifdef JWebTopLog
@@ -115,14 +98,6 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	return 0;
 }
 
-// 处理消息窗口的WM_COPYDATA消息
-void jw::msgwin_thread_executeWmCopyData(DWORD msgId, std::wstring msg){
-	// 暂时不需要做任何处理
-}
-// 用于createWin进行回调
-void jw::onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
-	// 暂时不需要做任何处理
-}
 // 应用程序入口
 int APIENTRY wWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
