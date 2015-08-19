@@ -6,8 +6,7 @@ width=270
 height=80
 enableDrag=1
 name=╡Бйтобжпнд
-style=369819648
-exStyle=128
+style=2516647936
 disableDevelop=0
 [CEF]
 single_process=0

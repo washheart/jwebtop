@@ -317,19 +317,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
 	bool changed = false;
-	//根据配置信息对窗口重新进行装饰(url、title在createBrower时处理了）
-	if (configs.dwStyle != 0){
-		DWORD dwStyle = winInfo.dwStyle;
-		dwStyle &= configs.dwStyle;//按位与将旧样式去掉  
-		SetWindowLong(hWnd, GWL_STYLE, dwStyle);//设置成新的样式
-		changed = true;
-	}
-	if (configs.dwExStyle != 0){
-		DWORD  dwExStyle = winInfo.dwExStyle;
-		dwExStyle &= configs.dwExStyle;//按位与将旧扩展样式去掉  
-		SetWindowLong(hWnd, GWL_EXSTYLE, dwExStyle);//设置新的扩展样式  
-		changed = true;
-	}
+	////根据配置信息对窗口重新进行装饰(url、title、style、dwStyle在createBrower时处理了）
 	if (!configs.icon.empty()){
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);

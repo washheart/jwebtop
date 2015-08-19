@@ -110,6 +110,8 @@ void createNewBrowser(JWebTopConfigs * configs){
 	// On Windows we need to specify certain flags that will be passed to
 	window_info.SetAsPopup((HWND)tmpConfigs->parentWin, tmpConfigs->name);
 #endif
+	if (tmpConfigs->dwStyle != 0)window_info.style = tmpConfigs->dwStyle;
+	if (tmpConfigs->dwExStyle != 0)window_info.style = tmpConfigs->dwExStyle;
 	if (tmpConfigs->x != -1)window_info.x = tmpConfigs->x;
 	if (tmpConfigs->y != -1)window_info.y = tmpConfigs->y;
 	if (tmpConfigs->w != -1)window_info.width = tmpConfigs->w;
