@@ -16,7 +16,7 @@ extern JavaVM* g_jvm;// 保存全局的虚拟机环境
 jclass g_nativeClass;// 记录全局的本地类变量
 jmethodID g_invokeByJS;// 从C端回调Java的方法
 extern HWND g_RemoteWinHWnd;
-
+wstring processPath;
 //extern HINSTANCE g_instance;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved){
 	switch (ul_reason_for_call)
@@ -49,10 +49,8 @@ wstring invoke_Wait(DWORD msgId, wstring json){
 	jstring sss = env->NewStringUTF(CefString(json).ToString().c_str());
 	jstring str = (jstring)env->CallStaticObjectMethod(g_nativeClass, g_invokeByJS, sss);
 	env->DeleteLocalRef(sss);
-	char * tmp = jstringToWindows(env, str);
 	CefString result(env->GetStringUTFChars(str, false));
 	env->DeleteLocalRef(str);
-	free(tmp);
 	if (detachEnv)g_jvm->DetachCurrentThread();
 	return result.ToWString();
 }
@@ -79,17 +77,15 @@ void jw::msgwin_thread_executeWmCopyData( DWORD msgId, wstring json){
 
 // 用于createWin进行回调
 void jw::onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
-	LPTSTR exe = L"D:\\c\\jwebtop\\JWebTop_c\\JWebTop\\Release\\JWebTop.exe";
-	//LPTSTR exe = L"JWebTop.exe";
 	wstringstream cmd;
 	cmd << L": ";// 标记为特殊命令
 	cmd << (long)hWnd << " ";// 追加msgWin的HWND
 	cmd << szCmdLine;// 其他命令行参数
-	createSubProcess(exe, LPTSTR(cmd.str().c_str()));
+	createSubProcess(LPTSTR(processPath.c_str()), LPTSTR(cmd.str().c_str()));
 }
-void appendCMd(JNIEnv * env, wstring * cmd, jstring url){
+void appendCMd(JNIEnv * env, wstring * cmd, const jstring &url){
 	if (url != NULL){
-		LPTSTR s = LPTSTR(jw::s2w(jstringToWindows(env, url)).c_str());
+		wstring s = jstring2wstring(env, url);
 		if (s[0] == L'"'){// 如果url中已以双引号开头，那么这里就不再添加双引号
 			cmd->append(L" ");
 			cmd->append(s);
@@ -104,38 +100,66 @@ void appendCMd(JNIEnv * env, wstring * cmd, jstring url){
 		cmd->append(L" :");// 冒号作为特殊符号不会出现在文件路径中
 	}
 }
-// jni方法：创建浏览器
+void thread_CreateJWebTop(std::wstring cmds)
+{
+	jw::createWin(::GetModuleHandle(NULL), LPTSTR(cmds.c_str()));// createWin会开启新的线程
+}
+// jni方法：创建JWebTop进程
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
-(JNIEnv * env, jclass nativeClass, jstring appfile, jlong parentWin
-// 一下参数会替换appfile中的形影参数
+(JNIEnv * env, jclass nativeClass, jstring jprocessPath, jstring configFile){
+	if (g_RemoteWinHWnd != NULL)return /*(jlong)g_RemoteWinHWnd*/;
+	if (g_invokeByJS == NULL){// 第一次被java端调用
+		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来		
+		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
+		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
+	}
+	processPath = jstring2wstring(env, jprocessPath);
+	wstring taskId = jw::task::createTaskId();			         // 生成任务id	
+	wstring cmds(taskId);                                        // 将任务id放到启动参数上 
+	wstring cfgFile = jstring2wstring(env, configFile);
+	if (cfgFile[0] != L'\"')cfgFile = L"\"" + cfgFile + L"\"";   // 用双引号将路径包含起来
+	cmds.append(L" ").append(cfgFile);	                         // 其他任务参数：configFile
+	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+	thread t(thread_CreateJWebTop, cmds); t.detach();			 // 在新线程中完成启动操作
+	lock->wait();		             		 		             // 等待任务完成
+	wstring result = lock->result;   		 		             // 取回执行结果
+	long tmp = jw::parseLong(result);
+	if (tmp != 0) g_RemoteWinHWnd = (HWND)tmp;
+	//return tmp;
+}
+
+/*
+* 对应org.jwebtop.JWebTopNative类的nCreateBrowser方法
+* 该方法用于创建一个浏览器窗口
+* appFile    浏览器根据此配置文件进行初始化
+* parentWin  创建的浏览器的父窗口是哪个
+*/
+JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
+(JNIEnv * env, jclass, jstring appFile, jlong parentWin
+// 以下参数会替换appfile中的相应参数
 , jstring url       // 要打开的链接地址
 , jstring title     // 窗口名称
 , jstring icon      // 窗口图标
 , jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
 , jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
 ){
-	//if (appfile == NULL)return -1;
 	wstringstream cmd;
-	cmd << " " << parentWin;
+	cmd << parentWin;
 	cmd << " " << x << " " << y << " " << w << " " << h;// xywh不可能是null，只可能是-1，所以优先传递
 	wstring cmds = cmd.str();
-	appendCMd(env, &cmds, appfile);
+	appendCMd(env, &cmds, appFile);
 	appendCMd(env, &cmds, url);
 	appendCMd(env, &cmds, icon);
 	if (title != NULL){// title放最后
-		cmds.append(L" ").append(jw::s2w(jstringToWindows(env, url)).c_str());
+		cmds.append(L" ").append(jstring2wstring(env, title).c_str());
 	}
-	if (g_invokeByJS == NULL){// 第一次被java端调用
-		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来
-		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
-		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(Ljava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
-		// 创建浏览器(创建过程中需要回调java，以便传递创建后的浏览器句柄到java端
-		jw::createWin(::GetModuleHandle(NULL), LPTSTR(cmds.c_str()));// createWin会开启新的线程
-		//startJWebTop(g_instance/*可以在dll attach的时候获取到*/, LPTSTR(result.ToWString().c_str()), parentWin, url_, title_, icon_, x, y, w, h);
-	}
-	else{	 //这样再次创建浏览器窗口不行，难道是在不同线程的原因？？用js执行RunApp反而可以
-		//jw::runApp(LPTSTR(result.ToWString().c_str()), parentWin);
-	}
+	wstring taskId = jw::task::createTaskId();			         // 生成任务id
+	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+	wstring wrapped = jw::wrapAsTaskJSON((long)g_RemoteWinHWnd, std::ref(taskId), std::ref(cmds));
+	jw::sendProcessMsg(g_RemoteWinHWnd, JWM_CREATEBROWSER, LPTSTR(wrapped.c_str()));
+	lock->wait();		             		 		             // 等待任务完成
+	wstring result = lock->result;   		 		             // 取回执行结果
+	return jw::parseLong(result);
 }
 
 jstring exeRemoteAndWait(JNIEnv * env, jlong browserHWnd, string msg, DWORD msgId){
@@ -157,35 +181,23 @@ jstring exeRemoteAndWait(JNIEnv * env, jlong browserHWnd, string msg, DWORD msgI
 }
 JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring script){
-	const char * tmp = env->GetStringUTFChars(script, false);
-	string js(tmp);
-	env->ReleaseStringUTFChars(script, tmp);
-	return exeRemoteAndWait(env,browserHWnd,js,JWM_JS_EXECUTE_WAIT);
+	return exeRemoteAndWait(env, browserHWnd, jstring2string(env,script), JWM_JS_EXECUTE_WAIT);
 }
 
 JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring json){
-	const char * tmp = env->GetStringUTFChars(json, false);
-	string js(tmp);
-	env->ReleaseStringUTFChars(json, tmp);
-	return exeRemoteAndWait(env, browserHWnd, js, JWM_JSON_EXECUTE_WAIT);
+	return exeRemoteAndWait(env, browserHWnd, jstring2string(env, json), JWM_JSON_EXECUTE_WAIT);
 }
 
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSNoWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring script){
-	const char * tmp = env->GetStringUTFChars(script, false);
-	string js(tmp);
-	env->ReleaseStringUTFChars(script, tmp);
-	jw::sendProcessMsg((HWND)browserHWnd, JWM_JS_EXECUTE_RETURN, LPTSTR(jw::s2w(js).c_str()));
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_JS_EXECUTE_RETURN, LPTSTR(jstring2wstring(env, script).c_str()));
 }
 
 // jni方法：执行脚本且不等待返回结果
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONNoWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring json){
-	const char * tmp = env->GetStringUTFChars(json, false);
-	string js(tmp);
-	env->ReleaseStringUTFChars(json, tmp);
-	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, LPTSTR(jw::s2w(js).c_str()));
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, LPTSTR(jstring2wstring(env, json).c_str()));
 }
 // jni方法：设置窗口大小
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize

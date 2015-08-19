@@ -7,6 +7,7 @@
 #include "common/process/MultiProcess.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 #include "common/task/Task.h"
+#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -121,40 +122,6 @@ namespace jb{
 	}
 
 
-	void browserwin_thread_executeWmCopyData(HWND browserHWnd, DWORD msgId, wstring msg){
-		BrowserWindowInfo * bwInfo = getBrowserWindowInfo(browserHWnd);		
-		switch (msgId)
-		{
-		case JWM_RESULT_RETURN:// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
-		{
-								   wstring taskId, result;
-								   long remoteHWnd;
-								   jw::parseMessageJSON(msg, ref(remoteHWnd), ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
-								   jw::task::putTaskResult(taskId, result);	   					   // 通知等待线程，远程任务已完成，结果已去取回
-								   break;
-		}
-		case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-		case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-		{
-
-									 CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create("waitjs");
-									 CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
-									 args->SetInt(0, msgId);
-									 args->SetString(1, msg);
-									 bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg);// 直接发送到render进程去执行
-									 break;
-		}
-		case JWM_JSON_EXECUTE_RETURN:
-			msg = L"invokeByDLL(" + msg + L")";// 包装json为js调用 
-			bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
-			break;
-		case JWM_JS_EXECUTE_RETURN:
-			bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
-			break;
-		default:
-			break;
-		}
-	}
 }
 
 HICON GetIcon(CefString url, CefString path){
@@ -167,21 +134,14 @@ HICON GetIcon(CefString url, CefString path){
 	}
 	return (HICON)::LoadImage(NULL, path.ToWString().data(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 }
-LRESULT onBrowserWinWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
-	wstring msg;
-	DWORD msgId = 0;
-	jw::parseProcessMsg(lParam, ref(msgId), ref(msg));
-	std::thread t(jb::browserwin_thread_executeWmCopyData, hWnd, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
-	t.detach();// 从当前线程分离
-	return JWEBTOP_MSG_SUCCESS;
-}
+
 // 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
 LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
 	case WM_COPYDATA:{
-						 return	 onBrowserWinWmCopyData(hWnd, message, wParam, lParam);
+						 return	 jw::dllex::onBrowserWinWmCopyData(hWnd, message, wParam, lParam);
 
 	}
 	case WM_SIZE:
@@ -309,7 +269,9 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
-
+namespace jw{
+	extern wstring g_TaskId;
+}
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
 	JWebTopConfigs configs = (*p_configs);
@@ -354,17 +316,15 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		bwInfo->enableDrag = configs.enableDrag;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
-		if (configs.msgWin != 0) {
-			std::wstringstream wss;
-			wss << L"@{\"action\":\"browser\",\"method\":\"setBrowserHwnd\",\"msg\":\"浏览器已创建\",\"value\":{\"hwnd\":" << (LONG)hWnd << L"}}";
-			jb::sendJWebTopProcessMsg(hWnd, 0, LPTSTR(wss.str().c_str()));
+		if (jw::dllex::ex()) {
+			jw::dllex::sendBrowserCreatedMessage(jw::g_TaskId, (LONG)hWnd);
 		}
 	}
 #ifdef JWebTopLog
 	stringstream ss;
 	ss << "hWnd===" << hWnd << ",bWnd=" << bWnd << ",rWnd=<<" << GetNextWindow(bWnd, GW_CHILD) //
 		<< ",parentWin=" << configs.parentWin
-		<< ",msgWin=" << configs.msgWin
+		<< ",msgWin=" << g_RemoteWinHWnd
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 

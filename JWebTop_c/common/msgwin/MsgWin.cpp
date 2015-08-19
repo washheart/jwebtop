@@ -17,16 +17,9 @@ namespace jw{
 		wstring msg;
 		DWORD msgId = 0;
 		jw::parseProcessMsg(lParam, ref(msgId), ref(msg));
-		if (msgId < MPMSG_USER){
-			if (msgId == WM_COPYDATA_HWND){// 远程窗口发来的其窗口句柄系消息
-				long tmp = parseLong(msg);
-				if (tmp != 0) g_RemoteWinHWnd = (HWND)tmp;
-				return JWEBTOP_MSG_SUCCESS;
-			}
-			else if (msgId == WM_COPYDATA_EXIT){
-				PostQuitMessage(0);
-				return JWEBTOP_MSG_SUCCESS;
-			}
+		if (msgId == WM_COPYDATA_EXIT){
+			PostQuitMessage(0);
+			return JWEBTOP_MSG_SUCCESS;
 		}
 		std::thread t(msgwin_thread_executeWmCopyData, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
 		t.detach();// 从当前线程分离
@@ -42,7 +35,7 @@ namespace jw{
 							 return	 onWmCopyData(hWnd, message, wParam, lParam);
 
 		}
-		case   WM_DESTROY:
+		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
 		}
@@ -72,8 +65,7 @@ namespace jw{
 
 		// 注册窗口类
 		if (!RegisterClass(&wndclass)){
-			MessageBox(NULL, TEXT("无法创建窗口，操作系统版本过低！"),
-				szAppName, MB_ICONERROR);
+			MessageBox(NULL, TEXT("无法创建窗口，操作系统版本过低！"), szAppName, MB_ICONERROR);
 			return 0;
 		}
 
@@ -86,10 +78,6 @@ namespace jw{
 			hInstance,//program instance handle
 			NULL); // creation parameters
 		g_LocalWinHWnd = hWnd;
-		if (g_RemoteWinHWnd != NULL){// 如果有设置远程窗口的句柄，那么向其发送当前窗口的句柄
-			wstringstream wss; wss << ((long)hWnd);
-			sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_HWND, LPTSTR(wss.str().c_str()));
-		}
 		onWindowHwndCreated(hWnd, szCmdLine);
 		ShowWindow(hWnd, SW_HIDE);
 		UpdateWindow(hWnd);

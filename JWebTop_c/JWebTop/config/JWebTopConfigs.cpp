@@ -114,29 +114,42 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	return configs;
 }
 
-// 从命令行读取
-JWebTopConfigs * JWebTopConfigs::parseCmdLine(LPTSTR szCmdLine){
+extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
+namespace jw{
+	extern wstring g_TaskId;
+}
+// 根据命令行执行启动进程的参数的解析
+JWebTopConfigs * JWebTopConfigs::parseCreateJWebTopCmdLine(LPTSTR szCmdLine){
 	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0 || szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
 		return JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(szCmdLine));
 	}
 	int argc = 0;
 	LPTSTR * args = CommandLineToArgvW(szCmdLine, &argc);
-	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile(args[7]));
 	//// args[0]===特殊符号“:”
-	configs->msgWin = jw::parseLong(args[1]);
-	configs->parentWin = jw::parseLong(args[2]);
-	int tmpi = jw::parseInt(args[3]);
+	g_RemoteWinHWnd = (HWND)jw::parseLong(args[1]);
+	jw::g_TaskId = wstring(args[2]);
+	return loadConfigs(JWebTopConfigs::getAppDefFile(args[3]));
+}
+
+// 根据命令行执行创建浏览器的参数的解析
+JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(wstring cmd){
+	int argc = 0;
+	//szCmdLine
+	LPTSTR * args = CommandLineToArgvW(cmd.c_str(), &argc);
+	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile(args[5]));
+	configs->parentWin = jw::parseLong(args[0]);
+	int tmpi = jw::parseInt(args[1]);
 	if (tmpi != -1)configs->x = tmpi;
-	tmpi = jw::parseInt(args[4]);
-	if (tmpi != -1)configs->y =tmpi;
-	tmpi = jw::parseInt(args[5]);
+	tmpi = jw::parseInt(args[2]);
+	if (tmpi != -1)configs->y = tmpi;
+	tmpi = jw::parseInt(args[3]);
 	if (tmpi != -1)configs->w = tmpi;
-	tmpi = jw::parseInt(args[6]);
+	tmpi = jw::parseInt(args[4]);
 	if (tmpi != -1)configs->h = tmpi;
-	LPTSTR  url = args[8];
+	LPTSTR  url = args[6];
 	if (url[0] != ':')configs->url = CefString(url);
-	url = args[9];
+	url = args[7];
 	if (url[0] != ':')configs->icon = CefString(url);
-	if (argc > 10)configs->name = CefString(args[10]);
+	if (argc > 8)configs->name = CefString(args[8]);// FIXME：名称含空格会解析不对
 	return configs;
 }

@@ -25,11 +25,9 @@ public:
 	bool isDraging;                     // 是否正在拖动窗口
 	LONG dragX, dragY;
 };
-typedef std::map<HWND, BrowserWindowInfo*> BrowserWindowInfoMap;// 定义一个存储BrowserWindowInfo的Map
-// 处理WM_COPYDATA消息
-LRESULT onWmCopyData(BrowserWindowInfo * bwInfo, HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-void thread_executeWmCopyData(HWND hWnd, DWORD msgId, std::wstring json);
+BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd);
 
+typedef std::map<HWND, BrowserWindowInfo*> BrowserWindowInfoMap;// 定义一个存储BrowserWindowInfo的Map
 
 // 对CEF浏览器窗口的消息进行拦截
 LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

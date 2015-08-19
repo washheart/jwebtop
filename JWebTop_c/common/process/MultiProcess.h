@@ -7,7 +7,6 @@
 #define WM_COPYDATA_MINI  1     // 定义WM_COPYDATA消息中dwData的数值：表示是小数据
 #define WM_COPYDATA_LARGE 2     // 定义WM_COPYDATA消息中dwData的数值：表示是大数据
 #define WM_COPYDATA_EXIT  3     // 定义WM_COPYDATA消息中dwData的数值：表示是退出窗口的消息循环
-#define WM_COPYDATA_HWND  9     // 定义WM_COPYDATA消息中dwData的数值：表示是在发送窗口HAWND给另一个进程（此时是小数据）
 #define MPMSG_USER        100   // 定义MPMSG_MINI和MPMSG_LARGE中msgId的起始值
 #define MPMSG_MINI_LEN 1024     // 定义小数据结构时字符串的长度
 #define MPMSG_LARGE_LEN 65535   // 定义大数据结构时字符串的长度

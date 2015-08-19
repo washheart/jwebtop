@@ -19,18 +19,16 @@ void DetachFromThread(bool *mustDetach) {
 		g_jvm->DetachCurrentThread();
 }
 
-//把java的字符串转换成windows的字符串   
-char*   jstringToWindows(JNIEnv*   env, jstring   jstr)
-{
-	int   length = env->GetStringLength(jstr);
-	const   jchar*   jcstr = env->GetStringChars(jstr, 0);
-	char*   rtn = (char*)malloc(length * 2 + 1);
-	int   size = 0;
-	size = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)jcstr, length, rtn,
-		(length * 2 + 1), NULL, NULL);
-	if (size <= 0)
-		return   NULL;
-	env->ReleaseStringChars(jstr, jcstr);
-	rtn[size] = 0;
-	return   rtn;
+
+std::string jstring2string(JNIEnv * env, jstring jstr){
+	const char * tmp = env->GetStringUTFChars(jstr, false);
+	string js(tmp);
+	env->ReleaseStringUTFChars(jstr, tmp);
+	return js;
+}
+std::wstring jstring2wstring(JNIEnv * env, jstring jstr){
+	const char * tmp = env->GetStringUTFChars(jstr, false);
+	string js(tmp);
+	env->ReleaseStringUTFChars(jstr, tmp);
+	return jw::s2w(js);
 }

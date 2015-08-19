@@ -5,5 +5,5 @@
 JNIEnv* GetJNIEnv();
 void DetachFromThread(bool *mustDetach);
 
-//把java的字符串转换成windows的字符串   
-char*   jstringToWindows(JNIEnv*   env, jstring   jstr);
+std::string jstring2string(JNIEnv * env, jstring jstr);
+std::wstring jstring2wstring(JNIEnv * env, jstring jstr);
