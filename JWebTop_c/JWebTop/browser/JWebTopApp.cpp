@@ -1,7 +1,7 @@
 #include "JWebTopApp.h"
 #include "JWebTopCommons.h"
 
-extern JWebTopConfigs * tmpConfigs;
+extern JWebTopConfigs * g_configs;
 void JWebTopApp::OnBeforeCommandLineProcessing(
 	const CefString& process_type,
 	CefRefPtr<CefCommandLine> command_line) {
@@ -9,5 +9,10 @@ void JWebTopApp::OnBeforeCommandLineProcessing(
 }
 
 void JWebTopApp::OnContextInitialized() {
-	createNewBrowser(tmpConfigs);
+	if (g_configs->msgWin != 0){// 如果不是从dll调用，那么直接创建浏览器
+		createNewBrowser(g_configs);
+	}
+	else{// 如果是从dll调用，那么只有当url有效时才创建浏览器
+		if (!g_configs->url.empty())createNewBrowser(g_configs);
+	}
 }

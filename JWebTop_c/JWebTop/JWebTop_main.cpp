@@ -19,11 +19,11 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
-JWebTopConfigs * tmpConfigs; // 创建过程中在多个上下文中共享的变量
-extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
-extern CefRefPtr<JWebTopClient> g_handler;// 全局保留一个JWebTopClient即可
-CefSettings settings;              // CEF全局设置
+JWebTopConfigs * g_configs;                // 应用启动时的第一个配置变量
+JWebTopConfigs * tmpConfigs;               // 创建过程中在多个上下文中共享的变量
+extern HWND g_RemoteWinHWnd;               // 远程进程的消息窗口HWND
+extern CefRefPtr<JWebTopClient> g_handler; // 全局保留一个JWebTopClient即可
+CefSettings settings;                      // CEF全局设置
 
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
