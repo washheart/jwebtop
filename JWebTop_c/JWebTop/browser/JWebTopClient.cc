@@ -24,6 +24,7 @@ JWebTopClient::JWebTopClient()
 JWebTopClient::~JWebTopClient() {
 }
 
+extern CefSettings settings;              // CEF全局设置
 extern bool g_single_process;
 // 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
 extern JWebTopConfigs * tmpConfigs;
@@ -115,6 +116,10 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	log << "JWebTopClient::OnBeforeClose " << browser_list_.size();
 	writeLog(log.str());
 #endif
+	if (!settings.multi_threaded_message_loop && browser_list_.empty()) {
+		// All browser windows have closed. Quit the application message loop.
+		CefQuitMessageLoop();
+	}
 }
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,

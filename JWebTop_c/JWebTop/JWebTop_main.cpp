@@ -44,10 +44,10 @@ void waitRemoteProcessTerminate(){
 	jw::sendProcessMsg(g_LocalWinHWnd, WM_COPYDATA_EXIT, L"");// 通知本进程主窗口，程序需要关闭
 }
 
+CefSettings settings;              // CEF全局设置
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	CefMainArgs main_args(hInstance);  // 提供CEF命令行参数
-	CefSettings settings;              // CEF全局设置
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::parseCmdLine(lpCmdLine);
 	if (g_configs == NULL)g_configs = tmpConfigs;
