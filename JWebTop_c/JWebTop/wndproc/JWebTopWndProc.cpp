@@ -15,9 +15,6 @@
 using namespace std;
 BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
 
-extern JWebTopConfigs * g_configs;
-extern JWebTopConfigs * tmpConfigs;
-
 BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 	BrowserWindowInfoMap::iterator it = BrowserWindowInfos.find(hWnd);
 	if (BrowserWindowInfos.end() != it) {
@@ -98,7 +95,7 @@ namespace jb{
 			bw->browser->GetMainFrame()->ExecuteJavaScript(CefString(js), "", 0);
 		}
 	}
-	void CreateNewBrowserThread(){
+	void CreateNewBrowserThread(JWebTopConfigs *tmpConfigs){
 		createNewBrowser(tmpConfigs);
 	}
 	void runApp(HWND hWnd, wstring appDefFile, long parentWin, const LPTSTR url, const LPTSTR &title, const LPTSTR &icon, const  int x, const  int y, const  int w, const  int h){
@@ -108,7 +105,7 @@ namespace jb{
 		writeLog(log.str());
 #endif
 		//if (tmpConfigs != g_configs)delete tmpConfigs;
-		tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
+		JWebTopConfigs *tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
 		tmpConfigs->parentWin = parentWin;
 	
 		if (url != NULL)tmpConfigs->url = CefString(url);
@@ -118,8 +115,7 @@ namespace jb{
 		if (y != -1)tmpConfigs->y= y;
 		if (h != -1)tmpConfigs->h = h;
 		if (w != -1)tmpConfigs->w = w;
-		/*createNewBrowser(tmpConfigs);*/
-		thread t(CreateNewBrowserThread);
+		thread t(CreateNewBrowserThread,tmpConfigs);
 		t.detach();
 	}
 

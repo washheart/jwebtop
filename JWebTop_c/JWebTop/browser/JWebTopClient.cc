@@ -13,6 +13,7 @@
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
+#include "JWebTopContext.h"
 #include "JWebTopCommons.h"
 
 using namespace std;
@@ -21,22 +22,13 @@ JWebTopClient::JWebTopClient()
 : is_closing_(false) {
 }
 
-JWebTopClient::~JWebTopClient() {
-}
+JWebTopClient::~JWebTopClient() {}
 
 extern CefSettings settings;              // CEF全局设置
-// 临时记录窗口配置信息，用于在JWebTopBrowser和JWebTopClient传递参数，（因为JWebTopClient是全局唯一实例）使用后置空
-extern JWebTopConfigs * tmpConfigs;
-void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
-	browser_list_.push_back(browser);// 记录下已经创建的窗口来
-#ifdef JWebTopLog
-	writeLog(L"JWebTopClient#OnAfterCreated 已缓存browser");
-#endif
-	renderBrowserWindow(browser, tmpConfigs);
-#ifdef JWebTopLog
-	writeLog(L"JWebTopClient#OnAfterCreated 已修饰browser");
-#endif
 
+void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
+	jw::ctx::addBrowser(browser);// 记录下已经创建的窗口来
+	renderBrowserWindow(browser, this->configs);
 	if (!message_router_) {
 		CefMessageRouterConfig config;
 		message_router_ = CefMessageRouterBrowserSide::Create(config);
@@ -90,7 +82,7 @@ bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 	// Closing the main window requires special handling. See the DoClose()
 	// documentation in the CEF header for a detailed destription of this
 	// process.
-	if (browser_list_.size() == 1) {
+	if (jw::ctx::getBrowserCount() == 1) {
 		// Set a flag to indicate that the window close should be allowed.
 		is_closing_ = true;
 	}
@@ -102,23 +94,7 @@ bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 
 void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
-	// Remove from the list of existing browsers.
-	BrowserList::iterator bit = browser_list_.begin();
-	for (; bit != browser_list_.end(); ++bit) {
-		if ((*bit)->IsSame(browser)) {
-			browser_list_.erase(bit);
-			break;
-		}
-	}
-#ifdef JWebTopLog
-	stringstream log;
-	log << "JWebTopClient::OnBeforeClose " << browser_list_.size();
-	writeLog(log.str());
-#endif
-	if (!settings.multi_threaded_message_loop && browser_list_.empty()) {
-		// All browser windows have closed. Quit the application message loop.
-		CefQuitMessageLoop();
-	}
+	jw::ctx::removeBrowser(browser);
 }
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -176,17 +152,4 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);" << endl;
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
-
-}
-
-void JWebTopClient::CloseAllBrowsers(bool force_close) {
-	if (!CefCurrentlyOn(TID_UI)) {
-		// Execute on the UI thread.
-		CefPostTask(TID_UI, base::Bind(&JWebTopClient::CloseAllBrowsers, this, force_close));
-		return;
-	}
-	if (browser_list_.empty()) return;
-	BrowserList::const_iterator it = browser_list_.begin();
-	for (; it != browser_list_.end(); ++it)
-		(*it)->GetHost()->CloseBrowser(force_close);
 }

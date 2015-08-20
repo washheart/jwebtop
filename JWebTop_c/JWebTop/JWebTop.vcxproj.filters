@@ -90,6 +90,9 @@
     <ClCompile Include="dllex\JWebTop_DLLEx.cpp">
       <Filter>jwebtop\dllex</Filter>
     </ClCompile>
+    <ClCompile Include="browser\JWebTopContext.cc">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="dllex\JWebTop_DLLEx.h">
       <Filter>jwebtop\dllex</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopContext.h">
+      <Filter>jwebtop\browser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

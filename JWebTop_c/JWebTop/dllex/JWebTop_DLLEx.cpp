@@ -14,7 +14,6 @@
 using namespace std;
 extern HWND g_LocalWinHWnd;  // 本地创建的消息窗口HWND
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
-extern JWebTopConfigs * tmpConfigs;               // 创建过程中在多个上下文中共享的变量
 namespace jw{
 	extern wstring g_TaskId;
 	namespace dllex{
@@ -96,8 +95,7 @@ namespace jw{
 			long remoteHWnd;
 			jw::parseMessageJSON(msg, ref(remoteHWnd), ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
 			jw::g_TaskId = taskId;
-			tmpConfigs = JWebTopConfigs::parseCreateBrowserCmdLine(result);
-			createNewBrowser(tmpConfigs);
+			createNewBrowser(JWebTopConfigs::parseCreateBrowserCmdLine(result));
 		}
 		// 暂时不需要做任何处理
 	}

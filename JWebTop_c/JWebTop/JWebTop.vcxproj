@@ -235,6 +235,7 @@
     <ClCompile Include="browser\JWebTopApp.cpp" />
     <ClCompile Include="browser\JWebTopCommons.cpp" />
     <ClCompile Include="browser\JWebTopClient.cc" />
+    <ClCompile Include="browser\JWebTopContext.cc" />
     <ClCompile Include="browser\JWebTopRenderer.cc" />
     <ClCompile Include="config\JWebTopConfigs.cpp" />
     <ClCompile Include="dllex\JWebTop_DLLEx.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="browser\JWebTopApp.h" />
     <ClInclude Include="browser\JWebTopCommons.h" />
     <ClInclude Include="browser\JWebTopClient.h" />
+    <ClInclude Include="browser\JWebTopContext.h" />
     <ClInclude Include="config\JWebTopConfigs.h" />
     <ClInclude Include="dllex\JWebTop_DLLEx.h" />
     <ClInclude Include="jshandler\JJH_Windows.h" />

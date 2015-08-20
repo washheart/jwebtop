@@ -11,7 +11,7 @@
 #endif
 #include "common/task/Task.h"
 #include "common/msgwin/MsgWin.h"
-#include "browser/JWebTopClient.h"
+#include "browser/JWebTopContext.h"
 #include "dllex/JWebTop_DLLEx.h"
 #if defined(CEF_USE_SANDBOX)
 // The cef_sandbox.lib static library is currently built with VS2013. It may not
@@ -19,21 +19,19 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-JWebTopConfigs * g_configs;                // 应用启动时的第一个配置变量
-JWebTopConfigs * tmpConfigs;               // 创建过程中在多个上下文中共享的变量
 extern HWND g_RemoteWinHWnd;               // 远程进程的消息窗口HWND
-extern CefRefPtr<JWebTopClient> g_handler; // 全局保留一个JWebTopClient即可
 CefSettings settings;                      // CEF全局设置
+
 namespace jw{
-	wstring g_TaskId;                       // 创建消息窗口或浏览器时的任务id
+	wstring g_TaskId;                      // 创建消息窗口或浏览器时的任务id
 }
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	//MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
 	CefMainArgs main_args(hInstance);  // 提供CEF命令行参数
 	// 读取程序配置信息
-	tmpConfigs = JWebTopConfigs::parseCreateJWebTopCmdLine(lpCmdLine);
-	if (g_configs == NULL)g_configs = tmpConfigs;
+	JWebTopConfigs * tmpConfigs = JWebTopConfigs::parseCreateJWebTopCmdLine(lpCmdLine);
+	jw::ctx::setDefaultConfigs(tmpConfigs);
 	// 对CEF进行一些设置
 	settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
 	CefString(&settings.user_data_path) = tmpConfigs->user_data_path;          // 用户数据保存目录
@@ -85,7 +83,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	if (settings.multi_threaded_message_loop == 1){// 如果是被DLL调用，这种方式只能建立一个进程		
 		jw::createWin(hInstance, lpCmdLine);       // 创建隐藏窗口并阻塞当前线程
 		// 在MsgWin中PostQuitMessage(0)之后，下面的代码根本没有机会执行了？？？进程直接退出
-		g_handler->CloseAllBrowsers(true);
+		jw::ctx::CloseAllBrowsers(true);
 		CefQuitMessageLoop();
 	}
 	else{

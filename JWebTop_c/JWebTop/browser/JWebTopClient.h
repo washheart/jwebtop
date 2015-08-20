@@ -15,10 +15,12 @@ class JWebTopClient : public CefClient,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRequestHandler {
+private:
+	JWebTopConfigs * configs=NULL;
 public:
 	JWebTopClient();
 	~JWebTopClient();
-
+	void setJWebTopConfigs(JWebTopConfigs * configs){ this->configs = configs; }
 	// CefClient methods:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE{
 		return this;
@@ -64,10 +66,7 @@ public:
 		bool is_redirect) OVERRIDE;
 	void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 		TerminationStatus status) OVERRIDE;
-
-	// Request that all existing browser windows close.
-	void CloseAllBrowsers(bool force_close);
-
+	
 	bool IsClosing() const { return is_closing_; }
 
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
@@ -80,9 +79,9 @@ public:
 	//}
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
 private:
-	// List of existing browser windows. Only accessed on the CEF UI thread.
-	typedef std::list<CefRefPtr<CefBrowser> > BrowserList;
-	BrowserList browser_list_;
+	//// List of existing browser windows. Only accessed on the CEF UI thread.
+	//typedef std::list<CefRefPtr<CefBrowser> > BrowserList;
+	//BrowserList browser_list_;
 	bool is_closing_;
 
 	// 和render进程进行通信的相关变量
