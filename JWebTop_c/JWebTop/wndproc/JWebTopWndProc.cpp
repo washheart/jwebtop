@@ -101,7 +101,7 @@ namespace jb{
 	void CreateNewBrowserThread(){
 		createNewBrowser(tmpConfigs);
 	}
-	void runApp(HWND hWnd, std::wstring appDefFile, long parentWin){
+	void runApp(HWND hWnd, wstring appDefFile, long parentWin, const LPTSTR url, const LPTSTR &title, const LPTSTR &icon, const  int x, const  int y, const  int w, const  int h){
 #ifdef JWebTopLog 
 		std::wstringstream log;
 		log << L"run app=" << appDefFile << L",parentWin=" << parentWin << L"\r\n";
@@ -110,13 +110,15 @@ namespace jb{
 		//if (tmpConfigs != g_configs)delete tmpConfigs;
 		tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
 		tmpConfigs->parentWin = parentWin;
+	
+		if (url != NULL)tmpConfigs->url = CefString(url);
+		if (title != NULL)tmpConfigs->url = CefString(title);
+		if (icon != NULL)tmpConfigs->url = CefString(icon);
+		if (x != -1)tmpConfigs->x = x;
+		if (y != -1)tmpConfigs->y= y;
+		if (h != -1)tmpConfigs->h = h;
+		if (w != -1)tmpConfigs->w = w;
 		/*createNewBrowser(tmpConfigs);*/
-		//DWORD  dwThreadId = 0; // 记录线程的id
-		////LPTSTR str = L"abcd";
-		//HANDLE threadHandle = // 记录线程的handler
-		//CreateThread(NULL, 0, CreateNewBrowserThread, NULL, NULL, &dwThreadId);
-		////Sleep(200);
-		//CloseHandle(threadHandle);
 		thread t(CreateNewBrowserThread);
 		t.detach();
 	}

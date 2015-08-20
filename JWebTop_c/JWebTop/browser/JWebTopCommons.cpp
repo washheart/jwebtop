@@ -45,11 +45,33 @@ bool excuteJSON(const CefString& request){
 		jb::reloadIgnoreCache((HWND)handler->GetInt());
 	}
 	else if (methodName == L"runApp"){
-		CefRefPtr<CefValue> handler = value->GetValue("handler"); 
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
 		if (handler == NULL)return false;
 		CefRefPtr<CefValue> app = value->GetValue("app");
 		CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
-		jb::runApp((HWND)handler->GetInt(), app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt());
+		jb::runApp((HWND)handler->GetInt(), app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt()
+			,NULL,NULL,NULL,-1,-1,-1,-1);
+	}
+	else if (methodName == L"runAppMore"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		CefRefPtr<CefValue> app = value->GetValue("app");
+		CefRefPtr<CefValue> parentWin = value->GetValue("parentWin");
+		CefRefPtr<CefValue> url = value->GetValue("url");
+		CefRefPtr<CefValue> title = value->GetValue("title");
+		CefRefPtr<CefValue> icon = value->GetValue("icon");
+		CefRefPtr<CefValue> x = value->GetValue("x");
+		CefRefPtr<CefValue> y = value->GetValue("y");
+		CefRefPtr<CefValue> w = value->GetValue("w");
+		CefRefPtr<CefValue> h = value->GetValue("h");
+		jb::runApp((HWND)handler->GetInt(), app->GetString().ToWString(), parentWin == NULL ? 0 : parentWin->GetInt()
+			, (url == NULL ? NULL : LPTSTR(url->GetString().ToWString().c_str()))
+			, (title == NULL ? NULL : LPTSTR(title->GetString().ToWString().c_str()))
+			, (icon == NULL ? NULL : LPTSTR(icon->GetString().ToWString().c_str()))
+			, (x == NULL ? -1 : x->GetInt())
+			, (y == NULL ? -1 : y->GetInt())
+			, (w == NULL ? -1 : w->GetInt())
+			, (h == NULL ? -1 : h->GetInt()));
 	}
 	else if(methodName == L"close"){
 		CefRefPtr<CefValue> handler = value->GetValue("handler");

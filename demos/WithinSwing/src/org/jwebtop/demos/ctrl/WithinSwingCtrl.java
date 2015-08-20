@@ -17,13 +17,13 @@ import org.jwebtop.demos.view.WithinSwing;
 import com.alibaba.fastjson.JSONObject;
 
 public class WithinSwingCtrl implements JWebtopJSONDispater {
-	public interface DetailBrowserListener {
-		void detailBrowserCreated(long detailHandler);
+	public interface WithinSwingCtrlHelper {
+		int[] getDetailRect();
 	}
 
 	private long listHandler, detailHandler;
 	private List<String> names = null;
-	private DetailBrowserListener detailBrowserListener = null;
+	private WithinSwingCtrlHelper withinSwingCtrlHelper = null;
 	private String currentNote;
 
 	@Override
@@ -62,9 +62,6 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 			return getDetailAppFile();
 		} else if ("setDetailHandler".equals(method)) {
 			this.detailHandler = jo.getLong("value");
-			if (this.detailBrowserListener != null) {
-				this.detailBrowserListener.detailBrowserCreated(this.detailHandler);
-			}
 			showDetail(null);
 		} else if ("showDetail".equals(method)) {
 			String name = jo.getString("value");
@@ -74,6 +71,15 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 			saveNote(jo.getString("note"), jo.getString("value"));
 		} else if ("javaWindowHwnd".equals(method)) {
 			return Long.toString(WithinSwing.frameHwnd);
+		} else if ("getDetailRect".equals(method)) {
+			int[] rect = withinSwingCtrlHelper.getDetailRect();
+			StringBuilder sb = new StringBuilder();
+			sb.append("{x:").append(rect[0]);
+			sb.append(",y:").append(rect[1]);
+			sb.append(",w:").append(rect[2]);
+			sb.append(",h:").append(rect[3]);
+			sb.append("}");
+			return sb.toString();
 		}
 		return "";
 	}
@@ -154,12 +160,12 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		return currentNote;
 	}
 
-	public DetailBrowserListener getDetailBrowserListener() {
-		return detailBrowserListener;
+	public WithinSwingCtrlHelper getWithinSwingCtrlHelper() {
+		return withinSwingCtrlHelper;
 	}
 
-	public void setDetailBrowserListener(DetailBrowserListener detailBrowserListener) {
-		this.detailBrowserListener = detailBrowserListener;
+	public void setWithinSwingCtrlHelper(WithinSwingCtrlHelper withinSwingCtrlHelper) {
+		this.withinSwingCtrlHelper = withinSwingCtrlHelper;
 	}
 
 	public long getDetailHandler() {

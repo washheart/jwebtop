@@ -12,6 +12,8 @@ import java.io.IOException;
 public final class JWebTopNative {
 	private static native void nExit();
 
+	public static native void cls();
+
 	private static native void nCreateJWebTop(String processPath, String configFile);
 
 	private static native long nCreateBrowser(String appFile, long parenHwnd, String url, String title, String icon, int x, int y, int w, int h);

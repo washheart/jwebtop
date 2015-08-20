@@ -1,7 +1,9 @@
 package org.jwebtop.demos.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -18,7 +20,7 @@ import org.jwebtop.JWebTopBrowser;
 import org.jwebtop.JWebTopBrowser.IBrowserHwndFeeder;
 import org.jwebtop.JWebTopNative;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl;
-import org.jwebtop.demos.ctrl.WithinSwingCtrl.DetailBrowserListener;
+import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -28,7 +30,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author washheart@163.com
  */
-public class WithinSwing extends JFrame {
+public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 	protected static long RootBrowserHwnd = 0;
 
 	private static void initDll(String[] args) {
@@ -56,6 +58,7 @@ public class WithinSwing extends JFrame {
 		this.setTitle("测试嵌入两个浏览器窗口到Swing中");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.ctrl = new WithinSwingCtrl();
+		this.ctrl.setWithinSwingCtrlHelper(this);
 		JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		toolPanel.add(new JButton(new AbstractAction("新增日记") {
 			@Override
@@ -109,12 +112,6 @@ public class WithinSwing extends JFrame {
 				return ctrl.getDetailHandler();
 			}
 		});
-		this.ctrl.setDetailBrowserListener(new DetailBrowserListener() {
-			@Override
-			public void detailBrowserCreated(long detailHandler) {
-				// if (detailWebtopView.isShowing()) detailWebtopView.setBrowserLocation(detailWebtopView.getLocationOnScreen());
-			}
-		});
 		mainPanel.add(this.listWebtopView, JSplitPane.LEFT);
 		mainPanel.add(this.detailWebtopView, JSplitPane.BOTTOM);
 
@@ -139,6 +136,13 @@ public class WithinSwing extends JFrame {
 			e.printStackTrace();
 		}
 		// if (listWebtopView.isShowing()) listWebtopView.setBrowserLocation(listWebtopView.getLocationOnScreen());
+	}
+
+	@Override
+	public int[] getDetailRect() {
+		Point p = detailWebtopView.calcBrowserLocation();
+		Dimension s = detailWebtopView.getSize();
+		return new int[] { p.x, p.y, s.width, s.height };
 	}
 
 	// 新增日记

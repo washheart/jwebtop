@@ -161,7 +161,16 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	}
 	// runApp(appName,handler);//运行一个app，appName为.app文件路径。
 	extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
-	extensionCode << "JWebTop.invokeJava=JWebTop.JJH_InvokeRemote_Wait;" << endl;
+	extensionCode << "JWebTop.runAppMore=function(app,parentWin,url,name,icon,x,y,w,h,handler){" \
+		"var morejson={m:'runAppMore',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)};" \
+		"if(url!=null)morejson.url=url;" \
+		"if(name!=null)morejson.name=name;" \
+		"if(icon!=null)morejson.icon=icon;" \
+		"if(x!=null)morejson.x=x;" \
+		"if(y!=null)morejson.y=y;" \
+		"if(w!=null)morejson.w=w;" \
+		"if(h!=null)morejson.h=h;" \
+		"JWebTop.cefQuery(morejson)};" << endl;
 
 	// 页面加载后，触发JWebTopReady消息
 	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
