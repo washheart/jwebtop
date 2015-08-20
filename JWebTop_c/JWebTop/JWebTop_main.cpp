@@ -29,7 +29,7 @@ namespace jw{
 }
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
-	MessageBox(NULL, L"1", L"2", 0);
+	//MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
 	CefMainArgs main_args(hInstance);  // 提供CEF命令行参数
 	// 读取程序配置信息
 	tmpConfigs = JWebTopConfigs::parseCreateJWebTopCmdLine(lpCmdLine);

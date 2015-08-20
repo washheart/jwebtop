@@ -229,3 +229,18 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
 (JNIEnv *, jclass){
 	jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT,L"");
 }
+
+JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv * env, jclass, jlong hWnd){
+	WINDOWINFO winInfo;
+	GetWindowInfo((HWND)hWnd, &winInfo);// 获取窗口信息
+	RECT rc = winInfo.rcClient;
+	jintArray rtn= env->NewIntArray(4);
+	jint * tmp = new jint[4];
+	tmp[0] = rc.left;
+	tmp[1] = rc.top;
+	tmp[2] = rc.right;
+	tmp[3] = rc.bottom;
+	delete[] tmp;
+	env->SetIntArrayRegion(rtn, 0, 4, tmp);
+	return rtn;
+}

@@ -32,6 +32,8 @@ public final class JWebTopNative {
 
 	// private static native void nSetUrl(long browserHwnd, String url);
 
+	private static native int[] nGetWindowClient(long browserHwnd);
+
 	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
 	// private final class CreateBrowserLocker {
@@ -77,11 +79,14 @@ public final class JWebTopNative {
 			, final String icon // -------窗口图标
 			, final int x, final int y // 窗口左上角坐标,当值为-1时不启用此变量
 			, final int w, final int h // 窗口的宽、高，当值为-1时不启用此变量
-	) throws IOException {
-		final String appfile2 = new File(appfile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
-		// Runnable creator = new Runnable() {
-		// @Override
-		// public void run() {
+	) {
+		String appfile2;
+		try {
+			appfile2 = new File(appfile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
+		}
 		System.out.println("准备调用JNI创建浏览器：");
 		System.out.println("\t parenHwnd = " + parenHwnd);
 		System.out.println("\t appfile = " + appfile2);
@@ -93,25 +98,6 @@ public final class JWebTopNative {
 		System.out.println("\t w = " + w);
 		System.out.println("\t w = " + h);
 		return nCreateBrowser(appfile2, parenHwnd, url, title, icon, x, y, w, h);
-		// }
-		// };
-		// SwingUtilities.invokeLater(creator);// 如果是在UI中调用此方法，那么这里会陷入无限等待，因为当前线程会锁死在lock的等待上
-		// new Thread(creator).start();
-		// System.out.println("已调用创建浏览器方法=");
-		// synchronized (locker) {
-		// try {
-		// waitLock = true;
-		// System.out.println("已调用创建浏览器方法，waitLock=" + waitLock);
-		// locker.wait();
-		// System.out.println("已调用创建浏览器方法，waitLock=------------");
-		// waitLock = false;
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// } finally {
-		// waitLock = false;
-		// }
-		// }
-		// return locker.hwnd;
 	}
 
 	// 关闭JWebTop的进程
@@ -261,5 +247,16 @@ public final class JWebTopNative {
 	 */
 	public static long getWindowHWND(Component target) {
 		return ((sun.awt.windows.WComponentPeer/* 此类来自JDK，纯jre不行 */) target.getPeer()).getHWnd();
+	}
+
+	/**
+	 * 获取指定窗口的客户区坐标信息，返回大小为4的数组，依次为右左上角x、y、右下角x、y
+	 * 
+	 * @param hWnd
+	 *            窗口句柄
+	 * @return int[left,top,right,bottom]
+	 */
+	public static int[] getWindowClient(long hWnd) {
+		return nGetWindowClient(hWnd);
 	}
 }

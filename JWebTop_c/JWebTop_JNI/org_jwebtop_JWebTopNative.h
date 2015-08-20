@@ -73,6 +73,8 @@ extern "C" {
 	// jni方法：退出JWebTop进程
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
 		(JNIEnv *, jclass);
+
+	JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv *, jclass,jlong hWnd);
 #ifdef __cplusplus
 }
 #endif

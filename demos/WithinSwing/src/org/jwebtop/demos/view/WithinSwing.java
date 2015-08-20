@@ -1,9 +1,7 @@
 package org.jwebtop.demos.view;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -114,7 +112,7 @@ public class WithinSwing extends JFrame {
 		this.ctrl.setDetailBrowserListener(new DetailBrowserListener() {
 			@Override
 			public void detailBrowserCreated(long detailHandler) {
-				if (detailWebtopView.isShowing()) detailWebtopView.setBrowserLocation(detailWebtopView.getLocationOnScreen());
+				// if (detailWebtopView.isShowing()) detailWebtopView.setBrowserLocation(detailWebtopView.getLocationOnScreen());
 			}
 		});
 		mainPanel.add(this.listWebtopView, JSplitPane.LEFT);
@@ -129,23 +127,18 @@ public class WithinSwing extends JFrame {
 			JOptionPane.showMessageDialog(this, "wait");
 			WithinSwing.frameHwnd = JWebTopNative.getWindowHWND(this);
 			System.out.println("Java窗口handler = " + WithinSwing.frameHwnd + " hex=0x" + Long.toHexString(WithinSwing.frameHwnd));
-			String path = "D:\\c\\jwebtop\\JWebTop_c\\JWebTop\\Release\\JWebTop.exe";
+			String path = "JWebTop.exe";
 			System.out.println("\tpath = " + path);
 			String appFile = ctrl.getListAppFile();
 			System.out.println("\tappFile = " + appFile);
 			JWebTopNative.getInstance().createJWebTop(path, appFile);
-			Point p = listWebtopView.getLocationOnScreen();
-			Dimension size = listWebtopView.getSize();
-			RootBrowserHwnd = JWebTopNative.getInstance().createBrowser(appFile, WithinSwing.frameHwnd//
-					, null, "列表页", null//
-					, p.x, p.y//
-					, size.width, size.height);
+			RootBrowserHwnd = listWebtopView.createInernalBrowser(appFile, null, "列表页", null);
 			System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
 			ctrl.setListHandler(RootBrowserHwnd);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (listWebtopView.isShowing()) listWebtopView.setBrowserLocation(listWebtopView.getLocationOnScreen());
+		// if (listWebtopView.isShowing()) listWebtopView.setBrowserLocation(listWebtopView.getLocationOnScreen());
 	}
 
 	// 新增日记

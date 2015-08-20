@@ -35,33 +35,33 @@ public class TestJWebTop {
 		System.load(dll);
 	}
 
-	static void test_createBrower(String appfile) throws IOException {
-		System.out.println("准备执行appfile=" + appfile);
-		JWebTopNative.getInstance().createJWebTop(appfile);
-	}
-
-	static void test_createBrower_multi(String appfile) throws IOException {
-		class CreateBrowserThread extends Thread {
-			private String appfile;
-
-			CreateBrowserThread(String appfile) {
-				this.appfile = appfile;
-			}
-
-			@Override
-			public void run() {
-				System.out.println("准备执行appfile=" + appfile);
-				try {
-					JWebTopNative.getInstance().createJWebTop(appfile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		// Crash? 估计是浏览器内部有些静态变量没有维护好
-		new CreateBrowserThread(appfile).start();
-		new CreateBrowserThread(appfile).start();
-	}
+	// static void test_createBrower(String appfile) throws IOException {
+	// System.out.println("准备执行appfile=" + appfile);
+	// JWebTopNative.getInstance().createJWebTop(appfile);
+	// }
+	//
+	// static void test_createBrower_multi(String appfile) throws IOException {
+	// class CreateBrowserThread extends Thread {
+	// private String appfile;
+	//
+	// CreateBrowserThread(String appfile) {
+	// this.appfile = appfile;
+	// }
+	//
+	// @Override
+	// public void run() {
+	// System.out.println("准备执行appfile=" + appfile);
+	// try {
+	// JWebTopNative.getInstance().createJWebTop(appfile);
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+	// // Crash? 估计是浏览器内部有些静态变量没有维护好
+	// new CreateBrowserThread(appfile).start();
+	// new CreateBrowserThread(appfile).start();
+	// }
 
 	protected static long RootBrowserHwnd;
 
@@ -92,9 +92,10 @@ public class TestJWebTop {
 				long hwnd = JWebTopNative.getWindowHWND(jf);
 				System.out.println("hwnd = " + hwnd);
 				try {
-					RootBrowserHwnd = webtop.createJWebTop(appfile, hwnd);
+					webtop.createJWebTop("JWebTop.exe", appfile);
+					RootBrowserHwnd = jwebtop.createInernalBrowser(appfile, null, null, null);
 					System.out.println("jwebtop.getLocationOnScreen() = " + jwebtop.getLocationOnScreen());
-					if (jwebtop.isShowing()) jwebtop.setBrowserLocation(jwebtop.getLocationOnScreen());
+					// if (jwebtop.isShowing()) jwebtop.setBrowserLocation(jwebtop.getLocationOnScreen());
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
