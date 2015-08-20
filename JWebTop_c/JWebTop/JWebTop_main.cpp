@@ -22,15 +22,13 @@
 extern HWND g_RemoteWinHWnd;               // 远程进程的消息窗口HWND
 CefSettings settings;                      // CEF全局设置
 
-namespace jw{
-	wstring g_TaskId;                      // 创建消息窗口或浏览器时的任务id
-}
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	//MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
 	CefMainArgs main_args(hInstance);  // 提供CEF命令行参数
+	wstring taskId;
 	// 读取程序配置信息
-	JWebTopConfigs * tmpConfigs = JWebTopConfigs::parseCreateJWebTopCmdLine(lpCmdLine);
+	JWebTopConfigs * tmpConfigs = JWebTopConfigs::parseCreateJWebTopCmdLine(lpCmdLine, std::ref(taskId));
 	jw::ctx::setDefaultConfigs(tmpConfigs);
 	// 对CEF进行一些设置
 	settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
@@ -81,7 +79,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		return exit_code;
 	}
 	if (settings.multi_threaded_message_loop == 1){// 如果是被DLL调用，这种方式只能建立一个进程		
-		jw::createWin(hInstance, lpCmdLine);       // 创建隐藏窗口并阻塞当前线程
+		jw::createWin(hInstance, LPTSTR(taskId.c_str()));       // 创建隐藏窗口并阻塞当前线程
 		// 在MsgWin中PostQuitMessage(0)之后，下面的代码根本没有机会执行了？？？进程直接退出
 		jw::ctx::CloseAllBrowsers(true);
 		CefQuitMessageLoop();

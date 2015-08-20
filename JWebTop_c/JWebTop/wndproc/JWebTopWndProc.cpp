@@ -267,9 +267,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
-namespace jw{
-	extern wstring g_TaskId;
-}
+
 // 根据配置信息(configs)对顶层窗口和实际浏览器窗口进行修饰
 void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_configs){
 	JWebTopConfigs configs = (*p_configs);
@@ -314,9 +312,6 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		bwInfo->enableDrag = configs.enableDrag;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
-		if (jw::dllex::ex()) {
-			jw::dllex::sendBrowserCreatedMessage(jw::g_TaskId, (LONG)hWnd);
-		}
 	}
 #ifdef JWebTopLog
 	stringstream ss;

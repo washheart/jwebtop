@@ -15,7 +15,7 @@ using namespace std;
 extern HWND g_LocalWinHWnd;  // 本地创建的消息窗口HWND
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
 namespace jw{
-	extern wstring g_TaskId;
+	//wstring g_TaskId;                 // 创建消息窗口或浏览器时的任务id
 	namespace dllex{
 		bool ex(){ return g_RemoteWinHWnd != NULL; }
 
@@ -83,7 +83,7 @@ namespace jw{
 		void sendBrowserCreatedMessage(wstring taskId, long browserHWnd){
 			wstringstream wss; wss << browserHWnd;
 			wstring ws = wss.str();
-			wstring wrapped = jw::wrapAsTaskJSON((long)g_RemoteWinHWnd, std::ref(g_TaskId), std::ref(ws));
+			wstring wrapped = jw::wrapAsTaskJSON((long)g_RemoteWinHWnd, std::ref(taskId), std::ref(ws));
 			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str()));
 		}
 	}	
@@ -94,7 +94,6 @@ namespace jw{
 			wstring taskId, result;
 			long remoteHWnd;
 			jw::parseMessageJSON(msg, ref(remoteHWnd), ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
-			jw::g_TaskId = taskId;
 			createNewBrowser(JWebTopConfigs::parseCreateBrowserCmdLine(result));
 		}
 		// 暂时不需要做任何处理
@@ -102,9 +101,10 @@ namespace jw{
 	// 用于createWin进行回调
 	void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
 		if (g_RemoteWinHWnd != NULL){// 如果有设置远程窗口的句柄，那么向其发送当前窗口的句柄
+			wstring taskId = wstring(szCmdLine);
 			wstringstream wss; wss << ((long)hWnd);
 			wstring ws = wss.str();
-			wstring wrapped = jw::wrapAsTaskJSON((long)g_RemoteWinHWnd, std::ref(g_TaskId), std::ref(ws));
+			wstring wrapped = jw::wrapAsTaskJSON((long)g_RemoteWinHWnd, std::ref(taskId), std::ref(ws));
 			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str()));
 		}
 	}

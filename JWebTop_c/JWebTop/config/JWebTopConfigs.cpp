@@ -6,6 +6,7 @@
 #include <sstream> 
 #include <strsafe.h>
 #include "common/util/StrUtil.h"
+#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -115,11 +116,9 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 }
 
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
-namespace jw{
-	extern wstring g_TaskId;
-}
+
 // 根据命令行执行启动进程的参数的解析
-JWebTopConfigs * JWebTopConfigs::parseCreateJWebTopCmdLine(LPTSTR szCmdLine){
+JWebTopConfigs * JWebTopConfigs::parseCreateJWebTopCmdLine(LPTSTR szCmdLine,wstring &taskId){
 	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0 || szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
 		return JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(szCmdLine));
 	}
@@ -127,7 +126,7 @@ JWebTopConfigs * JWebTopConfigs::parseCreateJWebTopCmdLine(LPTSTR szCmdLine){
 	LPTSTR * args = CommandLineToArgvW(szCmdLine, &argc);
 	//// args[0]===特殊符号“:”
 	g_RemoteWinHWnd = (HWND)jw::parseLong(args[1]);
-	jw::g_TaskId = wstring(args[2]);
+	taskId= wstring(args[2]);
 	return loadConfigs(JWebTopConfigs::getAppDefFile(args[3]));
 }
 

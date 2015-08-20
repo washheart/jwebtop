@@ -10,6 +10,7 @@
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
+#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -28,6 +29,9 @@ extern CefSettings settings;              // CEF全局设置
 
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	jw::ctx::addBrowser(browser);// 记录下已经创建的窗口来
+	if (jw::dllex::ex()) {
+		jw::dllex::sendBrowserCreatedMessage(this->taskId, (LONG)browser->GetHost()->GetWindowHandle());
+	}
 	renderBrowserWindow(browser, this->configs);
 	if (!message_router_) {
 		CefMessageRouterConfig config;

@@ -112,7 +112,7 @@ html,body {
 			var app = AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，获取日记内容浏览器的地址
 			toJava = {method : "getDetailRect"}
 			var rect = AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，获取细节区的坐标信息
-			alert(rect);
+			//alert(rect);
 			rect= eval("(" + rect + ")");
 			AlloyDesktop.runAppMore(app, parseInt(JWebTop.javaWindowHwnd),null,null,null,rect.x,rect.y,rect.w,rect.h);			
 		}

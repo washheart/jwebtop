@@ -72,7 +72,7 @@ public:
 	// 从数据定义文件读取
 	static JWebTopConfigs * loadConfigs(std::wstring appDefFile);
 	// // 根据命令行执行启动进程的参数的解析
-	static JWebTopConfigs * parseCreateJWebTopCmdLine(LPTSTR szCmdLine);
+	static JWebTopConfigs * parseCreateJWebTopCmdLine(LPTSTR szCmdLine, std::wstring &taskId);
 	// 根据命令行执行创建浏览器的参数的解析
 	static JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(std::wstring cmd);
 };

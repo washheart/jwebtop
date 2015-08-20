@@ -107,7 +107,11 @@ namespace jc/*jc=JWebTop Client*/{
 namespace jw{
 	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 }
+
 void createNewBrowser(JWebTopConfigs * configs){
+	createNewBrowser(configs, wstring());
+}
+void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 	CEF_REQUIRE_UI_THREAD();
 	if (configs == NULL)configs = jw::ctx::getDefaultConfigs();
 	// 用于构建本地窗口的配置信息
@@ -130,6 +134,7 @@ void createNewBrowser(JWebTopConfigs * configs){
 	if (configs->h != -1)window_info.height = configs->h;
 	CefRefPtr<JWebTopClient>  handler = new JWebTopClient();
 	handler->setJWebTopConfigs(configs);
+	handler->setTaskId(taskId);
 	CefBrowserSettings browser_settings;
 	// 创建浏览器窗口
 	CefBrowserHost::CreateBrowser(window_info, handler.get(), configs->getAbsolutePath(configs->url.ToWString()), browser_settings, NULL);

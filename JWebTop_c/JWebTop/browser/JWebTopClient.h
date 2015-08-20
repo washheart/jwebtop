@@ -6,21 +6,24 @@
 
 #include <list>
 #include <set>
+#include <string>
 #include "include/cef_client.h"
 #include "include/wrapper/cef_message_router.h"
 #include "JWebTop/config/JWebTopConfigs.h"
-
+using namespace std;
 class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRequestHandler {
 private:
-	JWebTopConfigs * configs=NULL;
+	JWebTopConfigs * configs=NULL; // 构建浏览器时的配置信息
+	wstring taskId;                // DLL方式时对应创建浏览器的任务ID
 public:
 	JWebTopClient();
 	~JWebTopClient();
 	void setJWebTopConfigs(JWebTopConfigs * configs){ this->configs = configs; }
+	void setTaskId(wstring taskId){ this->taskId = taskId; }
 	// CefClient methods:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE{
 		return this;
