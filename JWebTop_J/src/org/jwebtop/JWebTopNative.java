@@ -62,8 +62,15 @@ public final class JWebTopNative {
 	 *            此配置文件用于启动JWebTop进程（但，不立刻创建浏览器窗口，即使指定了url参数）
 	 * @return
 	 */
-	public void createJWebTop(String processPath, String configFile) throws IOException {
-		nCreateJWebTop(processPath, configFile);
+	public void createJWebTop(String processPath, String configFile) {
+		String processPath2, appfile2;
+		try {
+			processPath2 = new File(processPath).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
+			appfile2 = new File(configFile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
+			nCreateJWebTop(processPath2, appfile2);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public long createBrowser(final String appfile) throws IOException {
