@@ -6,6 +6,7 @@
 #include "include/cef_app.h" 
 #include "JWebTopJSHanlder.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
+#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
 
 // JJH=JWebTop JavaScriptHandler
@@ -262,7 +263,7 @@ class JJH_InvokeRemote_Wait: public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 1)return false;
-		retval = CefV8Value::CreateString(jb::invokeRemote_Wait(getHWND(object, arguments, 1),arguments[0]->GetStringValue()));
+		retval = CefV8Value::CreateString(jw::dllex::invokeRemote_Wait(getHWND(object, arguments, 1),arguments[0]->GetStringValue()));
 		return true;
 	}
 private:
@@ -274,7 +275,7 @@ class JJH_InvokeRemote_NoWait : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 1)return false;
-		jb::invokeRemote_NoWait(getHWND(object, arguments, 1), arguments[0]->GetStringValue());
+		jw::dllex::invokeRemote_NoWait(getHWND(object, arguments, 1), arguments[0]->GetStringValue());
 		return true;
 	}
 private:

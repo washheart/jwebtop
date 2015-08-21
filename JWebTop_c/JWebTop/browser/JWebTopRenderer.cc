@@ -4,52 +4,14 @@
 
 #include <string>
 
-//#include "JWebTopApper.h"
 #include "JWebTopApp.h"
 #include "JWebTop/jshandler/JWebTopJSHanlder.h"
 #include "include/base/cef_logging.h"
-#include "common/task/Task.h"
-#include "common/JWebTopMsg.h"
-#include "JWebTop/wndproc/JWebTopWndProc.h"
+#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
-void syncExecuteJS(	CefRefPtr<CefBrowser> browser,	CefProcessId source_process,	CefRefPtr<CefProcessMessage> message){
-	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	CefString msg = args->GetString(1);
-	wstring remoteTaskId, taskInfo;
-	long remoteHWnd;
-	jw::parseMessageJSON(msg, ref(remoteHWnd), ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
-	CefString rtn;
-	CefRefPtr<CefV8Context>  v8 = browser->GetMainFrame()->GetV8Context();
-	long browserHWnd = 0;
-	if (v8 != NULL){
-		int msgId = args->GetInt(0);
-		wstringstream wss;
-		wss << "消息,msgId=" << msgId << "，taskInfo=" << taskInfo.c_str() << endl;
-		writeLog(wss.str());
-		if (v8->Enter()){
-			CefRefPtr<CefV8Value> reval;
-			CefRefPtr<CefV8Exception> exception;
-			if (msgId == JWM_JSON_EXECUTE_WAIT){
-				taskInfo = L"invokeByDLL(" + taskInfo + L")";// 包装json为js调用 
-			}
-			//taskInfo = L"testInvoke()";// FIXME：调试用
-			if (v8->Eval(taskInfo, reval, exception)){// 执行JS
-				rtn = reval->GetStringValue();
-			}
-			CefRefPtr<CefV8Value> global= v8->GetGlobal();
-			CefRefPtr<CefV8Value> jwebtop = global->GetValue(CefString("JWebTop"));
-			CefRefPtr<CefV8Value> handler = jwebtop->GetValue("handler");
-			browserHWnd = handler->GetIntValue();// 从JWebTop.handler获取窗口句柄
-			v8->Exit();
-		}
-	}
-	wstring result = rtn.ToWString();
-	wstring wrapped = jw::wrapAsTaskJSON(browserHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
-	//FIXME：多进程时下面的方法会失败，因为获取不到browserHWnd对应的BrowserWindowInfo
-	jb::sendJWebTopProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
-}
+
 namespace renderer {
 	namespace {
 		// Must match the value in client_handler.cc.
@@ -103,7 +65,7 @@ namespace renderer {
 				CefRefPtr<CefProcessMessage> message) OVERRIDE{
 				wstring name=message->GetName().ToWString();
 					if (L"waitjs" == name){
-						syncExecuteJS(browser, source_process, message);
+						jw::dllex::syncExecuteJS(browser, source_process, message);
 						return 1;
 					}
 				return message_router_->OnProcessMessageReceived(

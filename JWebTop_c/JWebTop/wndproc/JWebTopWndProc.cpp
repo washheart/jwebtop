@@ -1,12 +1,10 @@
 #include "JWebTopWndProc.h"
 
+#include <thread>
 #include "JWebTop/browser/JWebTopCommons.h"
 
-#include "common/JWebTopMsg.h"
 #include "common/util/StrUtil.h"
-#include "common/process/MultiProcess.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
-#include "common/task/Task.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
@@ -23,35 +21,7 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 	return NULL;
 }
 
-extern HWND g_RemoteWinHWnd;
-namespace jb{
-	bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, LPTSTR msg){
-		BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
-		if (bw == NULL)return false;
-		if (g_RemoteWinHWnd == NULL)return false;
-		return jw::sendProcessMsg(g_RemoteWinHWnd, msgId, msg);
-	}
-
-	CefString invokeRemote_Wait(HWND browserHWnd, CefString json){
-		wstring taskId = jw::task::createTaskId();			         // 生成任务id
-		// taskId附加到json字符串上
-		wstring newjson = json.ToWString();
-		wstring wrapped = jw::wrapAsTaskJSON((long)browserHWnd, std::ref(taskId), std::ref(newjson));
-		jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-		if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, LPTSTR(wrapped.c_str()))){ // 发送任务到远程进程
-			lock->wait();		             		 		             // 等待任务完成
-			wstring result = lock->result;   		 		             // 取回执行结果
-			return CefString(result);									 // 返回数据
-		}
-		else{
-			jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
-			return CefString();											// 返回数据：注意这里是空字符串
-		}
-	}
-
-	void invokeRemote_NoWait(HWND browserHWnd, CefString json){
-		sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, LPTSTR(json.ToWString().c_str())); // 发送任务到远程进程
-	}
+namespace jb{	
 	//close(handler);// 关闭窗口
 	void close(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
@@ -302,7 +272,6 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	stringstream ss;
 	ss << "hWnd===" << hWnd << ",bWnd=" << bWnd << ",rWnd=<<" << GetNextWindow(bWnd, GW_CHILD) //
 		<< ",parentWin=" << configs.parentWin
-		<< ",msgWin=" << g_RemoteWinHWnd
 		<< "\r\n";
 	writeLog(ss.str());
 #endif 

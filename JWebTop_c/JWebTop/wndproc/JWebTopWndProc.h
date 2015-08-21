@@ -3,9 +3,8 @@
 #include <sstream>
 #include <string>
 #include "include/cef_browser.h"
-#include "include/cef_resource_handler.h"
-#include "include/cef_request.h"
-#include "include/wrapper/cef_message_router.h"
+//#include "include/cef_resource_handler.h"
+//#include "include/cef_request.h"
 #include "JWebTop/config/JWebTopConfigs.h"
 
 using namespace std;
@@ -52,11 +51,5 @@ namespace jb{
 	void ExecJS(HWND hWnd, wstring js);
 
 	void runApp(HWND hWnd, wstring appDefFile, long parentWin, const LPTSTR url, const LPTSTR &title, const LPTSTR &icon, const  int x, const  int y, const  int w, const  int h);
-
-	// 调用另外的进程并等待
-	CefString invokeRemote_Wait(HWND hWnd, CefString json);
-	void invokeRemote_NoWait(HWND hWnd, CefString json);
-
-	bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, LPTSTR msg);
 }
 #endif

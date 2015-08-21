@@ -86,7 +86,69 @@ namespace jw{
 			wstring wrapped = jw::wrapAsTaskJSON((long)g_RemoteWinHWnd, std::ref(taskId), std::ref(ws));
 			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str()));
 		}
-	}	
+
+		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, LPTSTR msg){
+			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
+			if (bw == NULL)return false;
+			if (g_RemoteWinHWnd == NULL)return false;
+			return jw::sendProcessMsg(g_RemoteWinHWnd, msgId, msg);
+		}
+
+		void syncExecuteJS(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message){
+			CefRefPtr<CefListValue> args = message->GetArgumentList();
+			CefString msg = args->GetString(1);
+			wstring remoteTaskId, taskInfo;
+			long remoteHWnd;
+			jw::parseMessageJSON(msg, ref(remoteHWnd), ref(remoteTaskId), ref(taskInfo));  // 从任务信息中解析出任务id和任务描述
+			CefString rtn;
+			CefRefPtr<CefV8Context>  v8 = browser->GetMainFrame()->GetV8Context();
+			long browserHWnd = 0;
+			if (v8 != NULL){
+				int msgId = args->GetInt(0);
+				if (v8->Enter()){
+					CefRefPtr<CefV8Value> reval;
+					CefRefPtr<CefV8Exception> exception;
+					if (msgId == JWM_JSON_EXECUTE_WAIT){
+						taskInfo = L"invokeByDLL(" + taskInfo + L")";// 包装json为js调用 
+					}
+					//taskInfo = L"testInvoke()";// FIXME：调试用
+					if (v8->Eval(taskInfo, reval, exception)){// 执行JS
+						rtn = reval->GetStringValue();
+					}
+					CefRefPtr<CefV8Value> global = v8->GetGlobal();
+					CefRefPtr<CefV8Value> jwebtop = global->GetValue(CefString("JWebTop"));
+					CefRefPtr<CefV8Value> handler = jwebtop->GetValue("handler");
+					browserHWnd = handler->GetIntValue();// 从JWebTop.handler获取窗口句柄
+					v8->Exit();
+				}
+			}
+			wstring result = rtn.ToWString();
+			wstring wrapped = jw::wrapAsTaskJSON(browserHWnd, std::ref(remoteTaskId), std::ref(result)); // 包装结果任务
+			//FIXME：多进程时下面的方法会失败，因为获取不到browserHWnd对应的BrowserWindowInfo
+			sendJWebTopProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+		}
+
+		CefString invokeRemote_Wait(HWND browserHWnd, CefString json){
+			wstring taskId = jw::task::createTaskId();			         // 生成任务id
+			// taskId附加到json字符串上
+			wstring newjson = json.ToWString();
+			wstring wrapped = jw::wrapAsTaskJSON((long)browserHWnd, std::ref(taskId), std::ref(newjson));
+			jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
+			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, LPTSTR(wrapped.c_str()))){ // 发送任务到远程进程
+				lock->wait();		             		 		             // 等待任务完成
+				wstring result = lock->result;   		 		             // 取回执行结果
+				return CefString(result);									 // 返回数据
+			}
+			else{
+				jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
+				return CefString();											// 返回数据：注意这里是空字符串
+			}
+		}
+
+		void invokeRemote_NoWait(HWND browserHWnd, CefString json){
+			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, LPTSTR(json.ToWString().c_str())); // 发送任务到远程进程
+		}
+	}
 
 	// 处理消息窗口的WM_COPYDATA消息
 	void msgwin_thread_executeWmCopyData(DWORD msgId, std::wstring msg){
@@ -108,5 +170,4 @@ namespace jw{
 			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str()));
 		}
 	}
-
 }
