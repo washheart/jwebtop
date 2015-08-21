@@ -124,8 +124,8 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 #endif
 	if (configs->dwStyle != 0)window_info.style = configs->dwStyle;
 	if (configs->dwExStyle != 0)window_info.style = configs->dwExStyle;
-	window_info.width = configs->w != -1 ? CW_USEDEFAULT : configs->w;
-	window_info.height = configs->h != -1 ? CW_USEDEFAULT : configs->h;
+	window_info.width = configs->w == -1 ? CW_USEDEFAULT : configs->w;
+	window_info.height = configs->h == -1 ? CW_USEDEFAULT : configs->h;
 	POINT p = jw::getScreenSize();
 	if (configs->x == -1){							// 未指定x坐标
 		if (p.x <= configs->w){			            // 设置的宽度超过了屏幕宽度
@@ -161,8 +161,8 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 	std::wstringstream log;
 	log << L"processId=" << GetCurrentProcessId() << L" threadId=" << GetCurrentThreadId() << " title=" << configs->name.ToWString() << L"\r\n";
 	log << L"JWebTopCommons createNewBrowser parentWin=" << configs->parentWin << L"\r\n";
-	log << L"\tconfigs[x=" << configs->x << ",y=" << configs->y << ",w=" << configs->w << ",h=" << configs->h << "]"
-		<< L"\tsetings[x=" << window_info.x << ",y=" << window_info.y << ",w=" << window_info.width << ",h=" << window_info.height << "]"
+	log << L"\tconfigs[x=" << configs->x << ",y=" << configs->y << ",w=" << configs->w << ",h=" << configs->h << "]\r\n"
+		<< L"\tsetings[x=" << window_info.x << ",y=" << window_info.y << ",w=" << window_info.width << ",h=" << window_info.height << "]\r\n"
 		<< L"\tscreninfo[x="<<p.x <<",y=" << p.y << L"]\r\n";
 	writeLog(log.str());
 #endif
