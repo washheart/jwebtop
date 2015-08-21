@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -96,7 +95,7 @@ public class TestJWebTop {
 					RootBrowserHwnd = jwebtop.createInernalBrowser(appfile, null, null, null);
 					System.out.println("jwebtop.getLocationOnScreen() = " + jwebtop.getLocationOnScreen());
 					// if (jwebtop.isShowing()) jwebtop.setBrowserLocation(jwebtop.getLocationOnScreen());
-				} catch (IOException e1) {
+				} catch (Throwable e1) {
 					e1.printStackTrace();
 				}
 			}

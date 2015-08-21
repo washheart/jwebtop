@@ -46,7 +46,7 @@ namespace jw{
 			wstringstream log;
 			log << L"JWebTopClient::OnBeforeClose 尚存[" << browser_list_.size() << L"]个,"
 				<< L"正在关闭的URL地址：" << browser->GetMainFrame()->GetURL().ToWString().c_str()
-				<< endl;
+				<< L"\r\n";
 			writeLog(log.str());
 #endif
 			if (!settings.multi_threaded_message_loop && browser_list_.empty()) {

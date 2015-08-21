@@ -5,7 +5,9 @@
 #include <strsafe.h>
 #include "common/util/StrUtil.h"
 #include "common/JWebTopMsg.h"
-
+#ifdef JWebTopLog
+#include "common/tests/TestUtil.h"
+#endif
 using namespace std;
 namespace jw{
 	// 创建一个新进程，返回的数据为进程中主线程的id
@@ -55,10 +57,15 @@ namespace jw{
 		return 0;
 	}
 
-	// 想指定窗口发送WM_COPYDATA消息。
+	// 向指定窗口发送WM_COPYDATA消息。
 	// WM_COPYDATA可以跨进程发送，不过此方法是同步方法，对于耗时任务接收到消息的进程应开启新线程处理。
 	// 在JWebTop中对于接收的WM_COPYDATA消息都是开启新线程处理
 	bool sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
+#ifdef JWebTopLog
+		writeLog(L"发送WM_COPYDATA消息：");
+		writeLog(msg);
+		writeLog(L"\r\n");
+#endif
 		COPYDATASTRUCT copyData;
 		int len = lstrlen(msg);
 		if (len > MPMSG_LARGE_LEN) return false;         // 太大了（超过65535）不给发了		
@@ -100,6 +107,11 @@ namespace jw{
 			msgId = mpMsg->msgId;
 			msg = wstring(mpMsg->msg);
 		}
+#ifdef JWebTopLog
+		wstringstream wss;
+		wss << L"接收WM_COPYDATA消息，msgId=" << msgId << L"，msg=" << msg << endl;
+		writeLog(wss.str());
+#endif
 		return JWEBTOP_MSG_SUCCESS;
 	}
 }

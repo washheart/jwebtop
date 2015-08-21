@@ -11,6 +11,11 @@
 #include "JWebTop/browser/JWebTopClient.h"
 #include "JWebTop/browser/JWebTopCommons.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
+
+#ifdef JWebTopLog
+#include "common/tests/TestUtil.h"
+#endif
+
 using namespace std;
 extern HWND g_LocalWinHWnd;  // 本地创建的消息窗口HWND
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND

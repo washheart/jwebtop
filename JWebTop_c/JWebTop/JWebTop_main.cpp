@@ -49,9 +49,9 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		jw::dllex::waitForRemoteProcessTerminate();// 创建一个线程用来监听远程进程是否终止以便结束当前程序
 		settings.multi_threaded_message_loop = 1;
 	}
-#ifdef JWebTopLog
-	settings.log_severity = LOGSEVERITY_VERBOSE;
-#endif
+//#ifdef JWebTopLog
+//	settings.log_severity = LOGSEVERITY_VERBOSE;
+//#endif
 	void* sandbox_info = NULL;
 
 #if defined(CEF_USE_SANDBOX)

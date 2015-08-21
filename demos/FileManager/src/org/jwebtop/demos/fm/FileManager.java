@@ -1,7 +1,6 @@
 package org.jwebtop.demos.fm;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.jwebtop.JWebTopNative;
 
@@ -51,8 +50,10 @@ public class FileManager {
 		JWebTopNative.getInstance().setJsonHandler(this.ctrl);
 		// 创建浏览器
 		try {
-			JWebTopNative.getInstance().createJWebTop(ctrl.getAppFile());
-		} catch (IOException e1) {
+			String appfile = ctrl.getAppFile();
+			JWebTopNative.getInstance().createJWebTop("JWebTop.exe", appfile);
+			JWebTopNative.getInstance().createBrowser(appfile);
+		} catch (Throwable e1) {
 			e1.printStackTrace();
 		}
 	}

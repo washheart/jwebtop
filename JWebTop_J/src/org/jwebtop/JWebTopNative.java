@@ -12,8 +12,6 @@ import java.io.IOException;
 public final class JWebTopNative {
 	private static native void nExit();
 
-	public static native void cls();
-
 	private static native void nCreateJWebTop(String processPath, String configFile);
 
 	private static native long nCreateBrowser(String appFile, long parenHwnd, String url, String title, String icon, int x, int y, int w, int h);
@@ -32,18 +30,10 @@ public final class JWebTopNative {
 
 	private static native void nSetBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
 
-	// private static native void nSetUrl(long browserHwnd, String url);
-
 	private static native int[] nGetWindowClient(long browserHwnd);
 
 	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
-	// private final class CreateBrowserLocker {
-	// long hwnd = 0L;
-	// }
-	//
-	// private boolean waitLock = false;
-	// private final CreateBrowserLocker locker = new CreateBrowserLocker();
 	private JWebtopJSONDispater jsonHandler = null;
 
 	public static JWebTopNative getInstance() {
@@ -63,13 +53,16 @@ public final class JWebTopNative {
 	 * @return
 	 */
 	public void createJWebTop(String processPath, String configFile) {
+		if (jsonHandler == null) throw new JWebTopException("必须设置jsonHandler。");
 		String processPath2, appfile2;
 		try {
-			processPath2 = new File(processPath).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
+			File file = new File(processPath);
+			if (!file.exists()) throw new JWebTopException("找不到可执行文件：" + processPath);
+			processPath2 = file.getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
 			appfile2 = new File(configFile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
 			nCreateJWebTop(processPath2, appfile2);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new JWebTopException("无法创建JWebTop", e);
 		}
 	}
 
@@ -93,19 +86,8 @@ public final class JWebTopNative {
 		try {
 			appfile2 = new File(appfile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
 		} catch (IOException e) {
-			e.printStackTrace();
-			return 0;
+			throw new JWebTopException("无法创建Browser", e);
 		}
-		System.out.println("准备调用JNI创建浏览器：");
-		System.out.println("\t parenHwnd = " + parenHwnd);
-		System.out.println("\t appfile = " + appfile2);
-		System.out.println("\t url = " + url);
-		System.out.println("\t title = " + title);
-		System.out.println("\t icon = " + icon);
-		System.out.println("\t x = " + x);
-		System.out.println("\t y = " + y);
-		System.out.println("\t w = " + w);
-		System.out.println("\t w = " + h);
 		return nCreateBrowser(appfile2, parenHwnd, url, title, icon, x, y, w, h);
 	}
 
@@ -158,33 +140,7 @@ public final class JWebTopNative {
 	}
 
 	String dispatch(String json) throws IOException {
-		// if (json.startsWith("@")) {// 约定通过特殊标记来进行处理
-		// json = json.substring(1);
-		// long rootBrowserHwnd = 0;
-		// JsonFactory f = new JsonFactory();
-		// JsonParser p = f.createParser(json);
-		// JsonToken result = null;
-		// while ((result = p.nextToken()) != null) {
-		// if (result == JsonToken.FIELD_NAME) {
-		// String field = p.getText();
-		// p.nextToken();
-		// if ("hwnd".equals(field)) {
-		// rootBrowserHwnd = p.getLongValue();
-		// break;
-		// }
-		// }
-		// }
-		// p.close();
-		// System.out.println("waitLock=" + waitLock + "\t " + rootBrowserHwnd);
-		// if (waitLock) synchronized (locker) {
-		// locker.hwnd = rootBrowserHwnd;
-		// locker.notify();// FIXME:通知解锁的时机需要控制
-		// }
-		// }
-		if (jsonHandler != null) {
-			return jsonHandler.dispatcher(json);
-		}
-		return "";
+		return jsonHandler.dispatcher(json);
 	}
 
 	public void setJsonHandler(JWebtopJSONDispater jsonHandler) {
@@ -197,9 +153,8 @@ public final class JWebTopNative {
 	 * @param json
 	 * @return
 	 */
-	private static String invokeByJS(String json) {
+	static String invokeByJS(String json) {// 可以说private，但用public可以避免被优化掉
 		try {
-			System.out.println("从dll端发起的调用 = " + json);
 			return INSTANCE.dispatch(json);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -215,7 +170,6 @@ public final class JWebTopNative {
 	 * @param h
 	 */
 	public static void setSize(long browserHwnd, int w, int h) {
-		// System.out.println("browserHwnd = " + browserHwnd + " =[w=" + w + ",h=" + h + "]");
 		if (browserHwnd != 0) nSetSize(browserHwnd, w, h);
 	}
 
@@ -242,10 +196,6 @@ public final class JWebTopNative {
 	public static void setBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h) {
 		if (browserHwnd != 0) nSetBound(browserHwnd, xOnScreen, yOnScreen, w, h);
 	}
-
-	// public static void setUrl(long browserHwnd, String url) {
-	// if (browserHwnd != 0) nSetUrl(browserHwnd, url);
-	// }
 
 	/**
 	 * 得到某Java控件对应的句柄HWND

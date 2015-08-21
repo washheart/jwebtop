@@ -2,7 +2,6 @@
 
 #include <thread>
 #include "JWebTop/browser/JWebTopCommons.h"
-
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"

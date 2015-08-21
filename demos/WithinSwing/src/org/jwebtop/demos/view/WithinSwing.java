@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -132,7 +131,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 			RootBrowserHwnd = listWebtopView.createInernalBrowser(appFile, null, "列表页", null);
 			System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
 			ctrl.setListHandler(RootBrowserHwnd);
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		// if (listWebtopView.isShowing()) listWebtopView.setBrowserLocation(listWebtopView.getLocationOnScreen());
