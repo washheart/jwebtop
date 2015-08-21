@@ -1,9 +1,8 @@
 #include "JWebTopApp.h"
 #include "JWebTopCommons.h"
-namespace jw{
-	extern JWebTopConfigs * g_configs;
-}
-extern HWND g_RemoteWinHWnd;
+#include "JWebTopContext.h"
+#include "JWebTop/dllex/JWebTop_DLLEx.h"
+
 void JWebTopApp::OnBeforeCommandLineProcessing(
 	const CefString& process_type,
 	CefRefPtr<CefCommandLine> command_line) {
@@ -11,10 +10,10 @@ void JWebTopApp::OnBeforeCommandLineProcessing(
 }
 
 void JWebTopApp::OnContextInitialized() {
-	if (g_RemoteWinHWnd == NULL){// 如果不是从dll调用，那么直接创建浏览器
-		createNewBrowser(jw::g_configs);
-	}
-	else{// 如果是从dll调用，不创建浏览器
+	if (jw::dllex::ex()){// 如果是从dll调用，不创建浏览器
 		//if (!g_configs->url.empty())createNewBrowser(g_configs);
+	}
+	else{// 如果不是从dll调用，那么直接创建浏览器
+		createNewBrowser(jw::ctx::getDefaultConfigs());
 	}
 }
