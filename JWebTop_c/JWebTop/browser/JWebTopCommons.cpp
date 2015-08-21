@@ -1,4 +1,5 @@
 #include "JWebTopCommons.h"
+#include <Windows.h>
 #include <string>
 #include "JWebTopClient.h"
 #include "include/cef_app.h"
@@ -8,6 +9,7 @@
 #include "JWebTop/wndproc/JWebTopWndProc.h"
 #include "JWebTopContext.h"
 #include "common/util/StrUtil.h"
+#include "common/winctrl/JWebTopWinCtrl.h"
 #include "common/task/Task.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
@@ -116,22 +118,54 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 	if (configs == NULL)configs = jw::ctx::getDefaultConfigs();
 	// 用于构建本地窗口的配置信息
 	CefWindowInfo window_info;
-#ifdef JWebTopLog 
-	std::wstringstream log;
-	log << L"processId=" << GetCurrentProcessId() << L" threadId=" << GetCurrentThreadId() << " title=" << configs->name.ToWString() << L"\r\n";
-	log << L"JWebTopCommons createNewBrowser parentWin=" << configs->parentWin << L"\r\n";
-	writeLog(log.str());
-#endif
 #if defined(OS_WIN)
 	// On Windows we need to specify certain flags that will be passed to
 	window_info.SetAsPopup((HWND)configs->parentWin, configs->name);
 #endif
 	if (configs->dwStyle != 0)window_info.style = configs->dwStyle;
 	if (configs->dwExStyle != 0)window_info.style = configs->dwExStyle;
-	if (configs->x != -1)window_info.x = configs->x;
-	if (configs->y != -1)window_info.y = configs->y;
-	if (configs->w != -1)window_info.width = configs->w;
-	if (configs->h != -1)window_info.height = configs->h;
+	window_info.width = configs->w != -1 ? CW_USEDEFAULT : configs->w;
+	window_info.height = configs->h != -1 ? CW_USEDEFAULT : configs->h;
+	POINT p = jw::getScreenSize();
+	if (configs->x == -1){							// 未指定x坐标
+		if (p.x <= configs->w){			            // 设置的宽度超过了屏幕宽度
+			window_info.x = 0;						// 设置x坐标为0
+			window_info.width = p.x;				// 重新设置宽度为屏幕宽度
+		}
+		else if (configs->w != -1){				    // 有设置窗口宽度
+			window_info.x = (p.x - configs->w) / 2; // 根据屏幕宽度和窗口宽度计算x坐标位置
+		}
+		else{
+			window_info.x = CW_USEDEFAULT;			// 未设置窗口宽度，那么x坐标取默认值
+		}
+	}
+	else{
+		window_info.x = configs->x;					// 有指定x坐标，那么直接取x坐标的值
+	}
+	if (configs->y == -1){							// 未指定y坐标
+		if (p.y <= configs->h){			            // 设置的高度超过了屏幕高度
+			window_info.y = 0;						// 设置y坐标为0
+			window_info.height = p.y;				// 重新设置高度为屏幕高度
+		}
+		else if (configs->h != -1){				    // 有设置窗口高度
+			window_info.y = (p.y - configs->h) / 2; // 根据屏幕高度和窗口高度计算y坐标位置
+		}
+		else{
+			window_info.y = CW_USEDEFAULT;			// 未设置窗口高度，那么y坐标取默认值
+		}
+	}
+	else{
+		window_info.y = configs->y;					// 有指定y坐标，那么直接取y坐标的值
+	}
+#ifdef JWebTopLog 
+	std::wstringstream log;
+	log << L"processId=" << GetCurrentProcessId() << L" threadId=" << GetCurrentThreadId() << " title=" << configs->name.ToWString() << L"\r\n";
+	log << L"JWebTopCommons createNewBrowser parentWin=" << configs->parentWin << L"\r\n";
+	log << L"\tconfigs[x=" << configs->x << ",y=" << configs->y << ",w=" << configs->w << ",h=" << configs->h << "]"
+		<< L"\tsetings[x=" << window_info.x << ",y=" << window_info.y << ",w=" << window_info.width << ",h=" << window_info.height << "]"
+		<< L"\tscreninfo[x="<<p.x <<",y=" << p.y << L"]\r\n";
+	writeLog(log.str());
+#endif
 	CefRefPtr<JWebTopClient>  handler = new JWebTopClient();
 	handler->setJWebTopConfigs(configs);
 	handler->setTaskId(taskId);

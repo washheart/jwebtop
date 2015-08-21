@@ -274,28 +274,13 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	HWND hWnd = browser->GetHost()->GetWindowHandle();// 浏览器所在窗口的handle
 	WINDOWINFO winInfo;
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
-	bool changed = false;
 	////根据配置信息对窗口重新进行装饰(url、title、style、dwStyle在createBrower时处理了）
 	if (!configs.icon.empty()){
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
-		changed = true;
 	}
 	if (configs.max){// 需要按最大化的方式来显示
 		jw::max(hWnd);
-	}
-	else if (configs.parentWin != 0){// 没有指定父窗口时，在桌面正中显示窗口
-		if (configs.x == -1 || configs.y == -1){
-			RECT rc = winInfo.rcWindow;
-			jw::setCenter(hWnd
-				, configs.x == -1 ? rc.left : configs.x
-				, configs.y == -1 ? rc.top : configs.y
-				, rc.right - rc.left, rc.bottom - rc.top);
-		}
-	}
-	else if (changed){// 如果窗口风格有改变，重绘下窗口
-		RECT rc = winInfo.rcWindow;
-		SetWindowPos(hWnd, HWND_TOPMOST, rc.left, rc.top, rc.right, rc.bottom, SWP_ASYNCWINDOWPOS | SWP_FRAMECHANGED | SWP_NOCOPYBITS | SWP_NOZORDER);
 	}
 	HWND bWnd = GetNextWindow(hWnd, GW_CHILD);// 得到真实的浏览器窗口
 	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);

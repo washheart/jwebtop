@@ -16,21 +16,20 @@ namespace jw{
 
 	// setToCenter(handler);// 让窗口显示在屏幕正中
 	void setCenter(HWND hWnd, int x, int y, int w, int h){
-		int sw = GetSystemMetrics(SM_CXFULLSCREEN);
-		int sh = GetSystemMetrics(SM_CYFULLSCREEN);// +GetSystemMetrics(SM_CYCAPTION);
-		if (sw <= w){
+		POINT p = getScreenSize();
+		if (p.x <= w){
 			x = 0;
-			w = sw;
+			w = p.x;
 		}
 		else{
-			x = (sw - w) / 2;
+			x = (p.x - w) / 2;
 		}
-		if (sh < h){
+		if (p.y < h){
 			y = 0;
-			h = sh;
+			h = p.y;
 		}
 		else{
-			y = (sh - h) / 2;
+			y = (p.y - h) / 2;
 		}
 		MoveWindow(hWnd, x, y, w, h, FALSE);
 	}
@@ -123,7 +122,7 @@ namespace jw{
 		SetWindowLong(hWnd, GWL_EXSTYLE, dwNewExStyle);//设置新的扩展样式
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
-	
+
 	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
 	void setWindowStyle(HWND hWnd, int exStyle){
 		HWND hWndTemp = hWnd;
