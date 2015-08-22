@@ -161,7 +161,7 @@ namespace jw{
 			wstring taskId, result;
 			long remoteHWnd;
 			jw::parseMessageJSON(msg, ref(remoteHWnd), ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
-			createNewBrowser(JWebTopConfigs::parseCreateBrowserCmdLine(result));
+			createNewBrowser(JWebTopConfigs::parseCreateBrowserCmdLine(result),taskId);
 		}
 		// 暂时不需要做任何处理
 	}
