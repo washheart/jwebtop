@@ -66,10 +66,6 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 		(JNIEnv *, jclass, jlong browserHWnd, jint x, jint y, int w, int h);
 
-	//// jni方法：设置新的网页地址
-	//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
-	//(JNIEnv *, jclass, jlong browserHWnd, jstring url);
-
 	// jni方法：退出JWebTop进程
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
 		(JNIEnv *, jclass);

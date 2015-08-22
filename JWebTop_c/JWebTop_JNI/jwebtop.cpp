@@ -12,12 +12,12 @@
 typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 typedef BOOL(WINAPI *lpfnSetLayeredWindowAttributes)(HWND hWnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 using namespace std;
-extern JavaVM* g_jvm;// 保存全局的虚拟机环境
-jclass g_nativeClass;// 记录全局的本地类变量
-jmethodID g_invokeByJS;// 从C端回调Java的方法
+
+JavaVM* g_jvm;               // 保存全局的虚拟机环境
+jclass g_nativeClass;        // 记录全局的本地类变量
+jmethodID g_invokeByJS;      // 从C端回调Java的方法
 extern HWND g_RemoteWinHWnd;
 wstring processPath;
-//extern HINSTANCE g_instance;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved){
 	switch (ul_reason_for_call)
 	{
@@ -216,13 +216,6 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 (JNIEnv *, jclass, jlong browserHWnd, jint x, jint y, int w, int h){
 	jw::setBound((HWND)browserHWnd, x, y, w, h);
 }
-
-//// jni方法：设置新的网页地址
-//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetUrl
-//(JNIEnv * env, jclass, jlong browserHWnd, jstring url){	
-//	jw::sendProcessMsg((HWND)browserHWnd, JWEBTOP_MSG_LOADURL, LPTSTR(jw::s2w(jstringToWindows(env, url)).c_str()));
-//	//jw::loadUrl((HWND)browserHWnd, chr2wch(jstringToWindows(env, url)));
-//}
 
 // jni方法：退出JWebTop进程
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
