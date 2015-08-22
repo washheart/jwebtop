@@ -109,7 +109,7 @@ namespace jw{
 		}
 #ifdef JWebTopLog
 		wstringstream wss;
-		wss << L"接收WM_COPYDATA消息，msgId=" << msgId << L"，msg=" << msg << endl;
+		wss << L"接收WM_COPYDATA消息，msgId=" << msgId << L"，msg=" << msg << L"\r\n";
 		writeLog(wss.str());
 #endif
 		return JWEBTOP_MSG_SUCCESS;
