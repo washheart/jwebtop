@@ -18,6 +18,8 @@ public final class JWebTopNative {
 
 	private static native long nCreateBrowser(String appFile, long parenHwnd, String url, String title, String icon, int x, int y, int w, int h);
 
+	private static native void nCloseBrowser(long browserHWnd);
+
 	private static native String nExecuteJSONWait(long browserHWnd, String jsonstring);
 
 	private static native void nExecuteJSONNoWait(long browserHWnd, String jsonstring);
@@ -92,6 +94,15 @@ public final class JWebTopNative {
 			throw new JWebTopException("无法创建Browser", e);
 		}
 		return nCreateBrowser(appfile2, parenHwnd, url, title, icon, x, y, w, h);
+	}
+
+	/**
+	 * 关闭指定浏览器
+	 * 
+	 * @param browserHWnd
+	 */
+	public static void closeBrowser(long browserHWnd) {
+		nCloseBrowser(browserHWnd);
 	}
 
 	// 关闭JWebTop的进程

@@ -40,8 +40,13 @@ extern "C" {
 		, jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
 		, jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
 		);
-
-
+   /*
+	* 对应org.jwebtop.JWebTopNative类的nCloseBrowser方法
+	* 该方法用于关闭一个浏览器窗口
+	* browserHWnd  浏览器窗口句柄
+	*/
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCloseBrowser
+		(JNIEnv * env, jclass, jlong browserHWnd);
 	/*
 	 * 下面四个方法用于执行浏览器脚本
 	 */

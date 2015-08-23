@@ -162,6 +162,17 @@ JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
 	return jw::parseLong(result);
 }
 
+/*
+ * 对应org.jwebtop.JWebTopNative类的nCloseBrowser方法
+ * 该方法用于关闭一个浏览器窗口
+ * browserHWnd  浏览器窗口句柄
+ */
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCloseBrowser
+(JNIEnv * env, jclass, jlong browserHWnd){
+	wstringstream wss; wss << browserHWnd;
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_CLOSEBROWSER, LPTSTR(wss.str().c_str()));
+}
+
 jstring exeRemoteAndWait(JNIEnv * env, jlong browserHWnd, string msg, DWORD msgId){
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	// taskId附加到json字符串上

@@ -16,8 +16,9 @@
 #define JWM_DLL_EXECUTE_WAIT	(MPMSG_USER+221)  // CEF调用DLL端：需要执行并等待的任务 
 #define JWM_DLL_EXECUTE_RETURN	(MPMSG_USER+222)  // CEF调用DLL端：需要执行但CEF无需等待的任务 
 #define JWM_RESULT_RETURN	    (MPMSG_USER+231)  
-#define JWM_STARTJWEBTOP		(MPMSG_USER+301)  // 启动JWebTop进程的消息
-#define JWM_CREATEBROWSER		(MPMSG_USER+302)  // 创建浏览器的消息
+#define JWM_STARTJWEBTOP		(MPMSG_USER+301)  // 启动JWebTop进程的消息	（同步发送）
+#define JWM_CREATEBROWSER		(MPMSG_USER+302)  // 创建浏览器的消息		（同步发送）
+#define JWM_CLOSEBROWSER		(MPMSG_USER+303)  // 关闭浏览器的消息		（异步发送）
 namespace jw{
 	// 从传入的JSON字符串(jsonString)中解析出任务id(taskId)和具体的JSON字符串(parsedJO)，已经回复消息的窗口句柄
 	// jsonString的结构如下：{"id":"task id string","hWnd":123456,"jo":"parsed json string"}

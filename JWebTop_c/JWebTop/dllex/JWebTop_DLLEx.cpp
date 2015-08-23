@@ -72,6 +72,9 @@ namespace jw{
 			case JWM_JS_EXECUTE_RETURN:
 				bwInfo->browser->GetMainFrame()->ExecuteJavaScript(msg, "", 0);
 				break;
+			case JWM_CLOSEBROWSER:
+				jb::close((HWND)parseLong(msg));
+				break;
 			default:
 				break;
 			}
@@ -163,7 +166,7 @@ namespace jw{
 			jw::parseMessageJSON(msg, ref(remoteHWnd), ref(taskId), ref(result));  // 从任务信息中解析出任务id和任务描述
 			createNewBrowser(JWebTopConfigs::parseCreateBrowserCmdLine(result),taskId);
 		}
-		// 暂时不需要做任何处理
+		// 暂时不需要其他任何处理
 	}
 	// 用于createWin进行回调
 	void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
