@@ -53,6 +53,7 @@ public class FileManager {
 			String appfile = ctrl.getAppFile();
 			JWebTopNative.getInstance().createJWebTop("JWebTop.exe", appfile);
 			JWebTopNative.getInstance().createBrowser(appfile);
+			this.ctrl.waitBrowserClosed();
 		} catch (Throwable e1) {
 			e1.printStackTrace();
 		}

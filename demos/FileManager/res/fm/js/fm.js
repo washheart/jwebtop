@@ -109,4 +109,10 @@ function afterBrowserInit() {// 直接的js代码会执行两次，所以这里�
 	zTree.addNodes(null, jo, true)
 	sizeHandler();
 }
+onbeforeunload=function(){return "您确认要关闭软件？";}
+onunload=function(){
+	AlloyDesktop.invokeJava(JSON.stringify({
+		method : "closing"// 关闭事件
+	}));
+}
 addEventListener("AlloyDesktopReady", afterBrowserInit);
