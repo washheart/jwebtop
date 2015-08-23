@@ -15,6 +15,13 @@ public class FMCtrl implements JWebtopJSONDispater {
 	SimpleDateFormat fdate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", java.util.Locale.getDefault());
 	DecimalFormat fdoulbe = new DecimalFormat("####.###");
 
+	private ClassLoader DEFAULT = FMCtrl.class.getClassLoader();
+
+	@Override
+	public void resetThreadClassLoader() {
+		Thread.currentThread().setContextClassLoader(DEFAULT);
+	}
+
 	@Override
 	public String dispatcher(String json) {
 		// 注意：下面的JSON解析方式未考虑性能，如果JSON数据过大，建议采用jackson按流模式解析

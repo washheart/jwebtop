@@ -17,6 +17,13 @@ import org.jwebtop.demos.view.WithinSwing;
 import com.alibaba.fastjson.JSONObject;
 
 public class WithinSwingCtrl implements JWebtopJSONDispater {
+	private ClassLoader DEFAULT = WithinSwingCtrl.class.getClassLoader();
+
+	@Override
+	public void resetThreadClassLoader() {
+		Thread.currentThread().setContextClassLoader(DEFAULT);
+	}
+
 	public interface WithinSwingCtrlHelper {
 		int[] getDetailRect();
 	}

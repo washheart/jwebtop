@@ -10,6 +10,8 @@ import java.io.IOException;
  * @author washheart@163.com
  */
 public final class JWebTopNative {
+	private static ClassLoader commonlassLoader;
+
 	private static native void nExit();
 
 	private static native void nCreateJWebTop(String processPath, String configFile);
@@ -56,6 +58,7 @@ public final class JWebTopNative {
 		if (jsonHandler == null) throw new JWebTopException("必须设置jsonHandler。");
 		String processPath2, appfile2;
 		try {
+			commonlassLoader = JWebTopNative.class.getClassLoader();
 			File file = new File(processPath);
 			if (!file.exists()) throw new JWebTopException("找不到可执行文件：" + processPath);
 			processPath2 = file.getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
@@ -140,6 +143,7 @@ public final class JWebTopNative {
 	}
 
 	String dispatch(String json) throws IOException {
+		jsonHandler.resetThreadClassLoader();
 		return jsonHandler.dispatcher(json);
 	}
 

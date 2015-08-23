@@ -79,6 +79,13 @@ public class TestJWebTop {
 		}));
 		final JWebTopNative webtop = JWebTopNative.getInstance();
 		webtop.setJsonHandler(new JWebtopJSONDispater() {
+			private ClassLoader DEFAULT = TestJWebTop.class.getClassLoader();
+
+			@Override
+			public void resetThreadClassLoader() {
+				Thread.currentThread().setContextClassLoader(DEFAULT);
+			}
+
 			@Override
 			public String dispatcher(String json) {
 				return "{\"a\":1,javaconvert:\"" + json + "\",b:2}";
