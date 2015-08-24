@@ -92,8 +92,8 @@ public:
 		retval = CefV8Value::CreateObject(NULL);
 		retval->SetValue("x", CefV8Value::CreateInt(rt.left), V8_PROPERTY_ATTRIBUTE_NONE);
 		retval->SetValue("y", CefV8Value::CreateInt(rt.top), V8_PROPERTY_ATTRIBUTE_NONE);
-		retval->SetValue("width", CefV8Value::CreateInt(rt.right), V8_PROPERTY_ATTRIBUTE_NONE);
-		retval->SetValue("height", CefV8Value::CreateInt(rt.bottom), V8_PROPERTY_ATTRIBUTE_NONE);
+		retval->SetValue("width", CefV8Value::CreateInt(rt.right - rt.left), V8_PROPERTY_ATTRIBUTE_NONE);
+		retval->SetValue("height", CefV8Value::CreateInt(rt.bottom - rt.top), V8_PROPERTY_ATTRIBUTE_NONE);
 		return true;
 	}
 private:
@@ -259,11 +259,11 @@ private:
 };
 
 //JJH_InvokeRemote_Wait(jsonstring,[handler]);// 从JS调用远程进程代码
-class JJH_InvokeRemote_Wait: public CefV8Handler {
+class JJH_InvokeRemote_Wait : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 1)return false;
-		retval = CefV8Value::CreateString(jw::dllex::invokeRemote_Wait(getHWND(object, arguments, 1),arguments[0]->GetStringValue()));
+		retval = CefV8Value::CreateString(jw::dllex::invokeRemote_Wait(getHWND(object, arguments, 1), arguments[0]->GetStringValue()));
 		return true;
 	}
 private:

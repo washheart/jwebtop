@@ -68,7 +68,7 @@ namespace jw{
 	void setBound(HWND hWnd, int x, int y, int w, int h){
 		::MoveWindow(hWnd, x, y, w, h, false);
 	}
-	// 获取窗口的位置和大小，返回值为一object，格式如下{x:100,y:100,width:130,height:54}
+	// 获取窗口信息，返回值为的左上角和右下角的屏幕坐标
 	RECT getBound(HWND hWnd){
 		RECT rt;
 		GetWindowRect(hWnd, &rt);

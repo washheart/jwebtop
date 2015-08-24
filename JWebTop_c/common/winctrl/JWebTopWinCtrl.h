@@ -14,7 +14,7 @@ namespace jw{
 	POINT getScreenSize();                                 // getScreenSize();//获取屏幕大小，返回值为一object，格式如下{width:130,height:54}
 	void move(HWND hWnd, int x, int y);                    // move(x, y, handler);//移动窗口
 	void setBound(HWND hWnd, int x, int y, int w, int h);  // setBound(x, y,w ,h, handler);// 同时设置窗口的坐标和大小
-	RECT getBound(HWND hWnd);                              // getBound(handler);//获取窗口的位置和大小，返回值为一object，格式如下{x:100,y:100,width:130,height:54}
+	RECT getBound(HWND hWnd);                              // getBound(handler);//获取窗口信息，返回值为的左上角和右下角的屏幕坐标
 	void setTitle(HWND hWnd, std::wstring title);          // setTitle(title, handler);// 设置窗口名称
 	std::wstring getTitle(HWND hWnd);                      // getTitle(handler);// 获取窗口名称，返回值为一字符串
 

@@ -62,14 +62,38 @@ extern "C" {
 	// jni方法：设置窗口大小
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
 		(JNIEnv *, jclass, jlong browserHWnd, jint w, jint h);
+	JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetSize
+		(JNIEnv *, jclass, jlong browserHWnd);
+	JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetScreenSize
+		(JNIEnv *, jclass);
 
 	// jni方法：设置窗口位置
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 		(JNIEnv *, jclass, jlong browserHWnd, jint x, jint y);
+	JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetLocation
+		(JNIEnv *, jclass, jlong browserHWnd);
 
 	// jni方法：设置窗口位置和大小
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 		(JNIEnv *, jclass, jlong browserHWnd, jint x, jint y, int w, int h);
+	JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetBound
+		(JNIEnv *, jclass, jlong browserHWnd);
+
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nBringToTop
+		(JNIEnv *, jclass, jlong browserHWnd);//窗口移到最顶层
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nFocus
+		(JNIEnv *, jclass, jlong browserHWnd);//使窗口获得焦点
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nHide
+		(JNIEnv *, jclass, jlong browserHWnd);//隐藏窗口
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMax
+		(JNIEnv *, jclass, jlong browserHWnd);//最大化窗口
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMini
+		(JNIEnv *, jclass, jlong browserHWnd);//最小化窗口
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nRestore
+		(JNIEnv *, jclass, jlong browserHWnd);//还原窗口，对应于hide函数
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
+		(JNIEnv *, jclass, jlong browserHWnd);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
+
 
 	// jni方法：退出JWebTop进程
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit

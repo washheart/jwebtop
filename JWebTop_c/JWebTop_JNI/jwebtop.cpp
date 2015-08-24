@@ -55,7 +55,7 @@ wstring invoke_Wait(DWORD msgId, wstring json){
 	return result.ToWString();
 }
 
-void jw::msgwin_thread_executeWmCopyData( DWORD msgId, wstring json){
+void jw::msgwin_thread_executeWmCopyData(DWORD msgId, wstring json){
 	if (msgId == JWM_RESULT_RETURN){// 远程任务已完成，结果发回来了，需要通知本进程的等待线程去获取结果
 		wstring taskId, result;
 		long browserHWnd;
@@ -67,8 +67,8 @@ void jw::msgwin_thread_executeWmCopyData( DWORD msgId, wstring json){
 		long browserHWnd;
 		jw::parseMessageJSON(json, ref(browserHWnd), ref(remoteTaskId), ref(taskInfo));        // 从任务信息中解析出任务id和任务描述
 		wstring result = invoke_Wait(msgId, taskInfo); 		         // 取回执行结果
-		wstring wrapped = jw::wrapAsTaskJSON(browserHWnd,ref(remoteTaskId), ref(result));      // 包装结果任务
-		sendProcessMsg((HWND)browserHWnd,JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
+		wstring wrapped = jw::wrapAsTaskJSON(browserHWnd, ref(remoteTaskId), ref(result));      // 包装结果任务
+		sendProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, LPTSTR(wrapped.c_str())); // 发送结果到远程进程
 	}
 	else{// 其他情况按远程发来的无需等待任务执行
 		invoke_Wait(msgId, json);
@@ -192,7 +192,7 @@ jstring exeRemoteAndWait(JNIEnv * env, jlong browserHWnd, string msg, DWORD msgI
 }
 JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring script){
-	return exeRemoteAndWait(env, browserHWnd, jstring2string(env,script), JWM_JS_EXECUTE_WAIT);
+	return exeRemoteAndWait(env, browserHWnd, jstring2string(env, script), JWM_JS_EXECUTE_WAIT);
 }
 
 JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
@@ -215,11 +215,43 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
 (JNIEnv * env, jclass, jlong browserHWnd, jint w, jint h){
 	jw::setSize((HWND)browserHWnd, w, h);
 }
-
+JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetSize
+(JNIEnv * env, jclass, jlong browserHWnd){
+	POINT p = jw::getSize((HWND)browserHWnd);
+	jintArray rtn = env->NewIntArray(2);
+	jint * tmp = new jint[2];
+	tmp[0] = p.x;
+	tmp[1] = p.y;
+	delete[] tmp;
+	env->SetIntArrayRegion(rtn, 0, 2, tmp);
+	return rtn;
+}
+JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetScreenSize
+(JNIEnv * env, jclass){
+	POINT p = jw::getScreenSize();
+	jintArray rtn = env->NewIntArray(2);
+	jint * tmp = new jint[2];
+	tmp[0] = p.x;
+	tmp[1] = p.y;
+	delete[] tmp;
+	env->SetIntArrayRegion(rtn, 0, 2, tmp);
+	return rtn;
+}
 // jni方法：设置窗口位置
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetLocation
 (JNIEnv * env, jclass, jlong browserHWnd, jint x, jint y){
 	jw::move((HWND)browserHWnd, x, y);
+}
+JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetLocation
+(JNIEnv * env, jclass, jlong browserHWnd){
+	POINT p = jw::getPos((HWND)browserHWnd);
+	jintArray rtn = env->NewIntArray(2);
+	jint * tmp = new jint[2];
+	tmp[0] = p.x;
+	tmp[1] = p.y;
+	delete[] tmp;
+	env->SetIntArrayRegion(rtn, 0, 2, tmp);
+	return rtn;
 }
 
 // jni方法：设置窗口位置和大小
@@ -227,18 +259,67 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetBound
 (JNIEnv *, jclass, jlong browserHWnd, jint x, jint y, int w, int h){
 	jw::setBound((HWND)browserHWnd, x, y, w, h);
 }
+JNIEXPORT jintArray JNICALL Java_org_jwebtop_JWebTopNative_nGetBound
+(JNIEnv * env, jclass, jlong browserHWnd){
+	RECT rc = jw::getBound((HWND)browserHWnd);
+	jintArray rtn = env->NewIntArray(4);
+	jint * tmp = new jint[4];
+	tmp[0] = rc.left;
+	tmp[1] = rc.top;
+	tmp[2] = rc.right - rc.left;
+	tmp[3] = rc.bottom - rc.top;
+	delete[] tmp;
+	env->SetIntArrayRegion(rtn, 0, 4, tmp);
+	return rtn;
+}
+
+//窗口移到最顶层
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nBringToTop
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::bringToTop((HWND)browserHWnd);
+}
+//使窗口获得焦点
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nFocus
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::focus((HWND)browserHWnd);
+}
+//隐藏窗口
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nHide
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::hide((HWND)browserHWnd);
+}
+//最大化窗口
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMax
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::max((HWND)browserHWnd);
+}
+//最小化窗口
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMini
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::mini((HWND)browserHWnd);
+}
+//还原窗口，对应于hide函数
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nRestore
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::restore((HWND)browserHWnd);
+}
+//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
+(JNIEnv *, jclass, jlong browserHWnd){
+	jw::setTopMost((HWND)browserHWnd);
+}
 
 // jni方法：退出JWebTop进程
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
 (JNIEnv *, jclass){
-	jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT,L"");
+	jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT, L"");
 }
 
 JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv * env, jclass, jlong hWnd){
 	WINDOWINFO winInfo;
 	GetWindowInfo((HWND)hWnd, &winInfo);// 获取窗口信息
 	RECT rc = winInfo.rcClient;
-	jintArray rtn= env->NewIntArray(4);
+	jintArray rtn = env->NewIntArray(4);
 	jint * tmp = new jint[4];
 	tmp[0] = rc.left;
 	tmp[1] = rc.top;

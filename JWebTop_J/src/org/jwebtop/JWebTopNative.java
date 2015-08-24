@@ -30,11 +30,33 @@ public final class JWebTopNative {
 
 	private static native void nSetSize(long browserHwnd, int w, int h);
 
+	private static native int[] nGetSize(long browserHwnd);
+
+	private static native int[] nGetScreenSize();
+
 	private static native void nSetLocation(long browserHwnd, int xOnScreen, int yOnScreen);
+
+	private static native int[] nGetLocation(long browserHwnd);
 
 	private static native void nSetBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h);
 
+	private static native int[] nGetBound(long browserHwnd);
+
 	private static native int[] nGetWindowClient(long browserHwnd);
+
+	private static native void nBringToTop(long browserHWnd);
+
+	private static native void nFocus(long browserHWnd);
+
+	private static native void nHide(long browserHWnd);
+
+	private static native void nMax(long browserHWnd);
+
+	private static native void nMini(long browserHWnd);
+
+	private static native void nRestore(long browserHWnd);
+
+	private static native void nSetTopMost(long browserHWnd);
 
 	private final static JWebTopNative INSTANCE = new JWebTopNative();
 
@@ -189,6 +211,25 @@ public final class JWebTopNative {
 	}
 
 	/**
+	 * 得到指定窗口的大小
+	 * 
+	 * @param browserHwnd
+	 * @return int[0]=宽，int[1]=高
+	 */
+	private static int[] getSize(long browserHwnd) {
+		return nGetSize(browserHwnd);
+	}
+
+	/**
+	 * 得到屏幕可用区域的大小
+	 * 
+	 * @return int[0]=宽，int[1]=高
+	 */
+	private static int[] getScreenSize() {
+		return nGetScreenSize();
+	}
+
+	/**
 	 * 设置指定窗口的位置
 	 * 
 	 * @param browserHwnd
@@ -197,6 +238,16 @@ public final class JWebTopNative {
 	 */
 	public static void setLocation(long browserHwnd, int xOnScreen, int yOnScreen) {
 		if (browserHwnd != 0) nSetLocation(browserHwnd, xOnScreen, yOnScreen);
+	}
+
+	/**
+	 * 得到窗口在屏幕上的位置
+	 * 
+	 * @param browserHwnd
+	 * @return int[0]=x，int[1]=y
+	 */
+	private static int[] getLocation(long browserHwnd) {
+		return nGetLocation(browserHwnd);
 	}
 
 	/**
@@ -210,6 +261,51 @@ public final class JWebTopNative {
 	 */
 	public static void setBound(long browserHwnd, int xOnScreen, int yOnScreen, int w, int h) {
 		if (browserHwnd != 0) nSetBound(browserHwnd, xOnScreen, yOnScreen, w, h);
+	}
+
+	/**
+	 * 得到窗口在屏幕的坐标信息
+	 * 
+	 * @param browserHwnd
+	 * @return int[0]=x，int[1]=y，int[2]=宽，int[3]=高
+	 */
+	private static int[] getBound(long browserHwnd) {
+		return nGetBound(browserHwnd);
+	}
+
+	// 窗口移到最顶层
+	private static void bringToTop(long browserHWnd) {
+		nBringToTop(browserHWnd);
+	}
+
+	// 使窗口获得焦点
+	private static void focus(long browserHWnd) {
+		nBringToTop(browserHWnd);
+	}
+
+	// 隐藏窗口
+	private static void hide(long browserHWnd) {
+		nHide(browserHWnd);
+	}
+
+	// 最大化窗口
+	private static void max(long browserHWnd) {
+		nMax(browserHWnd);
+	}
+
+	// 最小化窗口
+	private static void mini(long browserHWnd) {
+		nMini(browserHWnd);
+	}
+
+	// 还原窗口，对应于hide函数
+	private static void restore(long browserHWnd) {
+		nRestore(browserHWnd);
+	}
+
+	// 窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
+	private static void setTopMost(long browserHWnd) {
+		nSetTopMost(browserHWnd);
 	}
 
 	/**
