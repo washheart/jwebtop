@@ -20,7 +20,7 @@ BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
 	return NULL;
 }
 
-namespace jb{	
+namespace jb{
 	//close(handler);// ¹Ø±Õ´°¿Ú
 	void close(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
@@ -76,15 +76,15 @@ namespace jb{
 		//if (tmpConfigs != g_configs)delete tmpConfigs;
 		JWebTopConfigs *tmpConfigs = JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(appDefFile.c_str()));
 		tmpConfigs->parentWin = parentWin;
-	
+
 		if (url != NULL)tmpConfigs->url = CefString(url);
 		if (title != NULL)tmpConfigs->url = CefString(title);
 		if (icon != NULL)tmpConfigs->url = CefString(icon);
 		if (x != -1)tmpConfigs->x = x;
-		if (y != -1)tmpConfigs->y= y;
+		if (y != -1)tmpConfigs->y = y;
 		if (h != -1)tmpConfigs->h = h;
 		if (w != -1)tmpConfigs->w = w;
-		thread t(CreateNewBrowserThread,tmpConfigs);
+		thread t(CreateNewBrowserThread, tmpConfigs);
 		t.detach();
 	}
 
@@ -215,24 +215,6 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 						  }
 	}
 		break;
-	case WM_KEYUP:{
-					  if (wParam == VK_F1){//
-						  //if (bwInfo->configs.enableDebug){
-						  CefPoint(pp);
-						  pp.x = 300;
-						  pp.y = 300;
-						  CefWindowInfo windowInfo;
-						  CefBrowserSettings settings;
-						  windowInfo.SetAsPopup(NULL, "cef_debug");
-						  CefRefPtr<CefBrowserHost> host = bwInfo->browser->GetHost();
-						  host->ShowDevTools(windowInfo, new DEBUG_Handler(), settings, pp);
-						  //}
-					  }
-					  else if (wParam == VK_F11){// 
-						  createNewBrowser(NULL);
-					  }
-					  break;
-	}break;
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
