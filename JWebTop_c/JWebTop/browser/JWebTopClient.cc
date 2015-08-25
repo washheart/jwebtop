@@ -126,6 +126,7 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
 	stringstream extensionCode;
 	extensionCode << "if(!JWebTop)JWebTop={};";
+	extensionCode << "(function() {";// 将OnLoad后，JWebTop动态添加的JS脚本包起来，避免和其他用户JS文件的冲突
 	extensionCode << "JWebTop.handler=" << (LONG)hWnd << ";" << endl;
 	extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
 	if (!settings.single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
@@ -172,6 +173,7 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 			<< "addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
 			<< endl;
 	}
+	extensionCode << "})()";// 结束对脚本的包围
 	writeLog(extensionCode.str());
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
