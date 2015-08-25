@@ -51,17 +51,21 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "setTopMost", new JJH_SetTopMost());  // setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 	regist(jWebTop, "setWindowStyle", new JJH_SetWindowStyle());	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
 
+
 	regist(jWebTop, "invokeRemote_Wait", new JJH_InvokeRemote_Wait());
 	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());
 
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
 	// 多进程模式要通过消息传递数据，参见JWebTopClient#OnLoadEnd（具体实现是JWebTopCommons#renderBrowserWindow）
 	if (settings.single_process){
-		regist(jWebTop, "close", new JJH_Close());      // close(handler);// 关闭窗口
-		regist(jWebTop, "loadUrl", new JJH_LoadUrl());	//loadUrl(url, handler);//加载网页，url为网页路径
-		regist(jWebTop, "reload", new JJH_Reload());	//reload(handler);//重新加载当前页面
+		regist(jWebTop, "close", new JJH_Close());            // close(handler);// 关闭窗口
+		regist(jWebTop, "loadUrl", new JJH_LoadUrl());	      //loadUrl(url, handler);//加载网页，url为网页路径
+		regist(jWebTop, "reload", new JJH_Reload());	      //reload(handler);//重新加载当前页面
 		regist(jWebTop, "reloadIgnoreCache", new JJH_ReloadIgnoreCache());	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
-		regist(jWebTop, "showDev", new JJH_ShowDev());	//showDev(handler);//打开开发者工具
+		regist(jWebTop, "showDev", new JJH_ShowDev());	      //showDev(handler);//打开开发者工具
+		regist(jWebTop, "enableDrag", new JJH_enableDrag());  // enableDrag(true|false,[handler]);
+		regist(jWebTop, "startDrag", new JJH_startDrag());	  // startDrag([handler]);
+		regist(jWebTop, "stopDrag", new JJH_stopDrag());	  // stopDrag([handler]);
 	}
 	// 以下方法只在实现JWebTopClient#OnLoadEnd实现（具体实现是JWebTopCommons#renderBrowserWindow）
 	//regist(jWebTop, "runApp", new JJH_RunApp());  //runApp(appName,handler);//运行一个app，appName为.app文件路径。

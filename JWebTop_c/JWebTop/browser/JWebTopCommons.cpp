@@ -41,10 +41,33 @@ bool excuteJSON(const CefString& request){
 		if (handler == NULL)return false;
 		jb::reload((HWND)handler->GetInt());
 	}
+	//// (true|false,[handler]);// 允许进行拖动
+	//extensionCode << "JWebTop.=function(enable,handler){JWebTop.cefQuery({m:'enableDrag',enable:enable,handler:(handler?handler:JWebTop.handler)})};" << endl;
+	//// ([handler]);// 开始进行拖动
+	//extensionCode << "JWebTop.=function(handler){JWebTop.cefQuery({m:'startDrag',handler:(handler?handler:JWebTop.handler)})};" << endl;
+	//// ([handler]);// 停止拖动
+	//extensionCode << "JWebTop.=function(handler){JWebTop.cefQuery({m:'stopDrag',handler:(handler?handler:JWebTop.handler)})};" << endl;
+	else if (methodName == L"enableDrag"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		CefRefPtr<CefValue> enable = value->GetValue("enable");
+		if (enable == NULL)return false;
+		jb::enableDrag((HWND)handler->GetInt(), enable->GetBool());
+	}
+	else if (methodName == L"startDrag"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jb::startDrag((HWND)handler->GetInt());
+	}
+	else if (methodName == L"stopDrag"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jb::stopDrag((HWND)handler->GetInt());
+	}
 	else if (methodName == L"reloadIgnoreCache"){
 		CefRefPtr<CefValue> handler = value->GetValue("handler");
 		if (handler == NULL)return false;
-		jb::reloadIgnoreCache((HWND)handler->GetInt());
+		jb::stopDrag((HWND)handler->GetInt());
 	}
 	else if (methodName == L"runApp"){
 		CefRefPtr<CefValue> handler = value->GetValue("handler");

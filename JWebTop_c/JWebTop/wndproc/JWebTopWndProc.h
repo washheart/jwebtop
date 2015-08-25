@@ -12,18 +12,16 @@ using namespace std;
 class DEBUG_Handler : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler); };
 class BrowserWindowInfo{
 public:
-	HWND hWnd;      // CEF浏览器的外部窗口
-	HWND bWnd;      // CEF内部浏览器窗口
-	//HWND msgWin;    // 用户跨进程通信的远程进程窗口（只有通过DLL调用JWebTop时才有此参数） 
+	HWND hWnd;							// CEF浏览器的外部窗口
+	HWND bWnd;							// CEF内部浏览器窗口
 
 	LONG oldMainProc;                   // 浏览器所在主窗口之前的消息处理函数
 	LONG oldBrowserProc;                // 浏览器窗口之前的消息处理函数
 	CefRefPtr<CefBrowser> browser;      // 窗口关联到的浏览器
-	//JWebTopConfigs  configs;            // 窗口相关的一些配置信息
 
-	bool enableDrag;
-	bool isDraging;                     // 是否正在拖动窗口
-	LONG dragX, dragY;
+	bool enableDrag = true;				// 是否允许窗口拖动
+	bool isDraging = false;			    // 是否正在拖动窗口
+	LONG dragX = 0, dragY = 0;			// 窗口拖动开始时的x、y坐标位置
 };
 BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd);
 
@@ -49,6 +47,10 @@ namespace jb{
 
 	void ExecJS(HWND hWnd, string js);
 	void ExecJS(HWND hWnd, wstring js);
+
+	void enableDrag(HWND hWnd, bool enable);
+	void startDrag(HWND hWnd);
+	void stopDrag(HWND hWnd);
 
 	void runApp(HWND hWnd, wstring appDefFile, long parentWin, const LPTSTR url, const LPTSTR &title, const LPTSTR &icon, const  int x, const  int y, const  int w, const  int h);
 }

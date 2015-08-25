@@ -88,7 +88,28 @@ namespace jb{
 		t.detach();
 	}
 
-
+	void enableDrag(HWND hWnd, bool enable){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw == NULL)return;
+		bw->enableDrag = enable;
+	}
+	void startDrag(HWND hWnd){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw == NULL || !bw->enableDrag)return;
+		POINT pt;
+		RECT rt;
+		GetWindowRect(hWnd, &rt);
+		GetCursorPos(&pt);
+		// 计算并设置相对坐标
+		bw->dragX = pt.x - rt.left;
+		bw->dragY = pt.y - rt.top;
+		bw->isDraging = true;// 标记为开始拖动
+	}
+	void stopDrag(HWND hWnd){
+		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+		if (bw == NULL)return;
+		bw->isDraging = false;// 停止拖动
+	}
 }
 
 HICON GetIcon(CefString url, CefString path){
@@ -162,8 +183,7 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 							   << "dispatchEvent(e);";
 						   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
 						   break;
-	}// End case-WM_ACTIVATEAPP
-
+	}// End case-WM_ACTIVATEAPP	
 	}// End switch-message
 	return CallWindowProc((WNDPROC)bwInfo->oldMainProc, hWnd, message, wParam, lParam);
 }
@@ -174,23 +194,8 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	switch (message) {
 	case WM_PARENTNOTIFY:
 	{
-#ifdef JWebTopLog
-							stringstream sss;
-							sss << "BrowerWndProc hWnd=" << hWnd << " WM_PARENTNOTIFY[wParam=" << wParam << ",lParam=" << lParam << "]" << "\r\n";
-							writeLog(sss.str());
-#endif
 							UINT msg2 = LOWORD(wParam);
-							// 如果有多个的话可以考虑用switch方式
-							if (msg2 == WM_LBUTTONDOWN){
-								if (bwInfo->enableDrag){// 是否允许拖动
-									POINT pt;
-									GetCursorPos(&pt);
-									bwInfo->isDraging = true;
-									bwInfo->dragX = LOWORD(lParam);
-									bwInfo->dragY = HIWORD(lParam);
-								}
-							}
-							else if (msg2 == WM_DESTROY){
+							if (msg2 == WM_DESTROY){
 								if (bwInfo == NULL){
 									DefWindowProc(hWnd, message, wParam, lParam);
 								}
@@ -201,9 +206,8 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 							}
 	}
 		break;
-	case WM_LBUTTONUP:
-	case WM_RBUTTONUP:
-		bwInfo->isDraging = false;
+	case WM_KILLFOCUS:
+		bwInfo->isDraging = false; // 失去焦点时，停止拖动
 		break;
 	case WM_MOUSEMOVE:{
 						  if (bwInfo->isDraging){

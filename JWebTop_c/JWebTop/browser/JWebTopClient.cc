@@ -138,6 +138,13 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		extensionCode << "JWebTop.reloadIgnoreCache=function(handler){JWebTop.cefQuery({m:'reloadIgnoreCache',handler:(handler?handler:JWebTop.handler)})};" << endl;
 		//showDev(handler);//打开开发者工具
 		extensionCode << "JWebTop.showDev=function(handler){JWebTop.cefQuery({m:'showDev',handler:(handler?handler:JWebTop.handler)})};" << endl;
+
+		// enableDrag(true|false,[handler]);// 允许进行拖动
+		extensionCode << "JWebTop.enableDrag=function(enable,handler){JWebTop.cefQuery({m:'enableDrag',enable:enable,handler:(handler?handler:JWebTop.handler)})};" << endl;
+		// startDrag([handler]);// 开始进行拖动
+		extensionCode << "JWebTop.startDrag=function(handler){JWebTop.cefQuery({m:'startDrag',handler:(handler?handler:JWebTop.handler)})};" << endl;
+		// stopDrag([handler]);// 停止拖动
+		extensionCode << "JWebTop.stopDrag=function(handler){JWebTop.cefQuery({m:'stopDrag',handler:(handler?handler:JWebTop.handler)})};" << endl;
 	}
 	// runApp(appName,handler);//运行一个app，appName为.app文件路径。
 	extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
