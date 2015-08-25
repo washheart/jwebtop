@@ -8,5 +8,6 @@ enableDrag=1
 name=╡Бйтобжпнд
 style=2516647936
 disableDevelop=0
+appendJs=dync.js
 [CEF]
 single_process=0

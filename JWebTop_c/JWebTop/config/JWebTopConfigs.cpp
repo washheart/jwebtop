@@ -63,9 +63,12 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	if (_waccess(path, 0) != 0)return configs;                                                   // 如果文件不存在
 	configs->appDefFile = CefString(appDefFile);
 	configs->appPath = GetFilePath(appDefFile);
-	TCHAR url[1000], name[100], iconPath[1000];
+	TCHAR url[1000], appendJs[1000], name[100], iconPath[1000];
 	GetPrivateProfileString(L"BASE", L"url", NULL, url, 1000, appDefFile.data());
 	configs->url = CefString(url);                                                                // 需要打开的地址 
+	GetPrivateProfileString(L"BASE", L"appendJs", NULL, appendJs, 1000, appDefFile.data());
+	configs->appendJs = CefString(appendJs);                                                                // 需要附加的JS文件 
+	
 	GetPrivateProfileString(L"BASE", L"name", NULL, name, 100, appDefFile.data());
 	configs->name = CefString(name);                                                              // 设置浏览器窗口名称 
 	GetPrivateProfileString(L"BASE", L"icon", NULL, iconPath, 1000, appDefFile.data());

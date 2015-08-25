@@ -11,6 +11,7 @@
 #include "include/wrapper/cef_helpers.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
+#include "common/util/StrUtil.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -162,5 +163,15 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	// 页面加载后，触发JWebTopReady消息
 	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);" << endl;
+	if (!configs->appendJs.empty()){// 需要附加一个js文件
+		string appendJS = configs->getAbsolutePath(configs->appendJs.ToWString()).ToString();
+		appendJS = jw::replace_all(appendJS, "\\", "/");// 替换文件中的换行符号
+		extensionCode << "var scriptLet = document.createElement(\"SCRIPT\");"
+			<< "scriptLet.type = \"text/javascript\";"
+			<< "scriptLet.src = \"" << appendJS.c_str() << "\";"
+			<< "addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
+			<< endl;
+	}
+	writeLog(extensionCode.str());
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
