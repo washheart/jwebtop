@@ -282,22 +282,22 @@ private:
 	IMPLEMENT_REFCOUNTING(JJH_InvokeRemote_NoWait);
 };
 
-//JJH_enableDrag([handler]);// 允许进行拖动
+//JJH_enableDrag(enable);// 允许进行拖动
 class JJH_enableDrag : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jb::enableDrag(getHWND(object, arguments, 1), arguments[0]->GetBoolValue());
+		jb::enableDrag(getHWND(object, arguments, 10000), arguments[0]->GetBoolValue());
 		return true;
 	}
 private:
 	IMPLEMENT_REFCOUNTING(JJH_enableDrag);
 };
 
-//JJH_startDrag([handler]);// 开始进行拖动
+//JJH_startDrag();// 开始进行拖动
 class JJH_startDrag : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jb::startDrag(getHWND(object, arguments, 0));
+		jb::startDrag(getHWND(object, arguments, 10000));
 		return true;
 	}
 private:
@@ -307,7 +307,7 @@ private:
 class JJH_stopDrag : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jb::stopDrag(getHWND(object, arguments, 0));
+		jb::stopDrag(getHWND(object, arguments, 10000));
 		return true;
 	}
 private:

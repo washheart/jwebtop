@@ -2,6 +2,7 @@
 addEventListener("JWebTopReady",function(){	
 	JWebTop.invokeJava=JWebTop.invokeRemote_Wait
 	AlloyDesktop=JWebTop;
+	AlloyDesktop.drag=JWebTop.startDrag;
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
 });
 addEventListener("JWebTopResize",function(v){	

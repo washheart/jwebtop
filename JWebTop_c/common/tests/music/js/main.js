@@ -430,7 +430,12 @@ var readyHandler=function(){
 	AlloyDesktop.setSize(270,80);
 	setTimeout('AlloyDesktop.toImage("screen.png")',2000);
 }
-
+document.body.onmousedown=(function() {
+	JWebTop.startDrag();
+})
+document.body.onmouseup=(function() {
+	JWebTop.stopDrag();
+})
 addEventListener("AlloyDesktopReady",readyHandler);
 closeBtn.onclick=function(){
 	AlloyDesktop.close();
@@ -440,6 +445,7 @@ onbeforeunload=function(){return "您确认要关闭软件？";}
 addEventListener("JWebTopReady",function(){	
 	AlloyDesktop=JWebTop;
 	dispatchEvent(new CustomEvent('AlloyDesktopReady'));
+	JWebTop.showDev();
 });
 addEventListener("JWebTopResize",function(v){	
 	var e = new CustomEvent('AlloyDesktopWindowResize',v);

@@ -63,9 +63,9 @@ void regist(CefRefPtr<CefBrowser> browser,
 		regist(jWebTop, "reload", new JJH_Reload());	      //reload(handler);//重新加载当前页面
 		regist(jWebTop, "reloadIgnoreCache", new JJH_ReloadIgnoreCache());	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
 		regist(jWebTop, "showDev", new JJH_ShowDev());	      //showDev(handler);//打开开发者工具
-		regist(jWebTop, "enableDrag", new JJH_enableDrag());  // enableDrag(true|false,[handler]);
-		regist(jWebTop, "startDrag", new JJH_startDrag());	  // startDrag([handler]);
-		regist(jWebTop, "stopDrag", new JJH_stopDrag());	  // stopDrag([handler]);
+		regist(jWebTop, "enableDrag", new JJH_enableDrag());  // enableDrag(true|false);
+		regist(jWebTop, "startDrag", new JJH_startDrag());	  // startDrag();
+		regist(jWebTop, "stopDrag", new JJH_stopDrag());	  // stopDrag();
 	}
 	// 以下方法只在实现JWebTopClient#OnLoadEnd实现（具体实现是JWebTopCommons#renderBrowserWindow）
 	//regist(jWebTop, "runApp", new JJH_RunApp());  //runApp(appName,handler);//运行一个app，appName为.app文件路径。
