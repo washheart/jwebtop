@@ -70,6 +70,15 @@ public:
 	void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 		TerminationStatus status) OVERRIDE;
 	
+	bool GetAuthCredentials(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		bool isProxy,
+		const CefString& host,
+		int port,
+		const CefString& realm,
+		const CefString& scheme,
+		CefRefPtr<CefAuthCallback> callback) OVERRIDE;
+
 	bool IsClosing() const { return is_closing_; }
 
 	//// CefKeyboardHandler-------------------------------------------------------------------------------

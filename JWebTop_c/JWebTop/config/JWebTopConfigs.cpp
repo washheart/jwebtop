@@ -115,6 +115,17 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	configs->locales_dir_path = CefString(locales_dir_path_);// 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
 	configs->ignore_certificate_errors = GetPrivateProfileInt(L"CEF", L"ignore_certificate_errors", configs->ignore_certificate_errors, appDefFile.data());             // 是否忽略SSL证书错误
 	configs->remote_debugging_port = GetPrivateProfileInt(L"CEF", L"remote_debugging_port", configs->remote_debugging_port, appDefFile.data());                 // 远程调试端口，取值范围[1024-65535]
+	
+	TCHAR proxyServer_[1000];
+	GetPrivateProfileString(L"CEF", L"proxyServer", configs->proxyServer.ToWString().c_str(), proxyServer_, 1000, appDefFile.data());
+	configs->proxyServer = CefString(proxyServer_);									// 设置代理服务器地址。设置一个http代理服务器：  设置多个代理服务器：--proxy-server="https=proxy1:80;http=socks4://baz:1080"
+	TCHAR proxyAuthUser_[1000];
+	GetPrivateProfileString(L"CEF", L"proxyAuthUser", configs->proxyAuthUser.ToWString().c_str(), proxyAuthUser_, 1000, appDefFile.data());
+	configs->proxyAuthUser = CefString(proxyAuthUser_);								// 登录代理服务器时需要的用户名（注意：不管proxyServer设置了多少代理服务器，这里暂时值支持一组用户名和密码）
+	TCHAR proxyAuthPwd_[1000];
+	GetPrivateProfileString(L"CEF", L"proxyAuthPwd", configs->proxyAuthPwd.ToWString().c_str(), proxyAuthPwd_, 1000, appDefFile.data());
+	configs->proxyAuthPwd = CefString(proxyAuthPwd_);									// 登录代理服务器时需要的密码
+
 	return configs;
 }
 

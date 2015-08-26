@@ -19,7 +19,9 @@
 #include "JWebTopCommons.h"
 
 using namespace std;
-
+namespace jw{
+	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
+}
 JWebTopClient::JWebTopClient()
 : is_closing_(false) {
 }
@@ -81,6 +83,21 @@ void JWebTopClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 	message_router_->OnRenderProcessTerminated(browser);
 }
 
+bool JWebTopClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	bool isProxy,
+	const CefString& host,
+	int port,
+	const CefString& realm,
+	const CefString& scheme,
+	CefRefPtr<CefAuthCallback> callback) {
+	if (isProxy) {// 对于代理，如果需要认证，提供用户名和密码
+		//if(frame->GetURL...)// 注意这里没有区分哪个代理，哪个url
+		callback->Continue(jw::g_configs->proxyAuthUser, jw::g_configs->proxyAuthPwd);
+		return true;
+	}
+	return false;
+}
 bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 
@@ -117,6 +134,7 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 		"<h2>Failed to load URL " << std::string(failedUrl) <<
 		" with error " << std::string(errorText) << " (" << errorCode <<
 		").</h2></body></html>";
+
 	frame->LoadString(ss.str(), failedUrl);
 }
 
@@ -174,6 +192,5 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 			<< endl;
 	}
 	extensionCode << "})()";// 结束对脚本的包围
-	writeLog(extensionCode.str());
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }

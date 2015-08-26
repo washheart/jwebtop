@@ -42,7 +42,13 @@ public:
 	int ignore_certificate_errors;                          // 是否忽略SSL证书错误
 	int remote_debugging_port;                              // 远程调试端口，取值范围[1024-65535]
 
+	CefString proxyServer;									// 设置代理服务器地址。设置一个http代理服务器：  设置多个代理服务器：--proxy-server="https=proxy1:80;http=socks4://baz:1080"
+	CefString proxyAuthUser;								// 登录代理服务器时需要的用户名（注意：不管proxyServer设置了多少代理服务器，这里暂时值支持一组用户名和密码）
+	CefString proxyAuthPwd;									// 登录代理服务器时需要的密码
+
 	int no_sandbox = 1;                                     // 是否使用沙盒模式：JWebTop默认不使用。CEF默认使用。此参数在JWebTop中不可以配置为使用，否则会造成部分JWebTop JS不能使用
+
+	
 	///// 以下cef参数暂不支持配置
 	//CefString product_version;                 // 如果指定了user_agent，此参数会被忽略,CEF默认是Chorminum的版本号
 	//int pack_loading_disabled;// 禁止从resources_dir_path和locales_dir_path读取数据，转为从CefApp::GetResourceBundleHandler()获取
