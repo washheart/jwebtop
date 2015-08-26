@@ -80,9 +80,8 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	}
 	if (settings.multi_threaded_message_loop == 1){// 如果是被DLL调用，这种方式只能建立一个进程		
 		jw::createWin(hInstance, LPTSTR(taskId.c_str()));       // 创建隐藏窗口并阻塞当前线程
-		// 在MsgWin中PostQuitMessage(0)之后，下面的代码根本没有机会执行了？？？进程直接退出
 		jw::ctx::CloseAllBrowsers(true);
-		CefQuitMessageLoop();
+		//CefQuitMessageLoop();	// 使用multi_threaded_message_loop时不需要退出cef消息循环
 	}
 	else{
 		CefRunMessageLoop();// 运行CEF消息监听，知道CefQuitMessageLoop()方法被调用

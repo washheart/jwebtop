@@ -20,7 +20,6 @@ using namespace std;
 extern HWND g_LocalWinHWnd;  // 本地创建的消息窗口HWND
 extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
 namespace jw{
-	//wstring g_TaskId;                 // 创建消息窗口或浏览器时的任务id
 	namespace dllex{
 		bool ex(){ return g_RemoteWinHWnd != NULL; }
 
@@ -29,12 +28,13 @@ namespace jw{
 				DWORD lpdwProcessId;
 				GetWindowThreadProcessId(g_RemoteWinHWnd, &lpdwProcessId);
 				//HANDLE hHandle = GetProcessHandleFromHwnd(g_RemoteWinHWnd);// 此函数的头文件不确定是哪个(Header: Use LoadLibrary and GetProcAddress.  Library: Use Oleacc.dll.)
-				HANDLE hHandle = OpenProcess(PROCESS_ALL_ACCESS, false, lpdwProcessId);
-				WaitForSingleObject(hHandle, INFINITE);
+				HANDLE hHandle = OpenProcess(SYNCHRONIZE, false, lpdwProcessId);// 降低权限，否则有些情况下OpendProcess失败（比如xp）
+				WaitForSingleObject(hHandle, INFINITE);// 等待进程结束
 			}
 			catch (...){
 			}
-			jw::sendProcessMsg(g_LocalWinHWnd, WM_COPYDATA_EXIT, L"");// 通知本进程主窗口，程序需要关闭
+			//jw::sendProcessMsg(g_LocalWinHWnd, WM_COPYDATA_EXIT, L"");// 通知本进程主窗口，程序需要关闭
+			::SendMessage(g_LocalWinHWnd, WM_DESTROY, 0, 0);// 因为是同一进程，直接发送销毁窗口的消息即可，不用WM_COPYDATA来中转
 		}
 		// 创建一个线程用来监听远程进程是否终止以便结束当前程序
 		void waitForRemoteProcessTerminate(){
