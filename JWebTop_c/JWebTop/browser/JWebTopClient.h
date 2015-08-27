@@ -15,7 +15,8 @@ class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
-	public CefRequestHandler {
+	public CefRequestHandler,
+	CefContextMenuHandler{
 private:
 	JWebTopConfigs * configs=NULL; // 构建浏览器时的配置信息
 	wstring taskId;                // DLL方式时对应创建浏览器的任务ID
@@ -35,6 +36,9 @@ public:
 		return this;
 	}
 	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() OVERRIDE{
+		return this;
+	}
+	virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() OVERRIDE{
 		return this;
 	}
 	// 替换默认的一些对话框
@@ -90,6 +94,14 @@ public:
 	// return this;
 	//}
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
+
+	// CefContextMenuHandler------------------------------------------------------------------------------
+	 void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		CefRefPtr<CefContextMenuParams> params,
+		CefRefPtr<CefMenuModel> model) OVERRIDE{
+		model->Clear();// 移除所有默认菜单
+	}
 private:
 	//// List of existing browser windows. Only accessed on the CEF UI thread.
 	//typedef std::list<CefRefPtr<CefBrowser> > BrowserList;
