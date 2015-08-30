@@ -23,7 +23,8 @@ namespace jw{
 	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 }
 JWebTopClient::JWebTopClient()
-: is_closing_(false) {
+: is_closing_(false) 
+, dialog_handler_(new JSDialogHandler()){
 }
 
 JWebTopClient::~JWebTopClient() {}

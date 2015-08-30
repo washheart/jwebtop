@@ -10,6 +10,7 @@
 #include "include/cef_client.h"
 #include "include/wrapper/cef_message_router.h"
 #include "JWebTop/config/JWebTopConfigs.h"
+#include "JWebTop/jshandler/JSDialogHandler.h"
 using namespace std;
 class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
@@ -20,6 +21,7 @@ class JWebTopClient : public CefClient,
 private:
 	JWebTopConfigs * configs=NULL; // 构建浏览器时的配置信息
 	wstring taskId;                // DLL方式时对应创建浏览器的任务ID
+	CefRefPtr<JSDialogHandler> dialog_handler_;
 public:
 	JWebTopClient();
 	~JWebTopClient();
@@ -41,10 +43,10 @@ public:
 	virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() OVERRIDE{
 		return this;
 	}
-	// 替换默认的一些对话框
-	// virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE{
-	//	 return dialog_handler_;
-	// }
+	 virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE{
+		 //return this;
+		 return dialog_handler_;
+	 }
 
 	bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefProcessId source_process,
@@ -101,7 +103,7 @@ public:
 		CefRefPtr<CefContextMenuParams> params,
 		CefRefPtr<CefMenuModel> model) OVERRIDE{
 		model->Clear();// 移除所有默认菜单
-	}
+	 }
 private:
 	//// List of existing browser windows. Only accessed on the CEF UI thread.
 	//typedef std::list<CefRefPtr<CefBrowser> > BrowserList;

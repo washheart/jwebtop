@@ -62,7 +62,7 @@ class CefJSDialogCallback : public virtual CefBase {
 // Implement this interface to handle events related to JavaScript dialogs. The
 // methods of this class will be called on the UI thread.
 ///
-/*--cef(source=client)--*/
+/*--cef(source=client)--*/ 
 class CefJSDialogHandler : public virtual CefBase {
  public:
   typedef cef_jsdialog_type_t JSDialogType;

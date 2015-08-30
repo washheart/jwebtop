@@ -40,6 +40,12 @@
     <Filter Include="jwebtop\dllex">
       <UniqueIdentifier>{42e6ccac-b7cd-4ab1-b032-e94d31986cb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\ui">
+      <UniqueIdentifier>{b0b7b54a-3fb9-419c-b138-bfe783f3cb2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\ui\dlgs">
+      <UniqueIdentifier>{511d482b-038c-4e0b-aff0-0ac9f19f8e5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JWebTop_main.cpp">
@@ -93,6 +99,12 @@
     <ClCompile Include="browser\JWebTopContext.cc">
       <Filter>jwebtop\browser</Filter>
     </ClCompile>
+    <ClCompile Include="jshandler\JSDialogHandler.cc">
+      <Filter>jwebtop\jshandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp">
+      <Filter>common\ui\dlgs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -142,6 +154,12 @@
     </ClInclude>
     <ClInclude Include="browser\JWebTopContext.h">
       <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="jshandler\JSDialogHandler.h">
+      <Filter>jwebtop\jshandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ui\dlgs\InputDialog.h">
+      <Filter>common\ui\dlgs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
