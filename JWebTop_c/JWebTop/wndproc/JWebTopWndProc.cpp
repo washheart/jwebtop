@@ -5,11 +5,15 @@
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
+#include <comdef.h>
+#include <algorithm>
+#include <gdiplus.h>
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
 
-using namespace std;
+#pragma comment(lib,"GdiPlus.lib")
+using namespace std; 
 BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
 
 BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
@@ -120,7 +124,18 @@ HICON GetIcon(CefString url, CefString path){
 		_path = _path.substr(0, _path.find_last_of('/') + 1);
 		path = _path.append(path);
 	}
-	return (HICON)::LoadImage(NULL, path.ToWString().data(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+	Gdiplus::GdiplusStartupInput StartupInput;
+	ULONG_PTR m_gdiplusToken;
+	Gdiplus::Status sResult = Gdiplus::GdiplusStartup(&m_gdiplusToken, &StartupInput, NULL);
+	if (sResult == Gdiplus::Ok){
+		Gdiplus::Bitmap * bb = Gdiplus::Bitmap::FromFile(path.c_str(), false);
+		HICON hIcon = NULL;
+		bb->GetHICON(&hIcon);
+		delete bb;
+		Gdiplus::GdiplusShutdown(m_gdiplusToken);// 关闭gdi
+		return hIcon;
+	}
+	return NULL;
 }
 
 // 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
@@ -232,7 +247,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	////根据配置信息对窗口重新进行装饰(url、title、style、dwStyle在createBrower时处理了）
 	if (!configs.icon.empty()){
 		HICON hIcon = GetIcon(configs.url, configs.icon);
-		SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
+		if (hIcon)SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
 	}
 	if (configs.max){// 需要按最大化的方式来显示
 		jw::max(hWnd);
