@@ -1,8 +1,8 @@
 #include "StrUtil.h"
 #include <windows.h> 
-#include <time.h>
 #include <ObjBase.h>
 #include <codecvt>
+#include <fstream>
 
 using namespace std;
 namespace jw{
@@ -234,5 +234,13 @@ namespace jw{
 	}
 	int parseInt(const wstring &ws){
 		return atoi(jw::w2s(ws).c_str());
+	}
+
+	int readfile(wstring file, string &result){
+		ifstream myfile(file);
+		if (!myfile)return 0;
+		result.append((std::istreambuf_iterator<char>(myfile)), std::istreambuf_iterator<char>());
+		myfile.close();
+		return 1;
 	}
 }

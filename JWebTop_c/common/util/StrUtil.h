@@ -38,5 +38,8 @@ namespace jw{
 
 	long parseLong(const wstring &ws);
 	int parseInt(const wstring &ws);
+
+	// 读取文件内容到result中（append方式），读取成功返回1，失败返回0
+	int readfile(wstring file, string &result);
 }
 #endif

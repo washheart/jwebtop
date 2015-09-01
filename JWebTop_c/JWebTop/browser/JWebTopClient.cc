@@ -182,16 +182,30 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 
 	// 页面加载后，触发JWebTopReady消息
 	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
-	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);" << endl;
 	if (!configs->appendJs.empty()){// 需要附加一个js文件
-		string appendJS = configs->getAbsolutePath(configs->appendJs.ToWString()).ToString();
-		appendJS = jw::replace_all(appendJS, "\\", "/");// 替换文件中的换行符号
-		extensionCode << "var scriptLet = document.createElement(\"SCRIPT\");"
-			<< "scriptLet.type = \"text/javascript\";"
-			<< "scriptLet.src = \"" << appendJS.c_str() << "\";"
-			<< "addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
-			<< endl;
+		wstring appendFile = configs->getAbsolutePath(configs->appendJs.ToWString()).ToWString();
+		// 下面这种方式会有跨域问题，所以采用读入文件的方式
+		//appendJS = jw::replace_all(appendJS, "\\", "/");// 替换文件中的换行符号
+		//extensionCode << "var scriptLet = document.createElement(\"SCRIPT\");"
+		//	<< "scriptLet.type = \"text/javascript\";"
+		//	<< "scriptLet.src = \"" << appendJS.c_str() << "\";"
+		//	<< "addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
+		//	<< endl;
+		if (appendFile.find(L"http") == 0){
+			MessageBox(hWnd, L"尚不支持http方式附加js！", L"警告", MB_OK);
+		}
+		else{
+			string appendJS;
+			if (jw::readfile(appendFile, ref(appendJS))){
+				extensionCode << "\r\n" << appendJS << "\r\n";
+			}
+		}
+		//if (configs->appendJs.st)
 	}
-	extensionCode << "})()";// 结束对脚本的包围
+	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);\r\n" << endl;
+	extensionCode << "})()\r\n";// 结束对脚本的包围
+#ifdef JWebTopLog
+	writeLog(extensionCode.str());
+#endif
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
 }
