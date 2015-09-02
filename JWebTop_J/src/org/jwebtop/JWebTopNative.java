@@ -1,6 +1,7 @@
 package org.jwebtop;
 
 import java.awt.Component;
+import java.awt.peer.ComponentPeer;
 import java.io.File;
 import java.io.IOException;
 
@@ -55,6 +56,8 @@ public final class JWebTopNative {
 	private static native void nMini(long browserHWnd);
 
 	private static native void nRestore(long browserHWnd);
+
+	private static native boolean nIsVisible(long browserHWnd);
 
 	private static native void nSetTopMost(long browserHWnd);
 
@@ -175,9 +178,9 @@ public final class JWebTopNative {
 		nExecuteJSNoWait(browserHWnd, script);
 	}
 
-	String dispatch(String json) throws IOException {
+	String dispatch(long browserHWnd, String json) throws IOException {
 		jsonHandler.resetThreadClassLoader();
-		return jsonHandler.dispatcher(json);
+		return jsonHandler.dispatcher(browserHWnd, json);
 	}
 
 	public void setJsonHandler(JWebtopJSONDispater jsonHandler) {
@@ -190,9 +193,9 @@ public final class JWebTopNative {
 	 * @param json
 	 * @return
 	 */
-	static String invokeByJS(String json) {// 可以说private，但用public可以避免被优化掉
+	static String invokeByJS(long browserHWnd, String json) {// 可以说private，但用public可以避免被优化掉
 		try {
-			return INSTANCE.dispatch(json);
+			return INSTANCE.dispatch(browserHWnd, json);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return "{success:false,msg:\"调用Java失败" + e.getMessage() + "\"}";
@@ -216,7 +219,7 @@ public final class JWebTopNative {
 	 * @param browserHwnd
 	 * @return int[0]=宽，int[1]=高
 	 */
-	private static int[] getSize(long browserHwnd) {
+	public static int[] getSize(long browserHwnd) {
 		return nGetSize(browserHwnd);
 	}
 
@@ -225,7 +228,7 @@ public final class JWebTopNative {
 	 * 
 	 * @return int[0]=宽，int[1]=高
 	 */
-	private static int[] getScreenSize() {
+	public static int[] getScreenSize() {
 		return nGetScreenSize();
 	}
 
@@ -246,7 +249,7 @@ public final class JWebTopNative {
 	 * @param browserHwnd
 	 * @return int[0]=x，int[1]=y
 	 */
-	private static int[] getLocation(long browserHwnd) {
+	public static int[] getLocation(long browserHwnd) {
 		return nGetLocation(browserHwnd);
 	}
 
@@ -269,42 +272,47 @@ public final class JWebTopNative {
 	 * @param browserHwnd
 	 * @return int[0]=x，int[1]=y，int[2]=宽，int[3]=高
 	 */
-	private static int[] getBound(long browserHwnd) {
+	public static int[] getBound(long browserHwnd) {
 		return nGetBound(browserHwnd);
 	}
 
 	// 窗口移到最顶层
-	private static void bringToTop(long browserHWnd) {
+	public static void bringToTop(long browserHWnd) {
 		nBringToTop(browserHWnd);
 	}
 
 	// 使窗口获得焦点
-	private static void focus(long browserHWnd) {
+	public static void focus(long browserHWnd) {
 		nBringToTop(browserHWnd);
 	}
 
 	// 隐藏窗口
-	private static void hide(long browserHWnd) {
+	public static void hide(long browserHWnd) {
 		nHide(browserHWnd);
 	}
 
 	// 最大化窗口
-	private static void max(long browserHWnd) {
+	public static void max(long browserHWnd) {
 		nMax(browserHWnd);
 	}
 
 	// 最小化窗口
-	private static void mini(long browserHWnd) {
+	public static void mini(long browserHWnd) {
 		nMini(browserHWnd);
 	}
 
 	// 还原窗口，对应于hide函数
-	private static void restore(long browserHWnd) {
+	public static void restore(long browserHWnd) {
 		nRestore(browserHWnd);
 	}
 
+	// 检查窗口是否正在显示状态
+	public static boolean isVisible(long browserHWnd) {
+		return nIsVisible(browserHWnd);
+	}
+
 	// 窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
-	private static void setTopMost(long browserHWnd) {
+	public static void setTopMost(long browserHWnd) {
 		nSetTopMost(browserHWnd);
 	}
 
@@ -316,7 +324,9 @@ public final class JWebTopNative {
 	 * @return 控件windowsID
 	 */
 	public static long getWindowHWND(Component target) {
-		return ((sun.awt.windows.WComponentPeer/* 此类来自JDK，纯jre不行 */) target.getPeer()).getHWnd();
+		ComponentPeer peer = target.getPeer();
+		if (peer == null) return 0;
+		return ((sun.awt.windows.WComponentPeer/* 此类来自JDK，纯jre不行 */) peer).getHWnd();
 	}
 
 	/**

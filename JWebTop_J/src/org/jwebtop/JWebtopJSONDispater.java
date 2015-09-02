@@ -9,11 +9,13 @@ public interface JWebtopJSONDispater {
 	/**
 	 * 处理浏览器发来的json内容，并返回结果
 	 * 
+	 * @param browserHWnd
+	 *            需要执行json的浏览器句柄
 	 * @param json
 	 *            浏览器端发来的要执行内容
 	 * @return 本地处理后的结果
 	 */
-	String dispatcher(String json);
+	String dispatcher(long browserHWnd, String json);
 
 	/**
 	 * 在Dispatcher之前，中心设置当前线程的类加载器。<br/>

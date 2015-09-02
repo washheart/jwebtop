@@ -14,8 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
-import org.jwebtop.JWebTopBrowser.IBrowserHwndFeeder;
-
 public class TestJWebTop {
 	private static void initDll(String[] args) {
 		String dll = "JWebTop.dll";
@@ -87,7 +85,8 @@ public class TestJWebTop {
 			}
 
 			@Override
-			public String dispatcher(String json) {
+			public String dispatcher(long browserHWnd, String json) {
+				System.out.println("分发浏览器JS，浏览器句柄=" + browserHWnd + "，" + json);
 				return "{\"a\":1,javaconvert:\"" + json + "\",b:2}";
 			}
 		});
@@ -126,12 +125,6 @@ public class TestJWebTop {
 		JScrollPane jspScript = new JScrollPane(txtJson);
 		jspScript.setBorder(BorderFactory.createTitledBorder("JavaScript脚本"));
 		mainPanel.add(jspScript, JSplitPane.TOP);
-		jwebtop.setBrowserHwndFeeder(new IBrowserHwndFeeder() {
-			@Override
-			public long getBrowserHwnd() {
-				return RootBrowserHwnd;
-			}
-		});
 		jwebtop.setTopWindow(jf);
 		mainPanel.add(jwebtop, JSplitPane.BOTTOM);
 

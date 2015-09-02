@@ -1,9 +1,9 @@
 [BASE]
-url=index.html
+url=index2.html
 x=100
 y=100
-width=270
-height=80
+width=700
+height=600
 enableDrag=1
 name=╡Бйтобжпнд
 style=2516647936
@@ -11,3 +11,5 @@ disableDevelop=0
 appendJs=dync.js
 [CEF]
 single_process=0
+#proxyServer=127.0.0.1:8580
+#proxyServer=10.1.30.161:808

@@ -14,14 +14,15 @@ HWND g_RemoteWinHWnd = NULL;  // 远程进程的消息窗口HWND
 namespace jw{
 	// 处理WM_COPYDATA消息
 	LRESULT onWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
-		wstring msg;
+		wstring msg, taskId;
 		DWORD msgId = 0;
-		jw::parseProcessMsg(lParam, ref(msgId), ref(msg));
+		long senderHWnd;
+		jw::parseProcessMsg(lParam, ref(msgId), ref(msg), ref(senderHWnd), ref(taskId));
 		if (msgId == WM_COPYDATA_EXIT){
 			PostQuitMessage(0);
 			return JWEBTOP_MSG_SUCCESS;
 		}
-		std::thread t(msgwin_thread_executeWmCopyData, msgId, msg);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
+		std::thread t(msgwin_thread_executeWmCopyData, msgId, msg, senderHWnd, taskId);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
 		t.detach();// 从当前线程分离
 		return JWEBTOP_MSG_SUCCESS;
 	}

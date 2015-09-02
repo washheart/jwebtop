@@ -34,7 +34,8 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 	private String currentNote;
 
 	@Override
-	public String dispatcher(String json) {
+	public String dispatcher(long browserHWnd, String json) {
+		System.out.println("分发浏览器JS，浏览器句柄=" + browserHWnd + "，" + json);
 		// 注意：下面的JSON解析方式未考虑性能，如果JSON数据过大，建议采用jackson按流模式解析
 		JSONObject jo = JSONObject.parseObject(json);
 		String method = jo.getString("method");

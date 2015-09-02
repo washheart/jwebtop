@@ -60,7 +60,7 @@ namespace jw{
 	// 向指定窗口发送WM_COPYDATA消息。
 	// WM_COPYDATA可以跨进程发送，不过此方法是同步方法，对于耗时任务接收到消息的进程应开启新线程处理。
 	// 在JWebTop中对于接收的WM_COPYDATA消息都是开启新线程处理
-	bool sendProcessMsg(HWND hWnd, DWORD msgId, LPTSTR msg){
+	bool sendProcessMsg(HWND receiverHWnd, DWORD msgId, LPTSTR msg, long senderHWND, LPTSTR taskId){
 #ifdef JWebTopLog
 		writeLog(L"发送WM_COPYDATA消息：");
 		writeLog(msg);
@@ -74,12 +74,13 @@ namespace jw{
 			copyData.dwData = WM_COPYDATA_LARGE;         // 表示是大数据
 			copyData.cbData = sizeof(mpMsg);             // 待发送的数据结构的大小
 			copyData.lpData = &mpMsg;                    // 待发送的数据结构
-			mpMsg.msgId = msgId;
 			StringCbCopy(mpMsg.msg, sizeof(mpMsg.msg), msg);
-			return ::SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData) == JWEBTOP_MSG_SUCCESS;
+			mpMsg.senderHWnd = senderHWND;
+			mpMsg.msgId = msgId;
+			StringCbCopy(mpMsg.taskId, sizeof(mpMsg.taskId), taskId);
 		}
 		else{
-			MPMSG_MINI mpMsg;
+			MPMSG_MINI  mpMsg;
 			if (msgId < MPMSG_USER){
 				copyData.dwData = msgId;
 			}
@@ -88,24 +89,30 @@ namespace jw{
 			}
 			copyData.cbData = sizeof(mpMsg);             // 待发送的数据结构的大小
 			copyData.lpData = &mpMsg;                    // 待发送的数据结构
-			mpMsg.msgId = msgId;
 			StringCbCopy(mpMsg.msg, sizeof(mpMsg.msg), msg);
-			return ::SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData) == JWEBTOP_MSG_SUCCESS;
+			mpMsg.senderHWnd = senderHWND;
+			mpMsg.msgId = msgId;
+			StringCbCopy(mpMsg.taskId, sizeof(mpMsg.taskId), taskId);
 		}
+		return ::SendMessage(receiverHWnd, WM_COPYDATA, NULL, (LPARAM)(LPVOID)&copyData) == JWEBTOP_MSG_SUCCESS;
 	}
 
 	// 解析WM_COPYDATA消息
-	LRESULT parseProcessMsg(const  LPARAM lParam, DWORD &msgId, wstring &msg){
+	LRESULT parseProcessMsg(const  LPARAM lParam, DWORD &msgId, wstring &msg, long &senderHWnd, std::wstring &taskId){
 		COPYDATASTRUCT* copyData = (COPYDATASTRUCT*)lParam;
 		if (copyData->dwData == WM_COPYDATA_LARGE){
 			MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
-			msgId = mpMsg->msgId;
 			msg = wstring(mpMsg->msg);
+			msgId = mpMsg->msgId;
+			senderHWnd = mpMsg->senderHWnd;
+			taskId = wstring(mpMsg->taskId);
 		}
 		else{
 			MPMSG_MINI * mpMsg = ((MPMSG_MINI *)(copyData->lpData));
-			msgId = mpMsg->msgId;
 			msg = wstring(mpMsg->msg);
+			msgId = mpMsg->msgId;
+			senderHWnd = mpMsg->senderHWnd;
+			taskId = wstring(mpMsg->taskId);
 		}
 #ifdef JWebTopLog
 		wstringstream wss;

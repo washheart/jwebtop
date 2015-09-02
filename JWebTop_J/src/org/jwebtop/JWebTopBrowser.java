@@ -18,29 +18,30 @@ import javax.swing.JComponent;
  */
 public class JWebTopBrowser extends JComponent {
 
-	public interface IBrowserHwndFeeder {
-		// 用于返回浏览器Hwnd，因为浏览器一般是后创建
-		long getBrowserHwnd();
-	}
+	// public interface IBrowserHwndFeeder {
+	// // 用于返回浏览器Hwnd，因为浏览器一般是后创建
+	// long getBrowserHwnd();
+	// }
 
 	public void setBrowserVisible(boolean aFlag) {
 		if (!aFlag) JWebTopNative.setSize(getBrowserHwnd(), 0, 0);
 	}
 
 	private long getBrowserHwnd() {
-		return browserHwndFeeder == null ? 0 : browserHwndFeeder.getBrowserHwnd();
+		// return browserHwndFeeder == null ? 0 : browserHwndFeeder.getBrowserHwnd();
+		return this.hWnd;
 	}
 
-	public IBrowserHwndFeeder getBrowserHwndFeeder() {
-		return browserHwndFeeder;
-	}
-
-	public void setBrowserHwndFeeder(IBrowserHwndFeeder browserHwndFeeder) {
-		this.browserHwndFeeder = browserHwndFeeder;
-	}
+	// public IBrowserHwndFeeder getBrowserHwndFeeder() {
+	// return browserHwndFeeder;
+	// }
+	//
+	// public void setBrowserHwndFeeder(IBrowserHwndFeeder browserHwndFeeder) {
+	// this.browserHwndFeeder = browserHwndFeeder;
+	// }
 
 	protected Window topWindow;
-	protected IBrowserHwndFeeder browserHwndFeeder = null;
+	// protected IBrowserHwndFeeder browserHwndFeeder = null;
 	private ComponentListener swtPanelComponentListener = new ComponentAdapter() {
 		@Override
 		public void componentMoved(ComponentEvent e) {
@@ -74,6 +75,7 @@ public class JWebTopBrowser extends JComponent {
 			}
 		}
 	};
+	private long hWnd;
 
 	public JWebTopBrowser() {
 		this.setOpaque(false);
@@ -101,11 +103,12 @@ public class JWebTopBrowser extends JComponent {
 	public long createInernalBrowser(String appFile, String url, String title, String icon) {
 		Dimension size = this.getSize();
 		Point p = this.calcBrowserLocation();
-		long hWnd = JWebTopNative.getWindowHWND(this.topWindow);
-		return JWebTopNative.getInstance().createBrowser(appFile, hWnd//
+		long parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
+		this.hWnd = JWebTopNative.getInstance().createBrowser(appFile, parentHWnd//
 				, url, title, icon//
 				, p.x, p.y//
 				, size.width, size.height);
+		return this.hWnd;
 	}
 
 	private ComponentListener topWindowComponentListener = null;

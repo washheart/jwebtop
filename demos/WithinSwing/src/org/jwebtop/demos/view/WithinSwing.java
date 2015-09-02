@@ -10,13 +10,13 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.jwebtop.JWebTopBrowser;
-import org.jwebtop.JWebTopBrowser.IBrowserHwndFeeder;
 import org.jwebtop.JWebTopNative;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
@@ -52,6 +52,13 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 	private JWebTopBrowser listWebtopView, detailWebtopView;
 	private WithinSwingCtrl ctrl;
 	public static long frameHwnd;
+
+	private long createDlg(JFrame f) {
+		JDialog d = new JDialog(f, "测试嵌入浏览器在对话框中");
+		d.setSize(100, 200);
+		d.setVisible(true);
+		return JWebTopNative.getWindowHWND(d);
+	}
 
 	public WithinSwing() {
 		this.setTitle("测试嵌入两个浏览器窗口到Swing中");
@@ -97,20 +104,8 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 		JWebTopNative.getInstance().setJsonHandler(this.ctrl);
 		this.listWebtopView = new JWebTopBrowser();
 		this.listWebtopView.setTopWindow(this);
-		this.listWebtopView.setBrowserHwndFeeder(new IBrowserHwndFeeder() {
-			@Override
-			public long getBrowserHwnd() {
-				return RootBrowserHwnd;
-			}
-		});
 		this.detailWebtopView = new JWebTopBrowser();
 		this.detailWebtopView.setTopWindow(this);
-		this.detailWebtopView.setBrowserHwndFeeder(new IBrowserHwndFeeder() {
-			@Override
-			public long getBrowserHwnd() {
-				return ctrl.getDetailHandler();
-			}
-		});
 		mainPanel.add(this.listWebtopView, JSplitPane.LEFT);
 		mainPanel.add(this.detailWebtopView, JSplitPane.BOTTOM);
 
@@ -134,7 +129,6 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		// if (listWebtopView.isShowing()) listWebtopView.setBrowserLocation(listWebtopView.getLocationOnScreen());
 	}
 
 	@Override

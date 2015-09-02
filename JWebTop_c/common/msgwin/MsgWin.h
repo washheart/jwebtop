@@ -9,6 +9,6 @@ namespace jw{
 	void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine);
 
 	// 窗口解析WM_COPYDATA消息后，会在新的独立线程中调用此方法
-	void msgwin_thread_executeWmCopyData(DWORD msgId, std::wstring msg);
+	void msgwin_thread_executeWmCopyData(DWORD msgId, std::wstring msg, long senderHWnd, std::wstring taskId);
 }
 #endif
