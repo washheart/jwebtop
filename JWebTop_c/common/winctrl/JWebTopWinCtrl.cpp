@@ -114,6 +114,10 @@ namespace jw{
 	void restore(HWND hWnd){
 		ShowWindow(hWnd, SW_RESTORE);
 	}
+
+	BOOL isVisible(HWND hWnd){
+		return IsWindowVisible(hWnd);
+	}
 	// setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 	void setTopMost(HWND hWnd){
 		DWORD dwExStyle = GetWindowLong(hWnd, GWL_EXSTYLE);//获取旧样式  

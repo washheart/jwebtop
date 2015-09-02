@@ -91,6 +91,8 @@ extern "C" {
 		(JNIEnv *, jclass, jlong browserHWnd);//最小化窗口
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nRestore
 		(JNIEnv *, jclass, jlong browserHWnd);//还原窗口，对应于hide函数
+	JNIEXPORT jboolean JNICALL Java_org_jwebtop_JWebTopNative_nIsVisible
+		(JNIEnv *, jclass, jlong browserHWnd);// 窗口是否显示
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 		(JNIEnv *, jclass, jlong browserHWnd);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 

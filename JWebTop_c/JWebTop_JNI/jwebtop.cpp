@@ -303,6 +303,11 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nRestore
 (JNIEnv *, jclass, jlong browserHWnd){
 	jw::restore((HWND)browserHWnd);
 }
+
+// 窗口是否显示
+JNIEXPORT jboolean JNICALL Java_org_jwebtop_JWebTopNative_nIsVisible(JNIEnv *, jclass, jlong browserHWnd){
+	return jw::isVisible((HWND)browserHWnd);
+}
 //窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 (JNIEnv *, jclass, jlong browserHWnd){
