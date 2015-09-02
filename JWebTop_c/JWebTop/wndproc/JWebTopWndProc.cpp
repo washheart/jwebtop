@@ -224,6 +224,16 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_KILLFOCUS:
 		bwInfo->isDraging = false; // 失去焦点时，停止拖动
 		break;
+#ifdef JWebTopLog
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case VK_F1:
+			jb::showDev(hWnd);
+			break;
+		}
+		break;
+#endif
 	case WM_MOUSEMOVE:{
 						  if (bwInfo->isDraging){
 							  POINT pt;
