@@ -16,8 +16,8 @@ namespace jw{
 	LRESULT onWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 		wstring msg, taskId;
 		DWORD msgId = 0;
-		long senderHWnd;
-		jw::parseProcessMsg(lParam, ref(msgId), ref(msg), ref(senderHWnd), ref(taskId));
+		jw::parseProcessMsg(lParam, ref(msgId), ref(msg), ref(taskId));
+		long senderHWnd = wParam;
 		if (msgId == WM_COPYDATA_EXIT){
 			PostQuitMessage(0);
 			return JWEBTOP_MSG_SUCCESS;

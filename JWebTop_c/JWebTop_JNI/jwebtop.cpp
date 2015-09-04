@@ -36,7 +36,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	return TRUE;
 }
 // 用于回调java程序的方法（定义于jwebtop_brige.h）
-wstring invoke_Wait(long browserHWnd, DWORD msgId, wstring json){
+wstring invoke_Wait(long browserHWnd, wstring json){
 	JNIEnv *env;
 	bool detachEnv = false;
 	if (g_jvm->GetEnv((void **)&env, JNI_VERSION_1_6) < 0){
@@ -61,9 +61,9 @@ void jw::msgwin_thread_executeWmCopyData(DWORD msgId, wstring json, long senderH
 		jw::task::putTaskResult(taskId, json);						   // 通知等待线程，远程任务已完成，结果已去取回
 	}
 	else{
-		wstring result = invoke_Wait(senderHWnd, msgId, json); 		         // 取回执行结果
+		wstring result = invoke_Wait(senderHWnd, json); 		         // 取回执行结果
 		if (msgId == JWM_DLL_EXECUTE_WAIT){// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-			sendProcessMsg((HWND)senderHWnd, JWM_RESULT_RETURN, LPTSTR(result.c_str()), (long)g_LocalWinHWnd, LPTSTR(taskId.c_str())); // 发送结果到远程进程
+			sendProcessMsg((HWND)senderHWnd, JWM_RESULT_RETURN, result, (long)g_LocalWinHWnd, taskId); // 发送结果到远程进程
 		}
 	}
 }
@@ -148,7 +148,7 @@ JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
 	}
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-	jw::sendProcessMsg(g_RemoteWinHWnd, JWM_CREATEBROWSER, LPTSTR(cmds.c_str()), (long)g_LocalWinHWnd, LPTSTR(taskId.c_str()));
+	jw::sendProcessMsg(g_RemoteWinHWnd, JWM_CREATEBROWSER, cmds, (long)g_LocalWinHWnd, taskId);
 	lock->wait();		             		 		             // 等待任务完成
 	wstring result = lock->result;   		 		             // 取回执行结果
 	return jw::parseLong(result);
@@ -162,14 +162,14 @@ JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCloseBrowser
 (JNIEnv * env, jclass, jlong browserHWnd){
 	wstringstream wss; wss << browserHWnd;
-	jw::sendProcessMsg((HWND)browserHWnd, JWM_CLOSEBROWSER, LPTSTR(wss.str().c_str()), (long)g_LocalWinHWnd, L"");
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_CLOSEBROWSER, wss.str(), (long)g_LocalWinHWnd, wstring());
 }
 
 jstring exeRemoteAndWait(JNIEnv * env, jlong browserHWnd, string msg, DWORD msgId){
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	wstring newmsg = jw::s2w(msg);
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-	if (jw::sendProcessMsg((HWND)browserHWnd, msgId, LPTSTR(newmsg.c_str()), (long)g_LocalWinHWnd, LPTSTR(taskId.c_str()))){ // 发送任务到远程进程
+	if (jw::sendProcessMsg((HWND)browserHWnd, msgId, newmsg, (long)g_LocalWinHWnd, taskId)){ // 发送任务到远程进程
 		lock->wait();		             		 		             // 等待任务完成
 		wstring result = lock->result;   		 		             // 取回执行结果
 		jstring sss = env->NewStringUTF(CefString(result).ToString().c_str());
@@ -192,13 +192,13 @@ JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
 
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSNoWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring script){
-	jw::sendProcessMsg((HWND)browserHWnd, JWM_JS_EXECUTE_RETURN, LPTSTR(jstring2wstring(env, script).c_str()), (long)g_LocalWinHWnd, L"");
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_JS_EXECUTE_RETURN, jstring2wstring(env, script), (long)g_LocalWinHWnd, wstring());
 }
 
 // jni方法：执行脚本且不等待返回结果
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONNoWait
 (JNIEnv * env, jclass, jlong browserHWnd, jstring json){
-	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, LPTSTR(jstring2wstring(env, json).c_str()), (long)g_LocalWinHWnd, L"");
+	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, jstring2wstring(env, json), (long)g_LocalWinHWnd, wstring());
 }
 // jni方法：设置窗口大小
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
@@ -307,7 +307,7 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 // jni方法：退出JWebTop进程
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
 (JNIEnv *, jclass){
-	jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT, L"", (long)g_LocalWinHWnd, L"");
+	jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT, wstring(), (long)g_LocalWinHWnd, wstring());
 }
 
 JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv * env, jclass, jlong hWnd){

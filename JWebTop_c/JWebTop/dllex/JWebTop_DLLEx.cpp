@@ -33,7 +33,6 @@ namespace jw{
 			}
 			catch (...){
 			}
-			//jw::sendProcessMsg(g_LocalWinHWnd, WM_COPYDATA_EXIT, L"");// 通知本进程主窗口，程序需要关闭
 			::SendMessage(g_LocalWinHWnd, WM_DESTROY, 0, 0);// 因为是同一进程，直接发送销毁窗口的消息即可，不用WM_COPYDATA来中转
 		}
 		// 创建一个线程用来监听远程进程是否终止以便结束当前程序
@@ -81,19 +80,19 @@ namespace jw{
 		LRESULT onBrowserWinWmCopyData(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 			wstring msg,taskId;
 			DWORD msgId = 0;
-			long senderHWnd;
-			jw::parseProcessMsg(lParam, ref(msgId), ref(msg), ref(senderHWnd), ref(taskId));
+			jw::parseProcessMsg(lParam, ref(msgId), ref(msg), ref(taskId));
+			long senderHWnd = wParam;
 			std::thread t(browserwin_thread_executeWmCopyData, hWnd, msgId, msg, senderHWnd, taskId);// onWmCopyData是同步消息，为了防止另一进程的等待，这里在新线程中进行业务处理
 			t.detach();// 从当前线程分离
 			return JWEBTOP_MSG_SUCCESS;
 		}
 
 		void sendBrowserCreatedMessage(wstring taskId, long browserHWnd){
-			wstringstream wss; wss << browserHWnd;wstring ws = wss.str();
-			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, LPTSTR(ws.c_str()), browserHWnd, LPTSTR(taskId.c_str()));
+			wstringstream wss; wss << browserHWnd; wstring ws = wss.str();
+			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, ws.c_str(), browserHWnd, taskId);
 		}
 
-		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, LPTSTR msg, long senderHWND, LPTSTR taskId){
+		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, long senderHWND, wstring taskId){
 			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
 			if (bw == NULL)return false;
 			if (g_RemoteWinHWnd == NULL)return false;
@@ -127,14 +126,14 @@ namespace jw{
 				}
 			}
 			wstring result = rtn.ToWString();
-			sendJWebTopProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, LPTSTR(result.c_str()), (long)browserHWnd, LPTSTR(remoteTaskId.c_str())); // 发送结果到远程进程
+			sendJWebTopProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, result, (long)browserHWnd, remoteTaskId); // 发送结果到远程进程
 		}
 
 		CefString invokeRemote_Wait(HWND browserHWnd, CefString json){
 			wstring taskId = jw::task::createTaskId();			         // 生成任务id
 			wstring newjson = json.ToWString();
 			jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, LPTSTR(newjson.c_str()), (long)browserHWnd, LPTSTR(taskId.c_str()))){ // 发送任务到远程进程
+			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, (long)browserHWnd, taskId)){ // 发送任务到远程进程
 				lock->wait();		             		 		             // 等待任务完成
 				wstring result = lock->result;   		 		             // 取回执行结果
 				return CefString(result);									 // 返回数据
@@ -147,7 +146,7 @@ namespace jw{
 
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json){
 			wstring newjson = json.ToWString();
-			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, LPTSTR(json.c_str()), (long)browserHWnd, L""); // 发送任务到远程进程
+			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, (long)browserHWnd, wstring()); // 发送任务到远程进程
 		}
 	}
 
@@ -160,10 +159,11 @@ namespace jw{
 	}
 	// 用于createWin进行回调
 	void onWindowHwndCreated(HWND hWnd, LPTSTR szCmdLine){
+		wstringstream wss;
 		if (g_RemoteWinHWnd != NULL){// 如果有设置远程窗口的句柄，那么向其发送当前窗口的句柄
 			wstring taskId = wstring(szCmdLine);
-			wstringstream wss; wss << ((long)hWnd);	wstring ws = wss.str();
-			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, LPTSTR(ws.c_str()), (long)hWnd, LPTSTR(taskId.c_str()));
+			wstringstream wss; wss << ((long)hWnd);	
+			sendProcessMsg(g_RemoteWinHWnd, JWM_RESULT_RETURN, wss.str(), (long)hWnd, taskId);
 		}
 	}
 }
