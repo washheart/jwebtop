@@ -9,6 +9,7 @@
 #include <comdef.h>
 #include <algorithm>
 #include <gdiplus.h>
+#include "JWebTop/jshandler/JJH_Windows.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -186,62 +187,20 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
-	case WM_COPYDATA:{
-						 return	 jw::dllex::onBrowserWinWmCopyData(hWnd, message, wParam, lParam);
-
-	}
+	case WM_COPYDATA:
+		return jw::dllex::onBrowserWinWmCopyData(hWnd, message, wParam, lParam);
 	case WM_SIZE:
-	{
-					stringstream js_event;
-					js_event << "var e = new CustomEvent(' ',{"// AlloyDesktopWindowResize
-						<< "	detail:{"
-						<< "		width:" << LOWORD(lParam) << ","
-						<< "		height:" << HIWORD(lParam)
-						<< "	}"
-						<< "});"
-						<< "dispatchEvent(e);";
-					bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
-					break;
-	}// End case-WM_SIZE
+		jw::js::events::sendSize(bwInfo->browser->GetMainFrame(), LOWORD(lParam), HIWORD(lParam));
+		break;// End case-WM_SIZE
 	case WM_MOVE:
-	{
-					stringstream js_event;
-					js_event << "var e = new CustomEvent('JWebTopMove',{"// AlloyDesktopWindowMove
-						<< "	detail:{"
-						<< "		x:" << GET_X_LPARAM(lParam) << ","
-						<< "		y:" << GET_Y_LPARAM(lParam)
-						<< "	}"
-						<< "});"
-						<< "dispatchEvent(e);";
-					bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
-					break;
-	}// End case-WM_MOVE
+		jw::js::events::sendMove(bwInfo->browser->GetMainFrame(), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;// End case-WM_MOVE
 	case WM_ACTIVATE:
-	{
-						stringstream js_event;
-						js_event << "var e = new CustomEvent('JWebTopWindowActive',{"// AlloyDesktopWindowActive
-							<< "	detail:{"
-							<< "		handler:0x" << bwInfo->hWnd
-							<< "       ,w:'main'"
-							<< "	}"
-							<< "});"
-							<< "dispatchEvent(e);";
-						bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
-						break;
-	}// End case-WM_ACTIVATE
+		jw::js::events::sendWinowActive(bwInfo->browser->GetMainFrame(), (long)hWnd);
+		break;// End case-WM_ACTIVATE
 	case WM_ACTIVATEAPP:
-	{
-						   stringstream js_event;
-						   js_event << "var e = new CustomEvent('JWebTopActive',{"
-							   << "	detail:{"
-							   << "		handler:0x" << bwInfo->hWnd
-							   << "       ,w:'main'"
-							   << "	}"
-							   << "});"
-							   << "dispatchEvent(e);";
-						   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
-						   break;
-	}// End case-WM_ACTIVATEAPP
+		jw::js::events::sendAppActive(bwInfo->browser->GetMainFrame(), (long)hWnd);
+		break;// End case-WM_ACTIVATEAPP
 	case WM_NCHITTEST:
 		if (bwInfo->rWnd != NULL)return topWinNCHITTEST(hWnd, message, wParam, lParam);
 		break;

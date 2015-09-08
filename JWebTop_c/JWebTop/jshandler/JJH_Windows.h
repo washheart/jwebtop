@@ -317,8 +317,20 @@ namespace jw{
 	namespace js{
 		namespace events{
 			// 发送页面准备好事件：new CustomEvent('JWebTopReady')
-			void sendReadey(CefRefPtr<CefFrame> frame);
-		}
+			void sendReadey(const CefRefPtr<CefFrame> frame);
+
+			// 发送窗口大小改变事件:new CustomEvent('JWebTopResize',{detail:{w:宽度数值,h:高度数值}})
+			void sendSize(const CefRefPtr<CefFrame> frame, const int w, const int h);
+
+			// 发送窗口位置改变事件:new CustomEvent('JWebTopMove',{detail:{x:X坐标值,y:Y坐标值}})
+			void sendMove(const CefRefPtr<CefFrame> frame, const int x, const int y);
+	
+			// 发送窗口被激活事件:new CustomEvent('JWebTopWindowActive',{detail:{handler:被激活的窗口的句柄}})
+			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler);
+
+			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:除非此消息的窗口的句柄}})
+			void sendAppActive(const CefRefPtr<CefFrame> frame, const long handler);
+			}
 	}
 }
 #endif
