@@ -313,4 +313,12 @@ public:
 private:
 	IMPLEMENT_REFCOUNTING(JJH_stopDrag);
 };
+namespace jw{
+	namespace js{
+		namespace events{
+			// 发送页面准备好事件：new CustomEvent('JWebTopReady')
+			void sendReadey(CefRefPtr<CefFrame> frame);
+		}
+	}
+}
 #endif

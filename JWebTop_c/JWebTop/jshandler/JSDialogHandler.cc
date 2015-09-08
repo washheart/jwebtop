@@ -76,3 +76,13 @@ void JSDialogHandler::OnResetDialogState(CefRefPtr<CefBrowser> browser) {
   CEF_REQUIRE_UI_THREAD();
   js_dialog_callback_ = NULL;
 }
+namespace jw{
+	namespace js{
+		namespace events{
+			void sendReadey(CefRefPtr<CefFrame> frame){
+				CefString js(L"var e = new CustomEvent('JWebTopReady');dispatchEvent(e);");
+				frame->ExecuteJavaScript(js, L"", 0);
+			}
+		}
+	}
+}

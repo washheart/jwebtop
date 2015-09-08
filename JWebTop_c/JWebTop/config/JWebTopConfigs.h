@@ -17,7 +17,7 @@ public:
 	int max;                       // 默认是否最大化
 
 	bool enableDebug;              // 是否允许调试，默认(false)不显示调试工具
-	bool enableResize;             // （尚未实现）是否可以调整窗口大小
+	bool enableResize;             // 是否可以调整窗口大小
 	bool disableRefresh;           // （尚未实现）是否禁止刷新
 	bool enableDrag;               // 是否通过页面进行拖动（默认可以）
 

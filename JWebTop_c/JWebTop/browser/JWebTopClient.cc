@@ -12,6 +12,7 @@
 #include "JWebTop/wndproc/JWebTopWndProc.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "common/util/StrUtil.h"
+#include "JWebTop/jshandler/JJH_Windows.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -179,9 +180,6 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		"if(w!=null)morejson.w=w;" \
 		"if(h!=null)morejson.h=h;" \
 		"JWebTop.cefQuery(morejson)};" << endl;
-
-	// 页面加载后，触发JWebTopReady消息
-	//extensionCode << "var e = new CustomEvent('JWebTopReady');" << "setTimeout('dispatchEvent(e);',0);" << endl;
 	if (!configs->appendJs.empty()){// 需要附加一个js文件
 		wstring appendFile = configs->getAbsolutePath(configs->appendJs.ToWString()).ToWString();
 		// 下面这种方式会有跨域问题，所以采用读入文件的方式
@@ -201,11 +199,11 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 			}
 		}
 	}
-	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);\r\n" << endl;
 	extensionCode << "})()\r\n";// 结束对脚本的包围
 #ifdef JWebTopLog
 	writeLog(extensionCode.str());
 #endif
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+	jw::js::events::sendReadey(browser->GetMainFrame());
 	if (configs->enableResize)jb::checkAndSetResizeAblity(hWnd);
 }
