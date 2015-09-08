@@ -1,6 +1,7 @@
 #include "JWebTopWndProc.h"
 
 #include <thread>
+#include <WindowsX.h>
 #include "JWebTop/browser/JWebTopCommons.h"
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
@@ -13,7 +14,7 @@
 #endif
 
 #pragma comment(lib,"GdiPlus.lib")
-using namespace std; 
+using namespace std;
 BrowserWindowInfoMap BrowserWindowInfos;// 在静态变量中缓存所有已创建的窗口信息
 
 BrowserWindowInfo * getBrowserWindowInfo(HWND hWnd){
@@ -137,7 +138,49 @@ HICON GetIcon(CefString url, CefString path){
 	}
 	return NULL;
 }
+const LONG border_width = 5; // 定义边框的宽度
+LRESULT transparentNCHITTEST(HWND hWnd, LPARAM lParam){
+	RECT wRect;
+	GetWindowRect(hWnd, &wRect);
+	long x = GET_X_LPARAM(lParam);
+	long y = GET_Y_LPARAM(lParam);
+	if (x >= wRect.left + border_width && y >= wRect.top + border_width
+		&&x <= wRect.right - border_width &&y <= wRect.bottom - border_width){
+		return HTCLIENT;// 如果在（重新计算的）客户区内
+	}
+	return HTTRANSPARENT;
+}
+LRESULT topWinNCHITTEST(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+	RECT wRect;
+	GetWindowRect(hWnd, &wRect);
+	long x = GET_X_LPARAM(lParam), xLT = wRect.left + border_width, xRB = wRect.right - border_width;
+	long y = GET_Y_LPARAM(lParam), yLT = wRect.top + border_width, yRB = wRect.bottom - border_width;
+	if (y >= wRect.top && y < yLT)	{
+		if (x < wRect.right && x >= xRB) return HTTOPRIGHT;		// 右上角		
+		if (x >= wRect.left && x < xLT)  return HTTOPLEFT;		// 左上角
+		return HTTOP;											// 上边
+	}
+	if (y < wRect.bottom && y >= yRB){
+		if (x < wRect.right && x >= xRB) return HTBOTTOMRIGHT;	// 右下角
+		if (x >= wRect.left && x < xLT)  return HTBOTTOMLEFT;	// 左下角
+		return                                  HTBOTTOM;		// 下边
+	}
+	if (x >= wRect.left && x < xLT)      return HTLEFT;			// 左边
+	if (x < wRect.right && x >= xRB)	 return HTRIGHT;		// 右边
+	return CallWindowProc((WNDPROC)bwInfo->oldMainProc, hWnd, message, wParam, lParam);
+}
 
+LRESULT CALLBACK JWebTop_RenderWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+	switch (message){
+	case WM_NCHITTEST:
+		return transparentNCHITTEST(hWnd, lParam);
+	}
+	if (bwInfo == NULL)return DefWindowProc(hWnd, message, wParam, lParam);
+	//return ss(L"Render", 1, hWnd, message, wParam, lParam);
+	return CallWindowProc((WNDPROC)bwInfo->oldRenderProc, hWnd, message, wParam, lParam);
+}
 // 拦截主窗口的消息：有些消息（比如关闭窗口、移动窗口等）只有在主窗口才能侦听到
 LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
@@ -165,8 +208,8 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 					stringstream js_event;
 					js_event << "var e = new CustomEvent('JWebTopMove',{"// AlloyDesktopWindowMove
 						<< "	detail:{"
-						<< "		x:" << LOWORD(lParam) << ","
-						<< "		y:" << HIWORD(lParam)
+						<< "		x:" << GET_X_LPARAM(lParam) << ","
+						<< "		y:" << GET_Y_LPARAM(lParam)
 						<< "	}"
 						<< "});"
 						<< "dispatchEvent(e);";
@@ -198,8 +241,12 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 							   << "dispatchEvent(e);";
 						   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(js_event.str(), "", 0);
 						   break;
-	}// End case-WM_ACTIVATEAPP	
+	}// End case-WM_ACTIVATEAPP
+	case WM_NCHITTEST:
+		if (bwInfo->rWnd != NULL)return topWinNCHITTEST(hWnd, message, wParam, lParam);
+		break;
 	}// End switch-message
+	if (bwInfo == NULL)return DefWindowProc(hWnd, message, wParam, lParam);
 	return CallWindowProc((WNDPROC)bwInfo->oldMainProc, hWnd, message, wParam, lParam);
 }
 // 拦截浏览器窗口的消息
@@ -244,7 +291,11 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 						  }
 	}
 		break;
+	case WM_NCHITTEST:
+		if (bwInfo->rWnd != NULL)return transparentNCHITTEST(hWnd, lParam);
+		break;
 	}// End switch-message
+	if (bwInfo == NULL)return DefWindowProc(hWnd, message, wParam, lParam);
 	return CallWindowProc((WNDPROC)bwInfo->oldBrowserProc, hWnd, message, wParam, lParam);
 }
 
@@ -279,10 +330,32 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 	}
 #ifdef JWebTopLog
-	stringstream ss;
-	ss << "hWnd===" << hWnd << ",bWnd=" << bWnd << ",rWnd=<<" << GetNextWindow(bWnd, GW_CHILD) //
-		<< ",parentWin=" << configs.parentWin
-		<< "\r\n";
-	writeLog(ss.str());
+	wstringstream wss;
+	wss << L"窗口句柄信息 windowWnd  =" << hWnd << L"\r\n"
+		<< L"           browserWnd =" << bWnd << L"\r\n"
+		<< L"           renderWnd  =" << GetNextWindow(bWnd, GW_CHILD) << L"\r\n"  //
+		<< L"           parentWin  =" << configs.parentWin << L"\r\n";
+	writeLog(wss.str());
 #endif 
+}
+namespace jb{
+
+	void checkAndSetResizeAblity(HWND hWnd){
+		DWORD style = GetWindowLong(hWnd, GWL_STYLE);
+		if (style & WS_BORDER){// 窗口自带了边框，不用特殊的处理
+			return;
+		}
+		if (style & WS_CHILD){// 作为子窗口嵌入，不用特殊的处理
+			return;
+		}
+		BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
+		if (bwInfo->rWnd != NULL) return;// 已进行过特殊处理
+		HWND rWnd = GetNextWindow(bwInfo->bWnd, GW_CHILD);// 得到真绘制器窗口
+		if (rWnd == NULL)return;
+		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(rWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
+		LONG preWndProc = GetWindowLongPtr(rWnd, GWLP_WNDPROC);
+		bwInfo->oldRenderProc = preWndProc;
+		SetWindowLongPtr(rWnd, GWLP_WNDPROC, (LONG)JWebTop_RenderWndProc);// 替换主窗口的消息处理函数
+		bwInfo->rWnd = rWnd;
+	}
 }

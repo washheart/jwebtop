@@ -200,7 +200,6 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 				extensionCode << "\r\n" << appendJS << "\r\n";
 			}
 		}
-		//if (configs->appendJs.st)
 	}
 	extensionCode << "var e = new CustomEvent('JWebTopReady');" << "dispatchEvent(e);\r\n" << endl;
 	extensionCode << "})()\r\n";// 结束对脚本的包围
@@ -208,4 +207,5 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 	writeLog(extensionCode.str());
 #endif
 	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+	if (configs->enableResize)jb::checkAndSetResizeAblity(hWnd);
 }

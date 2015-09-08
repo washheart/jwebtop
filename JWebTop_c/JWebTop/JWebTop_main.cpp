@@ -44,14 +44,14 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	settings.ignore_certificate_errors = tmpConfigs->ignore_certificate_errors;// 是否忽略SSL证书错误
 	settings.remote_debugging_port = tmpConfigs->remote_debugging_port;        // 远程调试端口，取值范围[1024-65535]
 
-	//settings.single_process = 1;
 	if (g_RemoteWinHWnd != NULL){
 		jw::dllex::waitForRemoteProcessTerminate();// 创建一个线程用来监听远程进程是否终止以便结束当前程序
 		settings.multi_threaded_message_loop = 1;
 	}
-//#ifdef JWebTopLog
-//	settings.log_severity = LOGSEVERITY_VERBOSE;
-//#endif
+#ifdef JWebTopLog
+	settings.single_process = 1;// 测试时，采用单进程
+	settings.log_severity = LOGSEVERITY_VERBOSE;
+#endif
 	void* sandbox_info = NULL;
 
 #if defined(CEF_USE_SANDBOX)

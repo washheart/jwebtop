@@ -12,11 +12,14 @@ using namespace std;
 class DEBUG_Handler : public CefClient{ IMPLEMENT_REFCOUNTING(DEBUG_Handler); };
 class BrowserWindowInfo{
 public:
-	HWND hWnd;							// CEF浏览器的外部窗口
-	HWND bWnd;							// CEF内部浏览器窗口
+	HWND hWnd = NULL;					// CEF浏览器的外部窗口
+	HWND bWnd = NULL;					// CEF内部浏览器窗口
+	HWND rWnd = NULL;					// CEF内部绘制器窗口
 
 	LONG oldMainProc;                   // 浏览器所在主窗口之前的消息处理函数
 	LONG oldBrowserProc;                // 浏览器窗口之前的消息处理函数
+	LONG oldRenderProc;                 // 内部绘制窗口之前的消息处理函数
+
 	CefRefPtr<CefBrowser> browser;      // 窗口关联到的浏览器
 
 	bool enableDrag = true;				// 是否允许窗口拖动
@@ -53,5 +56,7 @@ namespace jb{
 	void stopDrag(HWND hWnd);
 
 	void runApp(HWND hWnd, wstring appDefFile, long parentWin, const LPTSTR url, const LPTSTR &title, const LPTSTR &icon, const  int x, const  int y, const  int w, const  int h);
+
+	void checkAndSetResizeAblity(HWND hWnd);// 检查窗口是否能拖动改变大小
 }
 #endif
