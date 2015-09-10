@@ -5,6 +5,7 @@
 #include <iostream> 
 #include <sstream> 
 #include <strsafe.h>
+#include "include/cef_parser.h"
 #include "common/util/StrUtil.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
@@ -145,24 +146,86 @@ JWebTopConfigs * JWebTopConfigs::parseCreateJWebTopCmdLine(LPTSTR szCmdLine,wstr
 }
 
 // 根据命令行执行创建浏览器的参数的解析
-JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(wstring cmd){
-	int argc = 0;
-	//szCmdLine
-	LPTSTR * args = CommandLineToArgvW(cmd.c_str(), &argc);
-	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile(args[5]));
-	configs->parentWin = jw::parseLong(args[0]);
-	int tmpi = jw::parseInt(args[1]);
-	if (tmpi != -1)configs->x = tmpi;
-	tmpi = jw::parseInt(args[2]);
-	if (tmpi != -1)configs->y = tmpi;
-	tmpi = jw::parseInt(args[3]);
-	if (tmpi != -1)configs->w = tmpi;
-	tmpi = jw::parseInt(args[4]);
-	if (tmpi != -1)configs->h = tmpi;
-	LPTSTR  url = args[6];
-	if (url[0] != ':')configs->url = CefString(url);
-	url = args[7];
-	if (url[0] != ':')configs->icon = CefString(url);
-	if (argc > 8)configs->name = CefString(args[8]);// FIXME：名称含空格会解析不对
+JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(wstring jsonString){
+	if (jsonString.length() == 0)return loadConfigs(JWebTopConfigs::getAppDefFile(NULL));
+	CefRefPtr<CefValue> v = CefParseJSON(CefString(jsonString), JSON_PARSER_RFC);  // 进行解析
+	if (v == NULL)return loadConfigs(JWebTopConfigs::getAppDefFile(NULL));
+	CefRefPtr<CefDictionaryValue> value = v->GetDictionary();// 按JSON字典来获取
+	CefRefPtr<CefValue> tmp= value->GetValue("appDefFile");
+	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile((tmp != NULL ? LPCTSTR(tmp->GetString().ToWString().c_str()) : NULL)));
+	
+	tmp = value->GetValue("parentWin");
+	if (tmp != NULL)configs->parentWin = tmp->GetInt();
+	// url,appendJs,name,icon,dwStyle,dwExStyle
+	tmp = value->GetValue("url");
+	if (tmp != NULL)configs->url = tmp->GetString();
+	tmp = value->GetValue("appendJs");
+	if (tmp != NULL)configs->appendJs = tmp->GetString();
+	tmp = value->GetValue("name");
+	if (tmp != NULL)configs->name = tmp->GetString();
+	tmp = value->GetValue("icon");
+	if (tmp != NULL)configs->icon = tmp->GetString();
+	tmp = value->GetValue("dwStyle");
+	if (tmp != NULL)configs->dwStyle = tmp->GetInt();
+	tmp = value->GetValue("dwExStyle");
+	if (tmp != NULL)configs->dwExStyle = tmp->GetInt();
+	// x,y,w,h,max
+	tmp = value->GetValue("x");
+	if (tmp != NULL)configs->x = tmp->GetInt();
+	tmp = value->GetValue("y");
+	if (tmp != NULL)configs->y = tmp->GetInt();
+	tmp = value->GetValue("h");
+	if (tmp != NULL)configs->h = tmp->GetInt();
+	tmp = value->GetValue("w");
+	if (tmp != NULL)configs->w = tmp->GetInt();
+	tmp = value->GetValue("max");
+	if (tmp != NULL)configs->max = tmp->GetInt();
+	// enableDebug,enableResize,disableRefresh,enableDrag
+	tmp = value->GetValue("enableDebug");
+	if (tmp != NULL)configs->enableDebug = (tmp->GetInt()!=0);
+	tmp = value->GetValue("enableResize");
+	if (tmp != NULL)configs->enableResize = (tmp->GetInt() != 0);
+	tmp = value->GetValue("disableRefresh");
+	if (tmp != NULL)configs->disableRefresh = (tmp->GetInt() != 0);
+	tmp = value->GetValue("enableDrag");
+	if (tmp != NULL)configs->enableDrag = (tmp->GetInt() != 0);
+
+	// [CEF]小节：cef配置参数（cef相关参数只在应用启动时起作用），配置在[CEF]小节下
+	tmp = value->GetValue("single_process");
+	if (tmp != NULL)configs->single_process = tmp->GetInt();
+	tmp = value->GetValue("user_data_path");
+	if (tmp != NULL)configs->user_data_path = tmp->GetString();
+	tmp = value->GetValue("cache_path");
+	if (tmp != NULL)configs->cache_path = tmp->GetString();
+	tmp = value->GetValue("persist_session_cookies");
+	if (tmp != NULL)configs->persist_session_cookies = tmp->GetInt();
+	tmp = value->GetValue("user_agent");
+	if (tmp != NULL)configs->user_agent = tmp->GetString();
+	tmp = value->GetValue("locale");
+	if (tmp != NULL)configs->locale = tmp->GetString();
+	tmp = value->GetValue("log_severity");
+	if (tmp != NULL)configs->log_severity = tmp->GetInt();
+	tmp = value->GetValue("log_file");
+	if (tmp != NULL)configs->log_file = tmp->GetString();
+	tmp = value->GetValue("resources_dir_path");
+	if (tmp != NULL)configs->resources_dir_path = tmp->GetString();
+
+	tmp = value->GetValue("locales_dir_path");
+	if (tmp != NULL)configs->locales_dir_path = tmp->GetString();
+	tmp = value->GetValue("ignore_certificate_errors");
+	if (tmp != NULL)configs->ignore_certificate_errors = tmp->GetInt();
+	tmp = value->GetValue("remote_debugging_port");
+	if (tmp != NULL)configs->remote_debugging_port = tmp->GetInt();
+	
+
+	tmp = value->GetValue("proxyServer");
+	if (tmp != NULL)configs->proxyServer = tmp->GetString();
+	tmp = value->GetValue("proxyAuthUser");
+	if (tmp != NULL)configs->proxyAuthUser = tmp->GetString();
+	tmp = value->GetValue("proxyAuthPwd");
+	if (tmp != NULL)configs->proxyAuthPwd = tmp->GetString();
+	tmp = value->GetValue("no_sandbox");
+	if (tmp != NULL)configs->no_sandbox = tmp->GetInt();
+
 	return configs;
 }

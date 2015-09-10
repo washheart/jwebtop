@@ -18,30 +18,15 @@ import javax.swing.JComponent;
  */
 public class JWebTopBrowser extends JComponent {
 
-	// public interface IBrowserHwndFeeder {
-	// // 用于返回浏览器Hwnd，因为浏览器一般是后创建
-	// long getBrowserHwnd();
-	// }
-
 	public void setBrowserVisible(boolean aFlag) {
 		if (!aFlag) JWebTopNative.setSize(getBrowserHwnd(), 0, 0);
 	}
 
 	private long getBrowserHwnd() {
-		// return browserHwndFeeder == null ? 0 : browserHwndFeeder.getBrowserHwnd();
 		return this.hWnd;
 	}
 
-	// public IBrowserHwndFeeder getBrowserHwndFeeder() {
-	// return browserHwndFeeder;
-	// }
-	//
-	// public void setBrowserHwndFeeder(IBrowserHwndFeeder browserHwndFeeder) {
-	// this.browserHwndFeeder = browserHwndFeeder;
-	// }
-
 	protected Window topWindow;
-	// protected IBrowserHwndFeeder browserHwndFeeder = null;
 	private ComponentListener swtPanelComponentListener = new ComponentAdapter() {
 		@Override
 		public void componentMoved(ComponentEvent e) {
@@ -101,20 +86,31 @@ public class JWebTopBrowser extends JComponent {
 	}
 
 	public long createInernalBrowser(String appFile, String url, String title, String icon) {
+		JWebTopConfigs config = new JWebTopConfigs();
+		config.setAppDefFile(appFile);
+		config.setUrl(url);
+		config.setName(title);
+		config.setIcon(icon);
+		return createInernalBrowser(config);
+	}
+
+	public long createInernalBrowser(JWebTopConfigs config) {
 		Dimension size = this.getSize();
 		Point p = this.calcBrowserLocation();
 		long parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
-		this.hWnd = JWebTopNative.getInstance().createBrowser(appFile, parentHWnd//
-				, url, title, icon//
-				, p.x, p.y//
-				, size.width, size.height);
+		config.setParentWin(parentHWnd);
+		config.setX(p.x);
+		config.setY(p.y);//
+		config.setW(size.width);
+		config.setH(size.height);
+		this.hWnd = JWebTopNative.getInstance().createBrowser(config);
 		return this.hWnd;
 	}
 
 	private ComponentListener topWindowComponentListener = null;
 
 	public void setTopWindow(Window w) {
-		if (w == null) throw new RuntimeException("必须设置容器所在窗口，否则不能创建SWT组件！");
+		if (w == null) throw new JWebTopException("必须设置容器所在窗口，否则不能创建组件！");
 		if (topWindowComponentListener == null) {
 			topWindowComponentListener = new ComponentAdapter() {
 				@Override

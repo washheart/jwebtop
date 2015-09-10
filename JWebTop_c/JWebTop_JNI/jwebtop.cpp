@@ -124,28 +124,11 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 /*
 * 对应org.jwebtop.JWebTopNative类的nCreateBrowser方法
 * 该方法用于创建一个浏览器窗口
-* appFile    浏览器根据此配置文件进行初始化
-* parentWin  创建的浏览器的父窗口是哪个
+* jWebTopConfigJSON 浏览器配置信息JSON
 */
 JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
-(JNIEnv * env, jclass, jstring appFile, jlong parentWin
-// 以下参数会替换appfile中的相应参数
-, jstring url       // 要打开的链接地址
-, jstring title     // 窗口名称
-, jstring icon      // 窗口图标
-, jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
-, jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
-){
-	wstringstream cmd;
-	cmd << parentWin;
-	cmd << " " << x << " " << y << " " << w << " " << h;// xywh不可能是null，只可能是-1，所以优先传递
-	wstring cmds = cmd.str();
-	appendCMd(env, &cmds, appFile);
-	appendCMd(env, &cmds, url);
-	appendCMd(env, &cmds, icon);
-	if (title != NULL){// title放最后
-		cmds.append(L" ").append(jstring2wstring(env, title).c_str());
-	}
+(JNIEnv * env, jclass, jstring jWebTopConfigJSON){
+	wstring cmds = jstring2wstring(env, jWebTopConfigJSON);
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
 	jw::sendProcessMsg(g_RemoteWinHWnd, JWM_CREATEBROWSER, cmds, (long)g_LocalWinHWnd, taskId);

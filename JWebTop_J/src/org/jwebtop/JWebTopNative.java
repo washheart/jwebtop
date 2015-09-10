@@ -5,6 +5,8 @@ import java.awt.peer.ComponentPeer;
 import java.io.File;
 import java.io.IOException;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * 与JWebTop交互的JNI接口java端
  * 
@@ -17,7 +19,7 @@ public final class JWebTopNative {
 
 	private static native void nCreateJWebTop(String processPath, String configFile);
 
-	private static native long nCreateBrowser(String appFile, long parenHwnd, String url, String title, String icon, int x, int y, int w, int h);
+	private static native long nCreateBrowser(String jWebTopConfigJSON);
 
 	private static native void nCloseBrowser(long browserHWnd);
 
@@ -96,29 +98,27 @@ public final class JWebTopNative {
 		}
 	}
 
-	public long createBrowser(final String appfile) throws IOException {
-		return createBrowser(appfile, 0, null, null, null, -1, -1, -1, -1);
+	public long createBrowserByJSON(final String jWebTopConfigJSON) throws IOException {
+		return nCreateBrowser(jWebTopConfigJSON);
 	}
 
-	public long createBrowser(final String appfile, final long parenHwnd) throws IOException {
-		return createBrowser(appfile, parenHwnd, null, null, null, -1, -1, -1, -1);
+	public long createBrowserByAppFile(final String appfile) throws IOException {
+		JWebTopConfigs config = new JWebTopConfigs();
+		config.setAppDefFile(appfile);
+		return createBrowser(config);
 	}
 
-	public long createBrowser(final String appfile, final long parenHwnd
-	// 以下参数会替换appfile中的相应参数
-			, final String url // --------要打开的链接地址
-			, final String title // ------窗口名称
-			, final String icon // -------窗口图标
-			, final int x, final int y // 窗口左上角坐标,当值为-1时不启用此变量
-			, final int w, final int h // 窗口的宽、高，当值为-1时不启用此变量
-	) {
-		String appfile2;
-		try {
-			appfile2 = new File(appfile).getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
-		} catch (IOException e) {
-			throw new JWebTopException("无法创建Browser", e);
-		}
-		return nCreateBrowser(appfile2, parenHwnd, url, title, icon, x, y, w, h);
+	public long createBrowserByAppFile(final String appfile, final long parenHwnd) throws IOException {
+		JWebTopConfigs config = new JWebTopConfigs();
+		config.setAppDefFile(appfile);
+		config.setParentWin(parenHwnd);
+		return createBrowser(config);
+	}
+
+	public long createBrowser(JWebTopConfigs configs) {
+		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
+		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
+		return nCreateBrowser(jo.toString());
 	}
 
 	/**

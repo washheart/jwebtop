@@ -60,7 +60,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)$(Configuration)\mid</IntDir>
+    <IntDir>$(ProjectDir)$(Configuration)\mid\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>JWebTop</TargetName>
     <RunCodeAnalysis>false</RunCodeAnalysis>

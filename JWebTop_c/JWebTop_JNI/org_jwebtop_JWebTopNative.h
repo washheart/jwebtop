@@ -26,20 +26,13 @@ extern "C" {
 	/*
 	* 对应org.jwebtop.JWebTopNative类的nCreateBrowser方法
 	* 该方法用于创建一个浏览器窗口
-	* appFile    浏览器根据此配置文件进行初始化
-	* parentWin  创建的浏览器的父窗口是哪个
+	* jWebTopConfigJSON 浏览器配置信息JSON(JWebTopConfigs.h)
 	*
 	* return 返回创建的浏览器窗口的句柄
 	*/
 	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
-		(JNIEnv *, jclass, jstring appFile, jlong parentWin
-		// 以下参数会替换appfile中的相应参数
-		, jstring url       // 要打开的链接地址
-		, jstring title     // 窗口名称
-		, jstring icon      // 窗口图标
-		, jint x, jint y    // 窗口左上角坐标,当值为-1时不启用此变量		 
-		, jint w, jint h    // 窗口的宽、高，当值为-1时不启用此变量		
-		);
+		(JNIEnv * env, jclass, jstring jWebTopConfigJSON);
+
    /*
 	* 对应org.jwebtop.JWebTopNative类的nCloseBrowser方法
 	* 该方法用于关闭一个浏览器窗口

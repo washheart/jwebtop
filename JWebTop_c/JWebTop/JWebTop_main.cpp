@@ -43,7 +43,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	CefString(&settings.locales_dir_path) = tmpConfigs->locales_dir_path;      // 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
 	settings.ignore_certificate_errors = tmpConfigs->ignore_certificate_errors;// 是否忽略SSL证书错误
 	settings.remote_debugging_port = tmpConfigs->remote_debugging_port;        // 远程调试端口，取值范围[1024-65535]
-
+	
 	if (g_RemoteWinHWnd != NULL){
 		jw::dllex::waitForRemoteProcessTerminate();// 创建一个线程用来监听远程进程是否终止以便结束当前程序
 		settings.multi_threaded_message_loop = 1;
