@@ -129,15 +129,7 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 
 	// Don't display an error for downloaded files.
 	if (errorCode == ERR_ABORTED) return;
-
-	// Display a load error message.
-	std::stringstream ss;
-	ss << "<html><body bgcolor=\"white\">"
-		"<h2>Failed to load URL " << std::string(failedUrl) <<
-		" with error " << std::string(errorText) << " (" << errorCode <<
-		").</h2></body></html>";
-
-	frame->LoadString(ss.str(), failedUrl);
+	frame->LoadString(L"<html><body><h2>出错了</h2></body></html>", failedUrl);
 }
 
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode){
@@ -179,20 +171,21 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		"if(y!=null)morejson.y=y;" \
 		"if(w!=null)morejson.w=w;" \
 		"if(h!=null)morejson.h=h;" \
-		"JWebTop.cefQuery(morejson)};" << endl;
+		"JWebTop.cefQuery(morejson)};";
 	if (!configs->appendJs.empty()){// 需要附加一个js文件
-		wstring appendFile = configs->getAbsolutePath(configs->appendJs.ToWString()).ToWString();
-		// 下面这种方式会有跨域问题，所以采用读入文件的方式
-		//appendJS = jw::replace_all(appendJS, "\\", "/");// 替换文件中的换行符号
-		//extensionCode << "var scriptLet = document.createElement(\"SCRIPT\");"
-		//	<< "scriptLet.type = \"text/javascript\";"
-		//	<< "scriptLet.src = \"" << appendJS.c_str() << "\";"
-		//	<< "addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
-		//	<< endl;
-		if (appendFile.find(L"http") == 0){
-			MessageBox(hWnd, L"尚不支持http方式附加js！", L"警告", MB_OK);
+		wstring appendFile = configs->appendJs.ToWString();
+		 //下面这种方式会有跨域问题，所以采用读入文件的方式
+		if (appendFile.find(L"http") == 0){// 通过docuemnt.wirte的方式来写
+			appendFile = jw::replace_allW(ref(appendFile), L"\\", L"/");// 替换文件中的换行符号	
+			extensionCode 
+				<< "\r\n var scriptLet = document.createElement(\"SCRIPT\");"
+				<< "\r\n scriptLet.type = 'text/javascript';"
+				<< "\r\n scriptLet.src = '" << jw::w2s(appendFile) << "';"
+				<< "\r\n addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
+				<< "\r\n";
 		}
 		else{
+			appendFile = configs->getAbsolutePath(appendFile).ToWString();
 			string appendJS;
 			if (jw::readfile(appendFile, ref(appendJS))){
 				extensionCode << "\r\n" << appendJS << "\r\n";
