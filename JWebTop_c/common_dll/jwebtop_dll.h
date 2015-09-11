@@ -1,0 +1,49 @@
+#ifndef _Included_org_jwebtop_JWebTopdll
+#define _Included_org_jwebtop_JWebTopdll
+#include <string>
+#include <Windows.h>
+
+#define EXPORT __declspec(dllexport)
+using namespace std;
+
+wstring invokeByBrowser(long browserHWnd, wstring json);
+extern "C" {
+
+
+	/*
+	 * 该方法用于创建一个浏览器窗口
+	 * processPath 待执行的JWebTop.exe的全路径。比如d:\c\JWebTop.exe，当然JWebTop可以命名为其他名字。
+	 * configFile  此配置文件用于启动JWebTop进程（但，不立刻创建浏览器窗口，即使指定了url参数）
+	 *
+	 * return 内被用于通信的隐藏窗口的句柄
+	 */
+	EXPORT long CreateJWebTop(wstring processPath, wstring configFile);
+
+	/*
+	 * 退出JWebTop进程
+	 */
+	EXPORT void ExitJWebTop();
+
+	/*
+	* 该方法用于创建一个浏览器窗口
+	* jWebTopConfigJSON 浏览器配置信息JSON(JWebTopConfigs.h)
+	*
+	* return 返回创建的浏览器窗口的句柄
+	*/
+	EXPORT long  CreateJWebTopBrowser(wstring jWebTopConfigJSON);
+
+	/*
+	 * 该方法用于关闭一个浏览器窗口
+	 * browserHWnd  浏览器窗口句柄
+	 */
+	EXPORT void  CloseJWebTopBrowser(long browserHWnd);
+
+	/*
+	 * 下面四个方法用于执行浏览器脚本
+	 */
+	EXPORT LPTSTR   JWebTopExecuteJSWait(long browserHWnd, wstring script);
+	EXPORT void  JWebTopExecuteJSNoWait(long browserHWnd, wstring script);
+	EXPORT LPTSTR  JWebTopExecuteJSONWait(long browserHWnd, wstring json);
+	EXPORT void  JWebTopExecuteJSONNoWait(long browserHWnd, wstring json);
+}
+#endif

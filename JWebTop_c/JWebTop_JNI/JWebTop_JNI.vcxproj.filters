@@ -28,11 +28,11 @@
     <Filter Include="common\msgwin">
       <UniqueIdentifier>{12bbe271-798d-49a1-9349-e2dca9f760b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common_dll">
+      <UniqueIdentifier>{1b4e1610-46b7-40a6-ad01-162a698fef31}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="jwebtop.cpp">
-      <Filter>jwebtop</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\tests\TestUtil.cpp">
       <Filter>common\tests</Filter>
     </ClCompile>
@@ -56,6 +56,12 @@
     </ClCompile>
     <ClCompile Include="..\common\msgwin\MsgWin.cpp">
       <Filter>common\msgwin</Filter>
+    </ClCompile>
+    <ClCompile Include="jwebtop_jni.cpp">
+      <Filter>jwebtop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common_dll\jwebtop_dll.cpp">
+      <Filter>common_dll</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,5 +104,11 @@
     <ClInclude Include="..\common\msgwin\MsgWin.h">
       <Filter>common\msgwin</Filter>
     </ClInclude>
+    <ClInclude Include="..\common_dll\jwebtop_dll.h">
+      <Filter>common_dll</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\JWebTop_DLL\JWebTop_DLL.vcxproj" />
   </ItemGroup>
 </Project>

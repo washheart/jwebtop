@@ -435,6 +435,7 @@
     <ClInclude Include="..\common\tests\TestUtil.h" />
     <ClInclude Include="..\common\util\StrUtil.h" />
     <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
+    <ClInclude Include="..\common_dll\jwebtop_dll.h" />
     <ClInclude Include="javautils.h" />
     <ClInclude Include="org_jwebtop_JWebTopNative.h" />
   </ItemGroup>
@@ -446,14 +447,18 @@
     <ClCompile Include="..\common\tests\TestUtil.cpp" />
     <ClCompile Include="..\common\util\StrUtil.cpp" />
     <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
+    <ClCompile Include="..\common_dll\jwebtop_dll.cpp" />
     <ClCompile Include="javautils.cpp" />
-    <ClCompile Include="jwebtop.cpp" />
+    <ClCompile Include="jwebtop_jni.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="jni_jdk1_6_24\jawt.h" />
     <ClInclude Include="jni_jdk1_6_24\jawt_md.h" />
     <ClInclude Include="jni_jdk1_6_24\jni.h" />
     <ClInclude Include="jni_jdk1_6_24\jni_md.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\JWebTop_DLL\JWebTop_DLL.vcxproj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

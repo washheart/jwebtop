@@ -7,21 +7,20 @@
 #ifndef _Included_org_jwebtop_JWebTopNative
 #define _Included_org_jwebtop_JWebTopNative
 #ifdef __cplusplus
-
 extern "C" {
 #endif
 
-	// dll入口函数
-	BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved);
 	/*
 	 * 对应org.jwebtop.JWebTopNative类的nCreateJWebTop方法
 	 * 该方法用于创建一个浏览器窗口
 	 * processPath 待执行的JWebTop.exe的全路径。比如d:\c\JWebTop.exe，当然JWebTop可以命名为其他名字。
 	 * configFile  此配置文件用于启动JWebTop进程（但，不立刻创建浏览器窗口，即使指定了url参数）
-	 * parentWin   创建的浏览器的父窗口是哪个
 	 */
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 		(JNIEnv *, jclass, jstring processPath, jstring configFile);
+
+	// jni方法：退出JWebTop进程
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit(JNIEnv *, jclass);
 
 	/*
 	* 对应org.jwebtop.JWebTopNative类的nCreateBrowser方法
@@ -88,11 +87,6 @@ extern "C" {
 		(JNIEnv *, jclass, jlong browserHWnd);// 窗口是否显示
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 		(JNIEnv *, jclass, jlong browserHWnd);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
-
-
-	// jni方法：退出JWebTop进程
-	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit
-		(JNIEnv *, jclass);
 
 	JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv *, jclass,jlong hWnd);
 #ifdef __cplusplus
