@@ -24,7 +24,7 @@ namespace jw{
 	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 }
 JWebTopClient::JWebTopClient()
-: is_closing_(false) 
+: is_closing_(false)
 , dialog_handler_(new JSDialogHandler()){
 }
 
@@ -132,6 +132,18 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	frame->LoadString(L"<html><body><h2>出错了</h2></body></html>", failedUrl);
 }
 
+// 判断附加的js是否需要以引用方式添加
+bool isReference(const wstring &appendFile){
+	wstring start = appendFile.substr(0, 10);
+	int len = start.length();
+	if (len < 7/*7=="http://".length()*/ || start.find(L":") == -1)return 0;
+	//for (int i = 0; i < len; i++){
+	//	start[i] = tolower(start[i]);
+	//}
+	transform(start.begin(), start.end(), start.begin(), ::tolower);
+	return start.find(L"http://") != -1 || start.find(L"https://") != -1 || start.find(L"jwebtop://") != -1;
+}
+
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode){
 	CefRefPtr<CefBrowserHost> host = browser->GetHost();
 	HWND hWnd = host->GetWindowHandle();
@@ -174,11 +186,11 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		"JWebTop.cefQuery(morejson)};";
 	if (!configs->appendJs.empty()){// 需要附加一个js文件
 		wstring appendFile = configs->appendJs.ToWString();
-		 //下面这种方式会有跨域问题，所以采用读入文件的方式
-		if (appendFile.find(L"http") == 0){// 通过docuemnt.wirte的方式来写
+		//下面这种方式会有跨域问题，所以采用读入文件的方式
+		if (isReference(ref(appendFile))){// 通过docuemnt.wirte的方式来写
 			appendFile = jw::replace_allW(ref(appendFile), L"\\", L"/");// 替换文件中的换行符号	
-			extensionCode 
-				<< "\r\n var scriptLet = document.createElement(\"SCRIPT\");"
+			extensionCode
+				<< "\r\n var scriptLet = document.createElement('SCRIPT');"
 				<< "\r\n scriptLet.type = 'text/javascript';"
 				<< "\r\n scriptLet.src = '" << jw::w2s(appendFile) << "';"
 				<< "\r\n addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"

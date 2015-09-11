@@ -1,6 +1,6 @@
 [BASE]
-#url=index.html
-url=http://www.baidu.com
+url=index.html
+#url=http://www.baidu.com
 x=100
 y=100
 width=700
@@ -9,7 +9,8 @@ enableDrag=1
 name=测试下中文
 style=2516647936
 disableDevelop=0
-appendJs=dync.js
+#appendJs=dync.js
+appendJs=jwebtop://dync.Js
 #appendJs=http://myserver/测试远程中文附加.js
 [CEF]
 single_process=0

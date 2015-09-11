@@ -1,4 +1,5 @@
 #include "JWebTopApp.h"
+#include "JWebTopScheme.h"
 #include "JWebTopCommons.h"
 #include "JWebTopContext.h"
 #include "JWebTop/config/JWebTopConfigs.h"
@@ -17,6 +18,7 @@ void JWebTopApp::OnBeforeCommandLineProcessing(
 }
 
 void JWebTopApp::OnContextInitialized() {
+	jw::jb::RegisterSchemeHandlers();// 注册jwebtop://协议到浏览器
 	if (jw::dllex::ex()){// 如果是从dll调用，不创建浏览器
 		//if (!g_configs->url.empty())createNewBrowser(g_configs);
 	}

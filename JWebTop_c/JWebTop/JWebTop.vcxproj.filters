@@ -105,6 +105,9 @@
     <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp">
       <Filter>common\ui\dlgs</Filter>
     </ClCompile>
+    <ClCompile Include="browser\JWebTopScheme.cpp">
+      <Filter>jwebtop\browser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\common\ui\dlgs\InputDialog.h">
       <Filter>common\ui\dlgs</Filter>
+    </ClInclude>
+    <ClInclude Include="browser\JWebTopScheme.h">
+      <Filter>jwebtop\browser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
