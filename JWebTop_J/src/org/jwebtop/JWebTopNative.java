@@ -102,13 +102,13 @@ public final class JWebTopNative {
 		return nCreateBrowser(jWebTopConfigJSON);
 	}
 
-	public long createBrowserByAppFile(final String appfile) throws IOException {
+	public long createBrowserByAppFile(final String appfile){
 		JWebTopConfigs config = new JWebTopConfigs();
 		config.setAppDefFile(appfile);
 		return createBrowser(config);
 	}
 
-	public long createBrowserByAppFile(final String appfile, final long parenHwnd) throws IOException {
+	public long createBrowserByAppFile(final String appfile, final long parenHwnd) {
 		JWebTopConfigs config = new JWebTopConfigs();
 		config.setAppDefFile(appfile);
 		config.setParentWin(parenHwnd);
