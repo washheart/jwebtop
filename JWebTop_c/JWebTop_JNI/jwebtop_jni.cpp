@@ -11,14 +11,12 @@
 #include "common_dll/jwebtop_dll.h"
 #include "javautils.h"
 typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
-typedef BOOL(WINAPI *lpfnSetLayeredWindowAttributes)(HWND hWnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 using namespace std;
 
 JavaVM* g_jvm;               // 保存全局的虚拟机环境
 jclass g_nativeClass;        // 记录全局的本地类变量
 jmethodID g_invokeByJS;      // 从C端回调Java的方法
 extern HWND g_RemoteWinHWnd;
-extern HWND g_LocalWinHWnd;
 
 // 实现回调java程序的方法
 wstring invokeByBrowser(long browserHWnd, wstring json){

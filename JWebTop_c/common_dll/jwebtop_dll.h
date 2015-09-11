@@ -5,11 +5,11 @@
 
 #define EXPORT __declspec(dllexport)
 using namespace std;
-
+/*
+ * 用于调用本地接口（java、c#等）程序，并返回执行结果
+ */
 wstring invokeByBrowser(long browserHWnd, wstring json);
 extern "C" {
-
-
 	/*
 	 * 该方法用于创建一个浏览器窗口
 	 * processPath 待执行的JWebTop.exe的全路径。比如d:\c\JWebTop.exe，当然JWebTop可以命名为其他名字。
