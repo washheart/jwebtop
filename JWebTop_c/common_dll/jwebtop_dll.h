@@ -17,12 +17,12 @@ extern "C" {
 	 *
 	 * return 内被用于通信的隐藏窗口的句柄
 	 */
-	EXPORT long CreateJWebTop(wstring processPath, wstring configFile);
+	EXPORT long WINAPI CreateJWebTop(wstring processPath, wstring configFile);
 
 	/*
 	 * 退出JWebTop进程
 	 */
-	EXPORT void ExitJWebTop();
+	EXPORT void WINAPI ExitJWebTop();
 
 	/*
 	* 该方法用于创建一个浏览器窗口
@@ -30,20 +30,20 @@ extern "C" {
 	*
 	* return 返回创建的浏览器窗口的句柄
 	*/
-	EXPORT long  CreateJWebTopBrowser(wstring jWebTopConfigJSON);
+	EXPORT long WINAPI CreateJWebTopBrowser(wstring jWebTopConfigJSON);
 
 	/*
 	 * 该方法用于关闭一个浏览器窗口
 	 * browserHWnd  浏览器窗口句柄
 	 */
-	EXPORT void  CloseJWebTopBrowser(long browserHWnd);
+	EXPORT void WINAPI CloseJWebTopBrowser(long browserHWnd);
 
 	/*
 	 * 下面四个方法用于执行浏览器脚本
 	 */
-	EXPORT LPTSTR   JWebTopExecuteJSWait(long browserHWnd, wstring script);
-	EXPORT void  JWebTopExecuteJSNoWait(long browserHWnd, wstring script);
-	EXPORT LPTSTR  JWebTopExecuteJSONWait(long browserHWnd, wstring json);
-	EXPORT void  JWebTopExecuteJSONNoWait(long browserHWnd, wstring json);
+	EXPORT LPTSTR WINAPI JWebTopExecuteJSWait(long browserHWnd, wstring script);
+	EXPORT void WINAPI JWebTopExecuteJSNoWait(long browserHWnd, wstring script);
+	EXPORT LPTSTR WINAPI JWebTopExecuteJSONWait(long browserHWnd, wstring json);
+	EXPORT void WINAPI JWebTopExecuteJSONNoWait(long browserHWnd, wstring json);
 }
 #endif

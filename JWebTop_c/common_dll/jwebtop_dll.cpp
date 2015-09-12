@@ -35,13 +35,13 @@ namespace jw{
 	}
 }
 
-EXPORT void thread_CreateJWebTop(std::wstring cmds)
+EXPORT void WINAPI thread_CreateJWebTop(std::wstring cmds)
 {
 	jw::createWin(::GetModuleHandle(NULL), LPTSTR(cmds.c_str()));// createWin会开启新的线程
 }
 
 // 创建JWebTop进程
-EXPORT long CreateJWebTop(wstring jprocessPath, wstring cfgFile){
+EXPORT long WINAPI CreateJWebTop(wstring jprocessPath, wstring cfgFile){
 	if (g_RemoteWinHWnd != NULL)return (long)g_RemoteWinHWnd;
 	processPath = jprocessPath;
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id	
@@ -61,7 +61,7 @@ EXPORT long CreateJWebTop(wstring jprocessPath, wstring cfgFile){
 * 该方法用于创建一个浏览器窗口
 * jWebTopConfigJSON 浏览器配置信息JSON
 */
-EXPORT long CreateJWebTopBrowser(wstring jWebTopConfigJSON){
+EXPORT long WINAPI CreateJWebTopBrowser(wstring jWebTopConfigJSON){
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
 	jw::sendProcessMsg(g_RemoteWinHWnd, JWM_CREATEBROWSER, jWebTopConfigJSON, (long)g_LocalWinHWnd, taskId);
@@ -74,7 +74,7 @@ EXPORT long CreateJWebTopBrowser(wstring jWebTopConfigJSON){
  * 该方法用于关闭一个浏览器窗口
  * browserHWnd  浏览器窗口句柄
  */
-EXPORT void CloseJWebTopBrowser(long browserHWnd){
+EXPORT void WINAPI CloseJWebTopBrowser(long browserHWnd){
 	wstringstream wss; wss << browserHWnd;
 	jw::sendProcessMsg((HWND)browserHWnd, JWM_CLOSEBROWSER, wss.str(), (long)g_LocalWinHWnd, wstring());
 }
@@ -91,24 +91,24 @@ LPTSTR exeRemoteAndWait(long browserHWnd, wstring msg, DWORD msgId){
 		return NULL;											// 返回数据：注意这里是空字符串
 	}
 }
-EXPORT LPTSTR JWebTopExecuteJSWait(long browserHWnd, wstring script){
+EXPORT LPTSTR WINAPI JWebTopExecuteJSWait(long browserHWnd, wstring script){
 	return exeRemoteAndWait(browserHWnd, script, JWM_JS_EXECUTE_WAIT);
 }
 
-EXPORT LPTSTR JWebTopExecuteJSONWait(long browserHWnd, wstring json){
+EXPORT LPTSTR WINAPI JWebTopExecuteJSONWait(long browserHWnd, wstring json){
 	return exeRemoteAndWait(browserHWnd, json, JWM_JSON_EXECUTE_WAIT);
 }
 
-void JWebTopExecuteJSNoWait(long browserHWnd, wstring script){
+EXPORT void WINAPI JWebTopExecuteJSNoWait(long browserHWnd, wstring script){
 	jw::sendProcessMsg((HWND)browserHWnd, JWM_JS_EXECUTE_RETURN, script, (long)g_LocalWinHWnd, wstring());
 }
 
 // jni方法：执行脚本且不等待返回结果
-void JWebTopExecuteJSONNoWait(long browserHWnd, wstring json){
+EXPORT void WINAPI JWebTopExecuteJSONNoWait(long browserHWnd, wstring json){
 	jw::sendProcessMsg((HWND)browserHWnd, JWM_JSON_EXECUTE_RETURN, json, (long)g_LocalWinHWnd, wstring());
 }
 
 // jni方法：退出JWebTop进程
-void ExitJWebTop(){
+EXPORT void WINAPI ExitJWebTop(){
 	jw::sendProcessMsg(g_RemoteWinHWnd, WM_COPYDATA_EXIT, wstring(), (long)g_LocalWinHWnd, wstring());
 }
