@@ -53,6 +53,8 @@
       <DependentUpon>JWebTopBrowser.cs</DependentUpon>
     </Compile>
     <Compile Include="JWebTopConfigs.cs" />
+    <Compile Include="JWebTopException.cs" />
+    <Compile Include="JWebtopJSONDispater.cs" />
     <Compile Include="JWebTopNative.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
