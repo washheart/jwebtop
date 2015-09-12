@@ -9,10 +9,6 @@ EXPORT void WINAPI SetCSharpCallback(CSharpCallBack callBack)
 {
 	g_CSharpCallBack = callBack;
 }
-//extern "C"__declspec(dllexport)void WINAPI SetCSharpCallback(CSharpCallBack callBack)
-//{
-//	g_CSharpCallBack = callBack;
-//}
 
 // »Øµ÷c#³ÌÐò
 std::wstring invokeByBrowser(long browserHWnd, wstring json){

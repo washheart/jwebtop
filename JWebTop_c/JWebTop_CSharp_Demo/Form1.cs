@@ -32,5 +32,11 @@ namespace JWebTop_CSharp_Demo
             String newstr = jo.ToString();
             textBox1.Text = textBox1.Text + "\r\n newstr==" + newstr;
         }
+        DemoBrowserCtrl ctrl;
+        private void MainForm_Load(object sender, EventArgs e) {
+            this.ctrl = new DemoBrowserCtrl();
+            JWebTopNative.setJsonHandler(this.ctrl);
+            JWebTopNative.createJWebTop("JWebTop.exe", "index.app");
+        }
     }
 }

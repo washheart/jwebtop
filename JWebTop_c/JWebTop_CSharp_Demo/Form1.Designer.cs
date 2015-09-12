@@ -36,9 +36,11 @@
             this.btnDelNote = new System.Windows.Forms.ToolStripButton();
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.jWebTopBrowser1 = new JWebTop.JWebTopBrowser();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
+            this.splitMain.Panel2.SuspendLayout();
             this.splitMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -87,6 +89,10 @@
             // splitMain.Panel1
             // 
             this.splitMain.Panel1.Controls.Add(this.textBox1);
+            // 
+            // splitMain.Panel2
+            // 
+            this.splitMain.Panel2.Controls.Add(this.jWebTopBrowser1);
             this.splitMain.Size = new System.Drawing.Size(424, 236);
             this.splitMain.SplitterDistance = 141;
             this.splitMain.TabIndex = 5;
@@ -100,6 +106,14 @@
             this.textBox1.Size = new System.Drawing.Size(139, 234);
             this.textBox1.TabIndex = 0;
             // 
+            // jWebTopBrowser1
+            // 
+            this.jWebTopBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.jWebTopBrowser1.Location = new System.Drawing.Point(0, 0);
+            this.jWebTopBrowser1.Name = "jWebTopBrowser1";
+            this.jWebTopBrowser1.Size = new System.Drawing.Size(277, 234);
+            this.jWebTopBrowser1.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -109,10 +123,12 @@
             this.Controls.Add(this.toolStrip1);
             this.Name = "MainForm";
             this.Text = "测试嵌入两个浏览器";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.splitMain.Panel1.ResumeLayout(false);
             this.splitMain.Panel1.PerformLayout();
+            this.splitMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).EndInit();
             this.splitMain.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -128,6 +144,7 @@
         private System.Windows.Forms.ToolStripButton btnDelNote;
         private System.Windows.Forms.SplitContainer splitMain;
         private System.Windows.Forms.TextBox textBox1;
+        private JWebTop.JWebTopBrowser jWebTopBrowser1;
 
 
     }

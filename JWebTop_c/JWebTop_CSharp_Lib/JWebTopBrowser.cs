@@ -8,27 +8,25 @@ using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
-namespace JWebTop
-{
-    public partial class JWebTopBrowser : UserControl
-    {
+namespace JWebTop {
+    public partial class JWebTopBrowser : UserControl {
         private long hWnd = 0;
-        public JWebTopBrowser()
-        {
+        public JWebTopBrowser() {
             InitializeComponent();
         }
 
-        private void sizeChanged(object sender, EventArgs e)
-        { Size size = this.Size;
-        JWebTopNative.setSize(this.hWnd, size.Width, size.Height);
+        private void sizeChanged(object sender, EventArgs e) {
+            Size size = this.Size;
+
+            JWebTopNative.setSize(this.hWnd, size.Width, size.Height);
         }
 
         public long createInernalBrowser(String appFile, String url, String title, String icon) {
             JWebTopConfigs config = new JWebTopConfigs();
-            config.appDefFile=appFile;
-            config.url=url;
-            config.name=title;
-            config.icon=icon;
+            config.appDefFile = appFile;
+            config.url = url;
+            config.name = title;
+            config.icon = icon;
             return createInernalBrowser(config);
         }
 

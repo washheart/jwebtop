@@ -48,8 +48,8 @@ namespace JWebTop
 	* jWebTopConfigJSON 浏览器配置信息JSON(JWebTopConfigs.h)
 	*
 	* return 返回创建的浏览器窗口的句柄
-    [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "CreateJWebTopBrowser")]
 	*/
+    [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "CreateJWebTopBrowser")]
 	public static extern long  nCreateJWebTopBrowser(string jWebTopConfigJSON);
 
 	/*
@@ -71,18 +71,17 @@ namespace JWebTop
     [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "JWebTopExecuteJSONNoWait")]
 	public static extern void  nJWebTopExecuteJSONNoWait(long browserHWnd, string json);
 
-        private static bool inited = false;// 是否已经初始化
-        public delegate string CSharpCallBack(long browserHWnd, string json);
-        //设置回调函数
-        [DllImport("JWebTop_DLL4CSharp.dll", EntryPoint = "SetCSharpCallback")]
-        static extern void SetCSharpCallback(CSharpCallBack fa);
-        // 声明回调的函数
-        public static string __CSharpCallBack(long browserHWnd, string json)
-        {
-            //MessageBox.Show(buf);
-            return "abcdefg";
-        }
+    public delegate string CSharpCallBack(long browserHWnd, string json);
+    //设置回调函数
+    [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "SetCSharpCallback")]
+    public static extern void SetCSharpCallback(CSharpCallBack fa);
+    // 声明回调的函数
+    public static string __CSharpCallBack(long browserHWnd, string json) {
+        //MessageBox.Show(buf);
+        return "abcdefg";
+    }
 	private static JWebtopJSONDispater jsonHandler = null;
+    private static bool inited = false;// 是否已经初始化
         private static void check()
         {
             if (inited) return;

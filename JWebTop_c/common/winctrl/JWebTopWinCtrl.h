@@ -4,7 +4,6 @@
 #include <sstream>
 #include <string>
 
-
 namespace jw{
 	void  setCenter(HWND hWnd);                             // setToCenter(handler);// 让窗口显示在屏幕正中
 	void  setCenter(HWND hWnd, int x, int y, int w, int h); // setToCenter(handler);// 让窗口显示在屏幕正中
