@@ -62,7 +62,7 @@
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\mid\</IntDir>
     <GenerateManifest>false</GenerateManifest>
-    <TargetName>JWebTop</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">
@@ -246,6 +246,10 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PostBuildEvent>
+      <Command>del $(SolutionDir)JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).dll /Q
+copy $(ProjectDir)$(Configuration)\$(ProjectName).dll  $(SolutionDir)JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).dll /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">
     <ClCompile>
