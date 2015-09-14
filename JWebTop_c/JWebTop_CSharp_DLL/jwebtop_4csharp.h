@@ -5,12 +5,21 @@
 typedef LPTSTR(CALLBACK *CSharpCallBack)(long browserHWnd, LPTSTR json);
 extern "C" {
 	EXPORT void WINAPI SetCSharpCallback(CSharpCallBack callBack);
-	EXPORT LPTSTR WINAPI CovWString(LPTSTR v);
-	EXPORT int WINAPI CovWString2(LPTSTR v);
-	EXPORT int WINAPI CovWString3(LPTSTR v);
-	EXPORT char* WINAPI CovWString4(LPTSTR v);
-	EXPORT int WINAPI CovString(char* v);
-	EXPORT char* WINAPI CovString2(char* v);
-	EXPORT int WINAPI Calc(int v);
+	//EXPORT LPTSTR WINAPI CovWString(LPTSTR v);
+	//EXPORT int WINAPI CovWString2(LPTSTR v);
+	//EXPORT int WINAPI CovWString3(LPTSTR v1,LPTSTR v2);
+	//EXPORT char* WINAPI CovWString4(LPTSTR v);
+	//EXPORT int WINAPI CovString(char* v);
+	//EXPORT char* WINAPI CovString2(char* v);
+	//EXPORT int WINAPI Calc(int v);
+
+	EXPORT long WINAPI nCreateJWebTop(LPTSTR processPath, LPTSTR configFile);
+	EXPORT void WINAPI nExitJWebTop();
+	EXPORT long WINAPI nCreateJWebTopBrowser(LPTSTR jWebTopConfigJSON);
+	EXPORT void WINAPI nCloseJWebTopBrowser(long browserHWnd);
+	EXPORT char* WINAPI nJWebTopExecuteJSWait(long browserHWnd, LPTSTR script);
+	EXPORT void WINAPI nJWebTopExecuteJSNoWait(long browserHWnd, LPTSTR script);
+	EXPORT char* WINAPI nJWebTopExecuteJSONWait(long browserHWnd, LPTSTR json);
+	EXPORT void WINAPI nJWebTopExecuteJSONNoWait(long browserHWnd, LPTSTR json);
 }
 #endif

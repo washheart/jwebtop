@@ -25,25 +25,25 @@ namespace JWebTop {
 
         #region 仅用于测试，且已测试通过的函数
 
-        // 按Unicode方式来回传递数据，最终没有发现问题（传回c#端后，需要把Unicode转为utf8）
-        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        public static extern string CovWString4([MarshalAs(UnmanagedType.LPTStr)]string fa);
+        //// 按Unicode方式来回传递数据，最终没有发现问题（传回c#端后，需要把Unicode转为utf8）
+        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+        //public static extern string CovWString4([MarshalAs(UnmanagedType.LPTStr)]string fa);
 
-        // 这种方式可以，但是有个问题，所有的字符都是gbk字符集，和JWebTop的Unicode完全不对应
-        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Ansi)]
-        public static extern StringBuilder CovString2([MarshalAs(UnmanagedType.LPStr)]StringBuilder fa);
+        //// 这种方式可以，但是有个问题，所有的字符都是gbk字符集，和JWebTop的Unicode完全不对应
+        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Ansi)]
+        //public static extern StringBuilder CovString2([MarshalAs(UnmanagedType.LPStr)]StringBuilder fa);
 
 
-        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        public static extern int CovString(StringBuilder fa);
+        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+        //public static extern int CovString(StringBuilder fa);
 
-        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        public static extern int CovWString2([MarshalAs(UnmanagedType.LPTStr)]StringBuilder fa);
+        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+        //public static extern int CovWString2([MarshalAs(UnmanagedType.LPTStr)]StringBuilder fa);
 
-        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        public static extern int CovWString3([MarshalAs(UnmanagedType.LPTStr)]string fa);
-        [DllImport("JWebTop_CSharp_DLL.dll")]
-        public static extern int Calc(int fa);                         // 测试通过了。。。。。。。。
+        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+        //public static extern int CovWString3([MarshalAs(UnmanagedType.LPTStr)]string v1, [MarshalAs(UnmanagedType.LPTStr)]string v2);
+        //[DllImport("JWebTop_CSharp_DLL.dll")]
+        //public static extern int Calc(int fa);                       
         #endregion
         #region  仅用于测试，且测试[未]通过的函数
         // 无论如何都无法返回LPTSTR(w_char)类型数据
@@ -69,13 +69,13 @@ namespace JWebTop {
 	 *
 	 * return 内被用于通信的隐藏窗口的句柄
 	 */
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "CreateJWebTop")]
-        public static extern long nCreateJWebTop(string processPath, string configFile);
+        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+        public static extern int nCreateJWebTop([MarshalAs(UnmanagedType.LPTStr)]string processPath, [MarshalAs(UnmanagedType.LPTStr)]string configFile);
 
         /*
          * 退出JWebTop进程
          */
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "ExitJWebTop")]
+        [DllImport("JWebTop_CSharp_DLL.dll")]
         public static extern void nExitJWebTop();
 
         /*
@@ -84,26 +84,26 @@ namespace JWebTop {
         *
         * return 返回创建的浏览器窗口的句柄
         */
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "CreateJWebTopBrowser")]
-        public static extern long nCreateJWebTopBrowser(string jWebTopConfigJSON);
+        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+        public static extern long nCreateJWebTopBrowser([MarshalAs(UnmanagedType.LPTStr)]string jWebTopConfigJSON);
 
         /*
          * 该方法用于关闭一个浏览器窗口
          * browserHWnd  浏览器窗口句柄
          */
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "CloseJWebTopBrowser")]
+        [DllImport("JWebTop_CSharp_DLL.dll")]
         public static extern void nCloseJWebTopBrowser(long browserHWnd);
 
         /*
          * 下面四个方法用于执行浏览器脚本
          */
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "JWebTopExecuteJSWait")]
+        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
         public static extern string nJWebTopExecuteJSWait(long browserHWnd, string script);
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "JWebTopExecuteJSNoWait")]
+        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
         public static extern void nJWebTopExecuteJSNoWait(long browserHWnd, string script);
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "JWebTopExecuteJSONWait")]
+        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
         public static extern string nJWebTopExecuteJSONWait(long browserHWnd, string json);
-        [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "JWebTopExecuteJSONNoWait")]
+        [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
         public static extern void nJWebTopExecuteJSONNoWait(long browserHWnd, string json);
 
 
