@@ -40,6 +40,7 @@ wstring invokeByBrowser(long browserHWnd, wstring json){
 }
 
 // jni方法：创建JWebTop进程
+// 这里暂时没有办法用JSON的方式来传递配置：因为用cmd方式发送数据时，系统会默认把参数中的双引号给去掉（或者，先创建窗口，再创建浏览器？）
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
 (JNIEnv * env, jclass nativeClass, jstring jprocessPath, jstring configFile){
 	if (g_RemoteWinHWnd != NULL)return /*(jlong)g_RemoteWinHWnd*/;
