@@ -186,7 +186,7 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 	log << L"JWebTopCommons createNewBrowser parentWin=" << configs->parentWin << L"\r\n";
 	log << L"\tconfigs[x=" << configs->x << ",y=" << configs->y << ",w=" << configs->w << ",h=" << configs->h << "]\r\n"
 		<< L"\tsetings[x=" << window_info.x << ",y=" << window_info.y << ",w=" << window_info.width << ",h=" << window_info.height << "]\r\n"
-		<< L"tstyle=" << window_info.style << ",ex_style=" << window_info.ex_style << "]\r\n"
+		<< L"\tstyle=" << window_info.style << ",ex_style=" << window_info.ex_style << "]\r\n"
 		<< L"\tscreninfo[x="<<p.x <<",y=" << p.y << L"]\r\n";
 	writeLog(log.str());
 #endif

@@ -18,7 +18,7 @@ public interface JWebtopJSONDispater {
 	String dispatcher(long browserHWnd, String json);
 
 	/**
-	 * 在Dispatcher之前，中心设置当前线程的类加载器。<br/>
+	 * 在Dispatcher之前，重新设置当前线程的类加载器。<br/>
 	 * 否则会使用BootstrapClassLoader来加载类，这样新加载类getClassLoader时会返回null，导致无法继续记载资源。<br/>
 	 * 一般可以这样实现：首先记录JWebtopJSONDispater实现类的加载器，然后在resetThreadClassLoader方法设置。<br/>
 	 * 如果使用了插件系统、或者实现了其他加载方式，也需要在resetThreadClassLoader方法中处理好。<br/>

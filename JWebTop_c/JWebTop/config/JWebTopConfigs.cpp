@@ -153,9 +153,8 @@ JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(wstring jsonString){
 	CefRefPtr<CefDictionaryValue> value = v->GetDictionary();// 按JSON字典来获取
 	CefRefPtr<CefValue> tmp= value->GetValue("appDefFile");
 	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile((tmp != NULL ? LPCTSTR(tmp->GetString().ToWString().c_str()) : NULL)));
-	
-	tmp = value->GetValue("parentWin");
-	if (tmp != NULL)configs->parentWin = tmp->GetInt();
+	tmp = value->GetValue("parentWinS");
+	if (tmp != NULL)configs->parentWin = jw::parseLong64(tmp->GetString().ToWString());
 	// url,appendJs,name,icon,dwStyle,dwExStyle
 	tmp = value->GetValue("url");
 	if (tmp != NULL)configs->url = tmp->GetString();
@@ -165,10 +164,10 @@ JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(wstring jsonString){
 	if (tmp != NULL)configs->name = tmp->GetString();
 	tmp = value->GetValue("icon");
 	if (tmp != NULL)configs->icon = tmp->GetString();
-	tmp = value->GetValue("dwStyle");
-	if (tmp != NULL)configs->dwStyle = tmp->GetInt();
-	tmp = value->GetValue("dwExStyle");
-	if (tmp != NULL)configs->dwExStyle = tmp->GetInt();
+	tmp = value->GetValue("dwStyleS");
+	if (tmp != NULL)configs->dwStyle = jw::parseLong64(tmp->GetString().ToWString());
+	tmp = value->GetValue("dwExStyleS");
+	if (tmp != NULL)configs->dwExStyle = jw::parseLong64(tmp->GetString().ToWString());
 	// x,y,w,h,max
 	tmp = value->GetValue("x");
 	if (tmp != NULL)configs->x = tmp->GetInt();

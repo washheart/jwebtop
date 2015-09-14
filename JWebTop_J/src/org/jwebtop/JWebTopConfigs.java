@@ -26,7 +26,8 @@ public class JWebTopConfigs {
 		}
 	}
 
-	private long parentWin = DEFAULT_INT; // 记录父窗口的HWND
+	// private long parentWin = DEFAULT_INT; // 记录父窗口的HWND
+	private String parentWinS; // 记录父窗口的HWND
 
 	// [BASE]小节：JWebTop相关配置，配置在[BASE]小节下
 	/**
@@ -40,8 +41,8 @@ public class JWebTopConfigs {
 	private String name;// 窗口名称
 	private String icon; // 窗口图标
 
-	private int dwStyle = DEFAULT_INT; // 附加窗口样式，默认(0)不应用任何附加窗口样式
-	private int dwExStyle = DEFAULT_INT; // 附加扩展窗口样式，默认(0)不应用任何附加扩展窗口样式
+	private String dwStyleS; // 附加窗口样式，默认(0)不应用任何附加窗口样式
+	private String dwExStyleS; // 附加扩展窗口样式，默认(0)不应用任何附加扩展窗口样式
 
 	private int x = DEFAULT_INT, y = DEFAULT_INT; // 窗口左上角坐标,当值为-1时不启用此变量
 	private int w = DEFAULT_INT, h = DEFAULT_INT; // 窗口的宽、高，当值为-1时不启用此变量
@@ -70,12 +71,16 @@ public class JWebTopConfigs {
 	private String proxyAuthUser; // 登录代理服务器时需要的用户名（注意：不管proxyServer设置了多少代理服务器，这里暂时值支持一组用户名和密码）
 	private String proxyAuthPwd; // 登录代理服务器时需要的密码
 
-	public long getParentWin() {
-		return parentWin;
+	public void setParentWin(long parentWin) {
+		this.parentWinS = String.valueOf(parentWin);
 	}
 
-	public void setParentWin(long parentWin) {
-		this.parentWin = parentWin;
+	public String getParentWinS() {
+		return parentWinS;
+	}
+
+	public void setParentWinS(String parentWinS) {
+		this.parentWinS = parentWinS;
 	}
 
 	public String getAppDefFile() {
@@ -124,20 +129,28 @@ public class JWebTopConfigs {
 		this.icon = icon;
 	}
 
-	public int getDwStyle() {
-		return dwStyle;
+	public void setDwStyle(long dwStyle) {
+		this.dwStyleS = String.valueOf(dwStyle);
 	}
 
-	public void setDwStyle(int dwStyle) {
-		this.dwStyle = dwStyle;
+	public void setDwExStyle(long dwExStyle) {
+		this.dwExStyleS = String.valueOf(dwExStyle);
 	}
 
-	public int getDwExStyle() {
-		return dwExStyle;
+	public String getDwStyleS() {
+		return dwStyleS;
 	}
 
-	public void setDwExStyle(int dwExStyle) {
-		this.dwExStyle = dwExStyle;
+	public void setDwStyleS(String dwStyleS) {
+		this.dwStyleS = dwStyleS;
+	}
+
+	public String getDwExStyleS() {
+		return dwExStyleS;
+	}
+
+	public void setDwExStyleS(String dwExStyleS) {
+		this.dwExStyleS = dwExStyleS;
 	}
 
 	public int getX() {
