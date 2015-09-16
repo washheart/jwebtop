@@ -37,6 +37,7 @@
             this.splitMain = new System.Windows.Forms.SplitContainer();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.jWebTopBrowser1 = new JWebTop.JWebTopBrowser();
+            this.detailBrowser = new JWebTop.JWebTopBrowser();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
             this.splitMain.Panel1.SuspendLayout();
@@ -92,6 +93,7 @@
             // 
             // splitMain.Panel2
             // 
+            this.splitMain.Panel2.Controls.Add(this.detailBrowser);
             this.splitMain.Panel2.Controls.Add(this.jWebTopBrowser1);
             this.splitMain.Size = new System.Drawing.Size(424, 236);
             this.splitMain.SplitterDistance = 141;
@@ -113,6 +115,14 @@
             this.jWebTopBrowser1.Name = "jWebTopBrowser1";
             this.jWebTopBrowser1.Size = new System.Drawing.Size(277, 234);
             this.jWebTopBrowser1.TabIndex = 0;
+            // 
+            // detailBrowser
+            // 
+            this.detailBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.detailBrowser.Location = new System.Drawing.Point(0, 0);
+            this.detailBrowser.Name = "detailBrowser";
+            this.detailBrowser.Size = new System.Drawing.Size(277, 234);
+            this.detailBrowser.TabIndex = 1;
             // 
             // MainForm
             // 
@@ -145,6 +155,7 @@
         private System.Windows.Forms.SplitContainer splitMain;
         private System.Windows.Forms.TextBox textBox1;
         private JWebTop.JWebTopBrowser jWebTopBrowser1;
+        private JWebTop.JWebTopBrowser detailBrowser;
 
 
     }

@@ -38,25 +38,20 @@ namespace JWebTop_CSharp_Demo
             JWebTopNative.setJsonHandler(this.ctrl);
             //JWebTopNative.check();// 测试通过
             //string a = "来自csharp端";
-            //int i1 = 10; int i2 = JWebTopNative.Calc(i1);// 测试通过
-            //a = a + i2
+            //int i1 = 10; int i2 = JWebTopNative.Calc(i1);a = a + i2// 测试通过
             //StringBuilder sb = new StringBuilder(a);
-            //string b = JWebTopNative.CovWString(sb);
-            //StringBuilder b = JWebTopNative.CovWString(sb);
-            //string b = JWebTopNative.CovWString(a);
-            //int b = JWebTopNative.CovString(sb);// 测试通过
-            //StringBuilder b = JWebTopNative.CovString2(sb);// 可以了（但是用的是ascii[gbk]参数，都是string类型），但是结果不对，有乱码
-            //int b = JWebTopNative.CovWString2(sb);// 测试通过
-            // b = JWebTopNative.CovWString3(a);// 测试通过
-            //string b = JWebTopNative.CovWString4(a);// 有乱码
-            //string tmp_unicode_error = JWebTopNative.CovWString4(a);// 这里是乱码
-            //byte[] buffer = Encoding.Unicode.GetBytes(tmp_unicode_error);
-            //string t = Encoding.UTF8.GetString(buffer);// 这里已经转换对了
-            //int c = JWebTopNative.CovWString3("中文", "xyz");
-            //a = a + t;
-            //a = a + b + c;
-            //textBox1.Text = a;
+            //StringBuilder b = JWebTopNative.CovString2(sb);
+            //string tmp_unicode_error = JWebTopNative.CovWString4(a);
+            //textBox1.Text += "\r\n CovWString4=" + tmp_unicode_error;
+            //sb = new StringBuilder(20);
+            //JWebTopNative.CovWString用StringBuilder方式(sb, a);
+            //textBox1.Text += "\r\n CovWString用StringBuilder方式=" + sb;
+            //sb = new StringBuilder(2);
+            //JWebTopNative.CovWString用StringBuilder方式(sb,a);
+            //textBox1.Text += "\r\n CovWString用StringBuilder方式=" +sb;
+
             JWebTopNative.createJWebTop("JWebTop.exe", "index.app");
+            this.detailBrowser.createInernalBrowser("index.app",null,null,null );
         }
     }
 }

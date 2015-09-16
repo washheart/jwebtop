@@ -4,15 +4,17 @@
 //ÉùÃ÷
 typedef LPTSTR(CALLBACK *CSharpCallBack)(long browserHWnd, LPTSTR json);
 extern "C" {
-	EXPORT void WINAPI SetCSharpCallback(CSharpCallBack callBack);
 	//EXPORT LPTSTR WINAPI CovWString(LPTSTR v);
 	//EXPORT int WINAPI CovWString2(LPTSTR v);
 	//EXPORT int WINAPI CovWString3(LPTSTR v1,LPTSTR v2);
 	//EXPORT char* WINAPI CovWString4(LPTSTR v);
+	//EXPORT void WINAPI CovWString5(LPTSTR, LPTSTR);
 	//EXPORT int WINAPI CovString(char* v);
 	//EXPORT char* WINAPI CovString2(char* v);
 	//EXPORT int WINAPI Calc(int v);
 
+	EXPORT void WINAPI DelPtrInDLL(void *p);
+	EXPORT void WINAPI SetCSharpCallback(CSharpCallBack callBack);
 	EXPORT long WINAPI nCreateJWebTop(LPTSTR processPath, LPTSTR configFile);
 	EXPORT void WINAPI nExitJWebTop();
 	EXPORT long WINAPI nCreateJWebTopBrowser(LPTSTR jWebTopConfigJSON);

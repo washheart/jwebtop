@@ -18,15 +18,9 @@ std::wstring invokeByBrowser(long browserHWnd, wstring json){
 	return g_CSharpCallBack(browserHWnd, LPTSTR(json.c_str()));
 }
 
+// 把wstring转为char*返回给csharp端
 char* wstring2char(wstring ws){
 	string s = jw::w2s(ws);
-	// 这里的方式是对的
-	//int len = s.length();
-	//char * bs;// 定义一个指针并分配空间（指针分配的空间在堆上,堆上的空间是由程序员分配和释放的，若程序员不释放,程序结束时可能由OS释放）
-	//bs = (char *)malloc(len + 1);// 为指针分配空间
-	//memcpy(bs, s.c_str(), len);
-	//return bs;
-	 // 下面的方式也可以
 	char* c;
 	const int len = s.length();
 	c = new char[len + 1];
@@ -34,6 +28,11 @@ char* wstring2char(wstring ws){
 	return c;
 }
 
+EXPORT void WINAPI DelPtrInDLL(void *p){
+	//writeLog(L"准备删除指针\r\n");
+	delete p;
+	//writeLog(L"指针已经删除\r\n");
+}
 EXPORT long WINAPI nCreateJWebTop(LPTSTR processPath, LPTSTR configFile){
 	writeLog(L"processPath="); writeLog(processPath); writeLog(L"\r\n");
 	writeLog(L"configFile ="); writeLog(configFile); writeLog(L"\r\n");
@@ -63,6 +62,13 @@ EXPORT void WINAPI nJWebTopExecuteJSONNoWait(long browserHWnd, LPTSTR json){
 	JWebTopExecuteJSONNoWait(browserHWnd, json);
 }
 
+//char* string2char(string s){
+//	char* c;
+//	const int len = s.length();
+//	c = new char[len + 1];
+//	strcpy(c, s.c_str());
+//	return c;
+//}
 //EXPORT LPTSTR WINAPI CovWString(LPTSTR v){
 //	wstring ws(v);
 //	ws.append(L"___在DLL中处理过了");
@@ -83,6 +89,12 @@ EXPORT void WINAPI nJWebTopExecuteJSONNoWait(long browserHWnd, LPTSTR json){
 //	ws.append(L"__按wstring进行了处理");
 //	string s = jw::w2s(ws);// 转换为utf-8的话，直接就是乱码
 //	return string2char(s);
+//}
+//EXPORT void WINAPI CovWString5(
+//	LPTSTR outsb,
+//	LPTSTR param){
+//	realloc(outsb, 100);
+//	lstrcpy(outsb, param);
 //}
 //EXPORT int WINAPI CovString(char* v){
 //	return 1234;

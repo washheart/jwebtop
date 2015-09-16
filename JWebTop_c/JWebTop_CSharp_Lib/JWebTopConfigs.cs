@@ -18,10 +18,14 @@ namespace JWebTop {
         public static void removeDefaults(JObject jo) {
             for (int i = 0; i < checksLen; i++) {
                 string key = checks[i];
-                if (jo[key] == null) jo.Remove(key);
-
-                if (((int)jo[key]) == DEFAULT_INT) jo.Remove(key);
-
+                if (jo[key] == null) {
+                    jo.Remove(key);
+                    break;
+                }
+                if (((int)jo[key]) == DEFAULT_INT) {
+                    jo.Remove(key);
+                    break;
+                }
             }
         }
 
