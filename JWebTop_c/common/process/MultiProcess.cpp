@@ -64,8 +64,10 @@ namespace jw{
 	bool sendProcessMsg(const HWND receiverHWnd, const DWORD msgId, const wstring msg, const  long senderHWND, const wstring taskId){
 #ifdef JWebTopLog
 		wstringstream wss;
-		wss<<L"发送WM_COPYDATA消息，msgId=" << msgId << L"，msg=" << msg
-			<< ",senderHWnd=" << senderHWND << ",taskId=" << taskId << L"\r\n";
+		wss<<L"发送WM_COPYDATA消息"
+			<< L"\r\n\t msgId=" << msgId << ",taskId=" << taskId << ",senderHWnd=" << senderHWND
+			<< L"\r\n\t msg=" << msg
+			<< L"\r\n";
 		writeLog(wss.str());
 #endif
 		COPYDATASTRUCT copyData;
@@ -92,6 +94,9 @@ namespace jw{
 
 	// 解析WM_COPYDATA消息
 	LRESULT parseProcessMsg(const LPARAM lParam, DWORD &msgId, wstring &msg, std::wstring &taskId){
+#ifdef JWebTopLog
+		writeLog(L"接收WM_COPYDATA消息\r\n");
+#endif
 		COPYDATASTRUCT* copyData = (COPYDATASTRUCT*)lParam;
 		if (copyData->dwData >LARGE_MSG_START){
 			MPMSG_LARGE * mpMsg = ((MPMSG_LARGE *)(copyData->lpData));
@@ -107,8 +112,8 @@ namespace jw{
 		}
 #ifdef JWebTopLog
 		wstringstream wss;
-		wss << L"接收WM_COPYDATA消息，msgId=" << msgId << L"，msg=" << msg 
-			<< ",taskId=" << taskId << L"\r\n";
+		wss << L"\t msgId=" << msgId << L"，taskId=" << taskId << L"\r\n"
+			<< L"\t msg=" << msg << L"\r\n";
 		writeLog(wss.str());
 #endif
 		return JWEBTOP_MSG_SUCCESS;
