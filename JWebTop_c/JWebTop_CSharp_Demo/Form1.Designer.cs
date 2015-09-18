@@ -28,27 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnNewNote = new System.Windows.Forms.ToolStripButton();
             this.btnDelNote = new System.Windows.Forms.ToolStripButton();
             this.splitMain = new System.Windows.Forms.SplitContainer();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.jWebTopBrowser1 = new JWebTop.JWebTopBrowser();
-            this.detailBrowser = new JWebTop.JWebTopBrowser();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
-            this.splitMain.Panel1.SuspendLayout();
-            this.splitMain.Panel2.SuspendLayout();
             this.splitMain.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
             // toolStrip1
             // 
@@ -86,43 +74,9 @@
             this.splitMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitMain.Location = new System.Drawing.Point(0, 25);
             this.splitMain.Name = "splitMain";
-            // 
-            // splitMain.Panel1
-            // 
-            this.splitMain.Panel1.Controls.Add(this.textBox1);
-            // 
-            // splitMain.Panel2
-            // 
-            this.splitMain.Panel2.Controls.Add(this.detailBrowser);
-            this.splitMain.Panel2.Controls.Add(this.jWebTopBrowser1);
             this.splitMain.Size = new System.Drawing.Size(424, 236);
             this.splitMain.SplitterDistance = 141;
             this.splitMain.TabIndex = 5;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(139, 234);
-            this.textBox1.TabIndex = 0;
-            // 
-            // jWebTopBrowser1
-            // 
-            this.jWebTopBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.jWebTopBrowser1.Location = new System.Drawing.Point(0, 0);
-            this.jWebTopBrowser1.Name = "jWebTopBrowser1";
-            this.jWebTopBrowser1.Size = new System.Drawing.Size(277, 234);
-            this.jWebTopBrowser1.TabIndex = 0;
-            // 
-            // detailBrowser
-            // 
-            this.detailBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.detailBrowser.Location = new System.Drawing.Point(0, 0);
-            this.detailBrowser.Name = "detailBrowser";
-            this.detailBrowser.Size = new System.Drawing.Size(277, 234);
-            this.detailBrowser.TabIndex = 1;
             // 
             // MainForm
             // 
@@ -136,9 +90,6 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.splitMain.Panel1.ResumeLayout(false);
-            this.splitMain.Panel1.PerformLayout();
-            this.splitMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitMain)).EndInit();
             this.splitMain.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -148,16 +99,10 @@
 
         #endregion
 
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnNewNote;
         private System.Windows.Forms.ToolStripButton btnDelNote;
         private System.Windows.Forms.SplitContainer splitMain;
-        private System.Windows.Forms.TextBox textBox1;
-        private JWebTop.JWebTopBrowser jWebTopBrowser1;
-        private JWebTop.JWebTopBrowser detailBrowser;
-
-
     }
 }
 

@@ -30,6 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -48,21 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JWebTopBrowser.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="JWebTopBrowser.Designer.cs">
-      <DependentUpon>JWebTopBrowser.cs</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="JWebTopConfigs.cs" />
     <Compile Include="JWebTopException.cs" />
     <Compile Include="JWebtopJSONDispater.cs" />
     <Compile Include="JWebTopNative.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="JWebTopBrowser.resx">
-      <DependentUpon>JWebTopBrowser.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,52 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Newtonsoft.Json.Linq;
+ 
 namespace JWebTop {
     public static class JWebTopNative {
-        #region 仅用于测试，且已测试通过的函数
-        //// 按Unicode方式来回传递数据，最终没有发现问题（传回c#端后，需要把Unicode转为utf8）
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode, EntryPoint = "CovWString4")]
-        //public static extern IntPtr CovWString直接返回字符串方式([MarshalAs(UnmanagedType.LPTStr)]string fa);
-        
-        //// 按Unicode方式来回传递数据，最终没有发现问题（传回c#端后，需要把Unicode转为utf8）
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode, EntryPoint = "CovWString5")]
-        //public static extern void CovWString用StringBuilder方式(
-        //    [MarshalAs(UnmanagedType.LPTStr)]StringBuilder outsb,
-        //    [MarshalAs(UnmanagedType.LPTStr)]string param);
-
-        //public static string CovWString4(string fa) {
-        //    IntPtr ptr = CovWString直接返回字符串方式(fa);
-        //    return ptr2string(ptr);
-        //}
-
-        //// 这种方式可以，但是有个问题，所有的字符都是gbk字符集，和JWebTop的Unicode完全不对应
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Ansi)]
-        //public static extern StringBuilder CovString2([MarshalAs(UnmanagedType.LPStr)]StringBuilder fa);
-
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        //public static extern int CovString(StringBuilder fa);
-
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        //public static extern int CovWString2([MarshalAs(UnmanagedType.LPTStr)]StringBuilder fa);
-
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        //public static extern int CovWString3([MarshalAs(UnmanagedType.LPTStr)]string v1, [MarshalAs(UnmanagedType.LPTStr)]string v2);
-        //[DllImport("JWebTop_CSharp_DLL.dll")]
-        //public static extern int Calc(int fa);
-        #endregion
-        #region  仅用于测试，且测试[未]通过的函数
-        // 无论如何都无法返回LPTSTR(w_char)类型数据
-        //[DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        //[return: MarshalAs(UnmanagedType.LPTStr)]// 设置返回类型也不管用
-        //public static extern string/*设置为string不行*/ CovWString([MarshalAs(UnmanagedType.LPTStr)]string fa);
-        //public static extern StringBuilder/*设置为StringBuilder不行*/ CovWString([MarshalAs(UnmanagedType.LPTStr)]StringBuilder fa);
-        #endregion
         #region 其他windows dll方法
         [DllImport("User32.dll")]
         private static extern int SetWindowPos(IntPtr hwnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
@@ -65,7 +27,7 @@ namespace JWebTop {
         /// </summary>
         /// <param name="ptr"></param>
         /// <returns></returns>
-        private static string ptr2string(IntPtr ptr) {
+        private static string ptr2stringWithDel(IntPtr ptr) {
             string s_unicode = Marshal.PtrToStringUni(ptr);
             DelPtrInDLL(ptr);// 调用dll，删除指定指针
             byte[] buffer = Encoding.Unicode.GetBytes(s_unicode);
@@ -77,22 +39,22 @@ namespace JWebTop {
         [DllImport("JWebTop_CSharp_DLL.dll")]
         private static extern void nExitJWebTop();
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        private static extern long nCreateJWebTopBrowser([MarshalAs(UnmanagedType.LPTStr)]string jWebTopConfigJSON);
+        private static extern int nCreateJWebTopBrowser([MarshalAs(UnmanagedType.LPTStr)]string jWebTopConfigJSON);
         [DllImport("JWebTop_CSharp_DLL.dll")]
-        private static extern void nCloseJWebTopBrowser(long browserHWnd);
+        private static extern void nCloseJWebTopBrowser(int browserHWnd);
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr nJWebTopExecuteJSWait(long browserHWnd, string script);
+        private static extern IntPtr nJWebTopExecuteJSWait(int browserHWnd, string script);
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        private static extern void nJWebTopExecuteJSNoWait(long browserHWnd, string script);
+        private static extern void nJWebTopExecuteJSNoWait(int browserHWnd, string script);
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr nJWebTopExecuteJSONWait(long browserHWnd, string json);
+        private static extern IntPtr nJWebTopExecuteJSONWait(int browserHWnd, string json);
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
-        private static extern void nJWebTopExecuteJSONNoWait(long browserHWnd, string json);
+        private static extern void nJWebTopExecuteJSONNoWait(int browserHWnd, string json);
 
-        private delegate string CSharpCallBack(long browserHWnd, string json);  // 声明回调函数原型        
+        private delegate StringBuilder CSharpCallBack(int browserHWnd, string json);  // 声明回调函数原型        
         [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "SetCSharpCallback")]
-        private static extern void SetCSharpCallback(CSharpCallBack fa);        // 设置回调函数     
-        
+        private static extern void SetCSharpCallback(CSharpCallBack callback);        // 设置回调函数     
+
         #endregion
 
         private static JWebtopJSONDispater jsonHandler = null;
@@ -104,9 +66,10 @@ namespace JWebTop {
         /// <param name="browserHWnd">回调来自哪个浏览器</param>
         /// <param name="json">传递的json数据</param>
         /// <returns>执行结果</returns>
-        private static string __CSharpCallBack(long browserHWnd, string json) {  // 实现回调函数
+        ///  
+        private static StringBuilder __CSharpCallBack(int browserHWnd, string json) {  // 实现回调函数
             jsonHandler.resetThreadClassLoader();
-            return jsonHandler.dispatcher(browserHWnd, json);
+            return new StringBuilder(jsonHandler.dispatcher(browserHWnd, json));
         }
         private static void check() {
             if (inited) return;
@@ -140,24 +103,24 @@ namespace JWebTop {
             }
         }
 
-        public static long createBrowserByJSON(string jWebTopConfigJSON) {
+        public static int createBrowserByJSON(string jWebTopConfigJSON) {
             return nCreateJWebTopBrowser(jWebTopConfigJSON);
         }
 
-        public static long createBrowserByAppFile(string appfile) {
+        public static int createBrowserByAppFile(string appfile) {
             JWebTopConfigs config = new JWebTopConfigs();
             config.appDefFile = appfile;
             return createBrowser(config);
         }
 
-        public static long createBrowserByAppFile(string appfile, long parenHwnd) {
+        public static int createBrowserByAppFile(string appfile, long parenHwnd) {
             JWebTopConfigs config = new JWebTopConfigs();
             config.appDefFile = appfile;
             config.parentWin = parenHwnd;
             return createBrowser(config);
         }
 
-        public static long createBrowser(JWebTopConfigs configs) {
+        public static int createBrowser(JWebTopConfigs configs) {
             JObject jo = JObject.FromObject(configs);
             JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
             return nCreateJWebTopBrowser(jo.ToString());
@@ -167,7 +130,7 @@ namespace JWebTop {
          * 
          * @param browserHWnd
          */
-        public static void closeBrowser(long browserHWnd) {
+        public static void closeBrowser(int browserHWnd) {
             nCloseJWebTopBrowser(browserHWnd);
         }
 
@@ -182,8 +145,8 @@ namespace JWebTop {
          * @param jsonstring
          * @return 返回是JSON字符串数据
          */
-        public static String executeJSON_Wait(long browserHWnd, String jsonstring) {
-            return ptr2string(nJWebTopExecuteJSONWait(browserHWnd, jsonstring));
+        public static String executeJSON_Wait(int browserHWnd, String jsonstring) {
+            return ptr2stringWithDel(nJWebTopExecuteJSONWait(browserHWnd, jsonstring));
         }
 
         /**
@@ -192,7 +155,7 @@ namespace JWebTop {
          * 
          * @param jsonstring
          */
-        public static void executeJSON_NoWait(long browserHWnd, String jsonstring) {
+        public static void executeJSON_NoWait(int browserHWnd, String jsonstring) {
             nJWebTopExecuteJSONNoWait(browserHWnd, jsonstring);
         }
 
@@ -203,8 +166,8 @@ namespace JWebTop {
          * @param script
          * @return 返回是字符串数据
          */
-        public static String executeJS_Wait(long browserHWnd, String script) {
-            return ptr2string(nJWebTopExecuteJSWait(browserHWnd, script));
+        public static String executeJS_Wait(int browserHWnd, String script) {
+            return ptr2stringWithDel(nJWebTopExecuteJSWait(browserHWnd, script));
         }
 
         /**
@@ -214,13 +177,13 @@ namespace JWebTop {
          * @param script
          * @return
          */
-        public static void executeJS_NoWait(long browserHWnd, String script) {
+        public static void executeJS_NoWait(int browserHWnd, String script) {
             nJWebTopExecuteJSNoWait(browserHWnd, script);
         }
         public const int SWP_NOMOVE = 0x2;
         public const int SWP_NOZORDER = 0x04;
         public const int HWND_TOPMOST = -1;
-        public static void setSize(long browserHwnd, int w, int h) {
+        public static void setSize(int browserHwnd, int w, int h) {
             if (browserHwnd != 0) {
                 //nSetSize(browserHwnd, w, h);
                 System.IntPtr hWnd = new IntPtr(browserHwnd);

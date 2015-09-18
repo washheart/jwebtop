@@ -34,9 +34,6 @@
     <Filter Include="common\task">
       <UniqueIdentifier>{2eb9f872-8eee-4b82-aa36-7cfc5aebefd3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\msgwin">
-      <UniqueIdentifier>{d5101867-28c7-4666-a40c-a777de317e67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="jwebtop\dllex">
       <UniqueIdentifier>{42e6ccac-b7cd-4ab1-b032-e94d31986cb6}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,9 @@
     </Filter>
     <Filter Include="common\ui\dlgs">
       <UniqueIdentifier>{511d482b-038c-4e0b-aff0-0ac9f19f8e5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jwebtop\browser\msgwin">
+      <UniqueIdentifier>{d5101867-28c7-4666-a40c-a777de317e67}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,7 +91,7 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="..\common\msgwin\MsgWin.cpp">
-      <Filter>common\msgwin</Filter>
+      <Filter>jwebtop\browser\msgwin</Filter>
     </ClCompile>
     <ClCompile Include="dllex\JWebTop_DLLEx.cpp">
       <Filter>jwebtop\dllex</Filter>
@@ -150,7 +150,7 @@
       <Filter>common\task</Filter>
     </ClInclude>
     <ClInclude Include="..\common\msgwin\MsgWin.h">
-      <Filter>common\msgwin</Filter>
+      <Filter>jwebtop\browser\msgwin</Filter>
     </ClInclude>
     <ClInclude Include="dllex\JWebTop_DLLEx.h">
       <Filter>jwebtop\dllex</Filter>

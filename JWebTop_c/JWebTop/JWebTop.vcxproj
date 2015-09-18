@@ -166,7 +166,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>Xcopy  "$(SolutionDir)common\tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y</Command>
+      <Command>Xcopy  "$(SolutionDir)common\tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y
+del $(SolutionDir)JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Q
+copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">

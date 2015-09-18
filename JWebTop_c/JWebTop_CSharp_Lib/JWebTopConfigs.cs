@@ -7,29 +7,23 @@ using System.Text;
 namespace JWebTop {
     public class JWebTopConfigs {
         private const int DEFAULT_INT = -1;
-        private static readonly string[] checks = { "parentWin", "dwStyle", "dwExStyle"//
-			, "x", "y", "w", "h", "max"//
-			, "enableDebug", "enableResize", "disableRefresh", "enableDrag"//
-			, "single_process", "persist_session_cookies", "log_severity"//
-			, "ignore_certificate_errors", "remote_debugging_port" };
-        private static readonly int checksLen = checks.Length;
 
         // 移除不需要的配置：否则有appDefFile时会用类默认的配置替换appDefFile中的配置。另外移除配置可以减小json字符串长度
         public static void removeDefaults(JObject jo) {
-            for (int i = 0; i < checksLen; i++) {
-                string key = checks[i];
-                if (jo[key] == null) {
-                    jo.Remove(key);
-                    break;
+            List<KeyValuePair<string, JToken>> tokens = jo.ToList<KeyValuePair<string, JToken>>();
+            foreach (KeyValuePair<string, JToken> entry in tokens) {
+                JTokenType t = entry.Value.Type;
+                if (t == JTokenType.Null) {
+                    jo.Remove(entry.Key); continue;// 移除值为null的数据（字符串）
                 }
-                if (((int)jo[key]) == DEFAULT_INT) {
-                    jo.Remove(key);
-                    break;
+                if (entry.Value.Type == JTokenType.Integer
+                    && (((int)entry.Value) == DEFAULT_INT)) {
+                    jo.Remove(entry.Key); continue;// 移除值=-1的数据（数值）
                 }
             }
         }
 
-        private string _parentWinS ; // 记录父窗口的HWND
+        private string _parentWinS; // 记录父窗口的HWND
 
         // [BASE]小节：JWebTop相关配置，配置在[BASE]小节下
         /**
@@ -78,7 +72,7 @@ namespace JWebTop {
             set { this._parentWinS = value; }
         }
         public long parentWin {
-            set { this._parentWinS =value.ToString(); }
+            set { this._parentWinS = value.ToString(); }
         }
         public string appDefFile {
             get { return _appDefFile; }
