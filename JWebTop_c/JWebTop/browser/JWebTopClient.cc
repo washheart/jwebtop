@@ -93,6 +93,7 @@ bool JWebTopClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
 	const CefString& realm,
 	const CefString& scheme,
 	CefRefPtr<CefAuthCallback> callback) {
+	CEF_REQUIRE_IO_THREAD();
 	if (isProxy) {// 对于代理，如果需要认证，提供用户名和密码
 		//if(frame->GetURL...)// 注意这里没有区分哪个代理，哪个url
 		callback->Continue(jw::g_configs->proxyAuthUser, jw::g_configs->proxyAuthPwd);

@@ -17,7 +17,7 @@ class JWebTopClient : public CefClient,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRequestHandler,
-	CefContextMenuHandler{
+	public CefContextMenuHandler{
 private:
 	JWebTopConfigs * configs=NULL; // 构建浏览器时的配置信息
 	wstring taskId;                // DLL方式时对应创建浏览器的任务ID
