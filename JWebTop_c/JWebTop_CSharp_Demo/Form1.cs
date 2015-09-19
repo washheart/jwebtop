@@ -45,14 +45,14 @@ namespace JWebTop_CSharp_Demo {
         }
 
         private void btnNewNote_Click(object sender, EventArgs e) {
-            String name = InputBox.ShowInputBox("输入", "请输入名称：");
+            string name = InputBox.ShowInputBox("输入", "请输入名称：");
             name = name.Trim();
             if (name.Length == 0) return;
             ctrl.addNote(name);
         }
 
         private void btnDelNote_Click(object sender, EventArgs e) {
-            String note = ctrl.getCurrentNote();
+            string note = ctrl.getCurrentNote();
             if (note == null) return;
             if (MessageBox.Show(this, "是否删除【" + note + "】日记？") != DialogResult.OK) return;
             ctrl.delNote();

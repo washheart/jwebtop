@@ -18,7 +18,7 @@ namespace JWebTop {
             JWebTopNative.setSize(getBorwserHWnd(), size.Width, size.Height);
         }
 
-        public int createInernalBrowser(String appFile, String url, String title, String icon) {
+        public int createInernalBrowser(string appFile, string url, string title, string icon) {
             JWebTopConfigs config = new JWebTopConfigs();
             config.appDefFile = appFile;
             config.url = url;

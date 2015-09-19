@@ -32,9 +32,20 @@ namespace JWebTop {
             string s_unicode = Marshal.PtrToStringUni(ptr);
             DelPtrInDLL(ptr);// 调用dll，删除指定指针
             byte[] buffer = Encoding.Unicode.GetBytes(s_unicode);
-            return Encoding.UTF8.GetString(buffer);
+            string rtn = Encoding.UTF8.GetString(buffer);
+            int idx = rtn.IndexOf((char)0);
+            if (idx >= 0) rtn = rtn.Substring(0, idx);
+            return rtn;
         }
-
+        private static string ptr2stringNoDel(IntPtr ptr) {
+            string s_unicode = Marshal.PtrToStringUni(ptr);
+            //DelPtrInDLL(ptr);// 调用dll，删除指定指针
+            byte[] buffer = Encoding.Unicode.GetBytes(s_unicode);
+            string rtn = Encoding.UTF8.GetString(buffer);
+            int idx = rtn.IndexOf((char)0);
+            if (idx >= 0) rtn = rtn.Substring(0, idx);
+            return rtn;
+        }
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
         private static extern int nCreateJWebTop([MarshalAs(UnmanagedType.LPTStr)]string processPath, [MarshalAs(UnmanagedType.LPTStr)]string configFile);
         [DllImport("JWebTop_CSharp_DLL.dll")]
@@ -52,7 +63,7 @@ namespace JWebTop {
         [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
         private static extern void nJWebTopExecuteJSONNoWait(int browserHWnd, string json);
 
-        private delegate StringBuilder CSharpCallBack(int browserHWnd, string json);  // 声明回调函数原型        
+        private delegate StringBuilder CSharpCallBack(int browserHWnd, IntPtr json);  // 声明回调函数原型        
         [DllImport("JWebTop_CSharp_DLL.dll", EntryPoint = "SetCSharpCallback")]
         private static extern void SetCSharpCallback(CSharpCallBack callback);        // 设置回调函数     
 
@@ -68,8 +79,9 @@ namespace JWebTop {
         /// <param name="json">传递的json数据</param>
         /// <returns>执行结果</returns>
         ///  
-        private static StringBuilder __CSharpCallBack(int browserHWnd, string json) {  // 实现回调函数
+        private static StringBuilder __CSharpCallBack(int browserHWnd, IntPtr jsonPtr) {  // 实现回调函数
             jsonHandler.resetThreadClassLoader();
+            string json = ptr2stringNoDel(jsonPtr);
             return new StringBuilder(jsonHandler.dispatcher(browserHWnd, json));
         }
         private static void check() {
@@ -90,7 +102,7 @@ namespace JWebTop {
         /// </summary>
         /// <param name="processPath">待执行的JWebTop.exe的全路径。比如d:\c\JWebTop.exe，当然JWebTop可以命名为其他名字。</param>
         /// <param name="configFile">此配置文件用于启动JWebTop进程（但，不立刻创建浏览器窗口，即使指定了url参数）</param>
-        public static void createJWebTop(String processPath, String configFile) {
+        public static void createJWebTop(string processPath, string configFile) {
             check();
             if (jsonHandler == null) throw new JWebTopException("必须设置jsonHandler。");
             string processPath2, appfile2;
@@ -147,7 +159,7 @@ namespace JWebTop {
          * @param jsonstring
          * @return 返回是JSON字符串数据
          */
-        public static String executeJSON_Wait(int browserHWnd, String jsonstring) {
+        public static string executeJSON_Wait(int browserHWnd, string jsonstring) {
             return ptr2stringWithDel(nJWebTopExecuteJSONWait(browserHWnd, jsonstring));
         }
 
@@ -157,7 +169,7 @@ namespace JWebTop {
          * 
          * @param jsonstring
          */
-        public static void executeJSON_NoWait(int browserHWnd, String jsonstring) {
+        public static void executeJSON_NoWait(int browserHWnd, string jsonstring) {
             nJWebTopExecuteJSONNoWait(browserHWnd, jsonstring);
         }
 
@@ -168,7 +180,7 @@ namespace JWebTop {
          * @param script
          * @return 返回是字符串数据
          */
-        public static String executeJS_Wait(int browserHWnd, String script) {
+        public static string executeJS_Wait(int browserHWnd, string script) {
             return ptr2stringWithDel(nJWebTopExecuteJSWait(browserHWnd, script));
         }
 
@@ -179,7 +191,7 @@ namespace JWebTop {
          * @param script
          * @return
          */
-        public static void executeJS_NoWait(int browserHWnd, String script) {
+        public static void executeJS_NoWait(int browserHWnd, string script) {
             nJWebTopExecuteJSNoWait(browserHWnd, script);
         }
         public const int SWP_NOMOVE = 0x2;

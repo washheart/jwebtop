@@ -15,7 +15,7 @@ namespace JWebTop_CSharp_Demo {
     }
     class DemoBrowserCtrl : JWebTop.JWebtopJSONDispater {
         private static readonly Encoding encoding = Encoding.UTF8;
-        private List<String> names = null;
+        private List<string> names = null;
         private WithinSwingCtrlHelper helper;
         private string currentNote;
         public void resetThreadClassLoader() { }
@@ -26,7 +26,7 @@ namespace JWebTop_CSharp_Demo {
             string method = (string)jo["method"];
             if ("initList".Equals(method)) {
                 if (names != null) return "{}";
-                names = new List<String>();
+                names = new List<string>();
                 string fn = getNotesFile();
                 IEnumerable<string> nameLines = File.ReadLines(fn, encoding);
                 foreach (string line in nameLines) {
@@ -74,7 +74,7 @@ namespace JWebTop_CSharp_Demo {
             }
             return fn;
         }
-        private string getNoteFile(String name) {
+        private string getNoteFile(string name) {
             string fn = ("data/note/" + name + ".txt");
             if (!File.Exists(fn)) {
                 File.Create(fn).Close();
@@ -82,10 +82,10 @@ namespace JWebTop_CSharp_Demo {
             return fn;
         }
 
-        private void showDetail(String note) {
+        private void showDetail(string note) {
             JObject rtn = new JObject();
             rtn["method"] = "showDetail";
-            String detail = null;
+            string detail = null;
             if (note == null || note.Trim().Length == 0) {
                 detail = "请使用“添加日记”按钮新建日记";
             } else {
@@ -99,13 +99,13 @@ namespace JWebTop_CSharp_Demo {
             rtn["note"] = note;
             JWebTopNative.executeJSON_NoWait(helper.getDetailHWnd(), rtn.ToString());
         }
-        public String getListAppFile() {
+        public string getListAppFile() {
             string fn = ("res/list/index.app");
             if (File.Exists(fn)) return Path.GetFullPath(fn);
             // 开发环境下		
             return Path.GetFullPath("../" + fn);
         }
-        public String getDetailAppFile() {
+        public string getDetailAppFile() {
             string fn = ("res/detail/index.app"); if (File.Exists(fn)) return Path.GetFullPath(fn);
             // 开发环境下		
             return Path.GetFullPath("../" + fn);
