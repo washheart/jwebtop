@@ -14,8 +14,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_CSharp_DLL", "JWebT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWebTop_CSharp_Demo", "JWebTop_CSharp_Demo\JWebTop_CSharp_Demo.csproj", "{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "查看控制台", "E:\dotnet\mydonet\查看控制台\查看控制台.csproj", "{976F405E-B6D4-4925-9CF7-23E8256D7B6C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,21 +114,6 @@ Global
 		{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}.发布版本|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}.发布版本|Mixed Platforms.Build.0 = Release|Any CPU
 		{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}.发布版本|Win32.ActiveCfg = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.Release|Win32.ActiveCfg = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.发布版本|Any CPU.ActiveCfg = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.发布版本|Any CPU.Build.0 = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.发布版本|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.发布版本|Mixed Platforms.Build.0 = Release|Any CPU
-		{976F405E-B6D4-4925-9CF7-23E8256D7B6C}.发布版本|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

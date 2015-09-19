@@ -1,0 +1,14 @@
+[BASE]
+name=list
+url=index.html
+width=500
+height=500
+x=-1
+style=1442906112
+disableTransparent=1
+disableRefresh=1
+disableDevelop=0
+enableDrag=0
+[CEF]
+single_process=1
+log_severity=0
