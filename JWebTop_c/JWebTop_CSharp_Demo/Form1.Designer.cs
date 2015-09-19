@@ -67,6 +67,7 @@
             this.btnDelNote.Name = "btnDelNote";
             this.btnDelNote.Size = new System.Drawing.Size(60, 22);
             this.btnDelNote.Text = "删除日记";
+            this.btnDelNote.Click += new System.EventHandler(this.btnDelNote_Click);
             // 
             // splitMain
             // 

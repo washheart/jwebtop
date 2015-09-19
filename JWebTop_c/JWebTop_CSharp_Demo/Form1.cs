@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using JWebTop;
 using System.Threading;
 namespace JWebTop_CSharp_Demo {
-    public partial class MainForm : Form {
+    public partial class MainForm : Form, WithinSwingCtrlHelper {
         private DemoBrowserCtrl ctrl = null;
         private JWebTopBrowser listBrowser = null;
         private JWebTopBrowser detailBrowser = null;
@@ -20,22 +20,12 @@ namespace JWebTop_CSharp_Demo {
             InitializeComponent();
         }
 
-        private void btnNewNote_Click(object sender, EventArgs e) {
-            //JWebTopConfigs configs = new JWebTopConfigs();
-            //configs.appDefFile = "d:/index.app";
-            //JObject jo = JObject.FromObject(configs);
-            //string jsonstring = jo.ToString();
-            //textBox1.Text = jsonstring;
-            //string v1 = (string)jo["appDefFile"];
-            //textBox1.Text = textBox1.Text + "\r\n v1=" + v1;
-            //JWebTopConfigs.removeDefaults(jo);
-            //String newstr = jo.ToString();
-            //textBox1.Text = textBox1.Text + "\r\n newstr==" + newstr;
-        }
         private void MainForm_Load(object sender, EventArgs e) {
             this.ctrl = new DemoBrowserCtrl();
+            this.ctrl.setWithinSwingCtrlHelper(this);
             this.listBrowser = new JWebTopBrowser();
             this.detailBrowser = new JWebTopBrowser();
+     
             JWebTopNative.setJsonHandler(this.ctrl);
             listBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
             detailBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -52,6 +42,28 @@ namespace JWebTop_CSharp_Demo {
             listBrowser.createInernalBrowser(appfile, null, null, null);
             appfile = "res/detail/index.app";
             detailBrowser.createInernalBrowser(appfile, null, null, null);
+        }
+
+        private void btnNewNote_Click(object sender, EventArgs e) {
+            String name = InputBox.ShowInputBox("输入", "请输入名称：");
+            name = name.Trim();
+            if (name.Length == 0) return;
+            ctrl.addNote(name);
+        }
+
+        private void btnDelNote_Click(object sender, EventArgs e) {
+            String note = ctrl.getCurrentNote();
+            if (note == null) return;
+            if (MessageBox.Show(this, "是否删除【" + note + "】日记？") != DialogResult.OK) return;
+            ctrl.delNote();
+        }
+
+        public int getListHandler() {
+            return this.listBrowser.getBrowserHWnd();
+        }
+
+        public int getDetailHWnd() {
+            return this.detailBrowser.getBrowserHWnd();
         }
     }
 }

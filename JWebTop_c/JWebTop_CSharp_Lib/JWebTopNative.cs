@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
  
 namespace JWebTop {
     public static class JWebTopNative {
@@ -114,6 +115,7 @@ namespace JWebTop {
         }
 
         public static int createBrowserByAppFile(string appfile, long parenHwnd) {
+            Trace.WriteLine("createBrowserByAppFile appfile=" + appfile);
             JWebTopConfigs config = new JWebTopConfigs();
             config.appDefFile = appfile;
             config.parentWin = parenHwnd;

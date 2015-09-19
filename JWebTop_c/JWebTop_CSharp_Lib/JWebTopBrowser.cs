@@ -17,6 +17,7 @@ namespace JWebTop {
             Size size = this.Size;
             JWebTopNative.setSize(getBorwserHWnd(), size.Width, size.Height);
         }
+
         public int createInernalBrowser(String appFile, String url, String title, String icon) {
             JWebTopConfigs config = new JWebTopConfigs();
             config.appDefFile = appFile;
@@ -28,12 +29,29 @@ namespace JWebTop {
 
         public int createInernalBrowser(JWebTopConfigs config) {
             Size size = this.Size;
-            config.parentWin = this.Handle.ToInt32();
+            config.parentWin = this.getControlHandle();
             config.x = 0;
             config.y = 0;//
             config.w = size.Width;
             config.h = size.Height;
             this.hWnd = JWebTopNative.createBrowser(config);
+            return this.hWnd;
+        }
+
+        private int GetHandle_direct() {
+            return this.Handle.ToInt32();
+        }
+        private delegate int GetHandle_delegate(); //定义委托变量
+        private int getControlHandle() {
+            if (this.InvokeRequired) {
+                GetHandle_delegate d = new GetHandle_delegate(GetHandle_direct);
+                return (int)this.Invoke(d);
+            } else {
+                return GetHandle_direct();
+            }
+        }
+
+        public int getBrowserHWnd() {
             return this.hWnd;
         }
     }
