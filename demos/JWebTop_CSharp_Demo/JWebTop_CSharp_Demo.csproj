@@ -107,7 +107,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JWebTop_CSharp_Lib\JWebTop_CSharp_Lib.csproj">
+    <ProjectReference Include="..\..\JWebTop_c\JWebTop_CSharp_Lib\JWebTop_CSharp_Lib.csproj">
       <Project>{4e55fa19-3bab-4229-8819-9ea7873a5e90}</Project>
       <Name>JWebTop_CSharp_Lib</Name>
     </ProjectReference>

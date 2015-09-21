@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>abcdefg</title>
+	<style type="text/css">
+
+	</style>
+</head>
+<body>
+	<div id="container">
+		
+		<div class="dragable" id="dragEl" onmousedown="start_()" onmouseup="end_()">测试</div> <br/>
+
+		<input type="button" value="警告框" onclick="alert(123)"> <br/>
+		<input type="button" value="确认框" onclick="confirmtest()"> <br/>
+		<input type="button" value="输入框" onclick="inputtest()"> <br/>
+		<input  id='txt' type="text" name="" value="单行文本"> <br/>
+		<textarea name="" rows="10" cols="20">
+		多行文本</textarea> <br/>
+		<textarea name="" rows="10" cols="20">
+		多行文本</textarea> <br/>
+		<textarea name="" rows="10" cols="20">
+		多行文本</textarea> <br/>
+		<textarea id name="" rows="10" cols="20">
+		多行文本</textarea> <br/>
+		<div class="dragable" id="dragE2" onmousedown="start_()" onmouseup="end_()">
+		111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+		</div>
+    </div>
+</body>
+<script type="text/javascript">
+<!--
+
+function confirmtest(){
+	var a=confirm("请确认？？")
+	var txtx=document.getElementById("txt");
+	txt.value=txt.value+"__"+a;
+}
+
+function inputtest(){
+	var a=prompt("请输入：")
+	var txtx=document.getElementById("txt");
+	txt.value=txt.value+a;
+}
+alert(1);
+onbeforeunload=function(){return "您确认要关闭软件？";}
+//-->
+</script>
+</html>
