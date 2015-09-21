@@ -1,0 +1,14 @@
+[BASE]
+name=测试直接启动浏览器窗口，不嵌入
+url=index.html
+width=800
+height=500
+x=400
+y=100
+style=2516647936
+enableDrag=1
+disableTransparent=1
+disableDevelop=0
+[CEF]
+single_process=1
+log_severity=0
