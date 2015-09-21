@@ -23,7 +23,7 @@ public:
 
 	CefString appDefFile;          // 当前配置对应的配置文件（有可能为null）
 	CefString appPath;             // 当前配置文件所在目录（不能为null）
-	CefString url;                 // 要打开的链接地址
+	CefString url=CefString("file:///index.html");   // 要打开的链接地址
 	CefString appendJs;			   // 通过此参数，可以附加一个js到当前页面（在OnLoad中通过<script type='text/javascript' src='appendJs.js'></script>)附加）
 	CefString name;                // 窗口名称
 	CefString icon;                // 窗口图标
