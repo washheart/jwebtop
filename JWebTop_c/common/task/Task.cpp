@@ -1,5 +1,6 @@
 #include "Task.h"
 #include <sstream>
+#include "common/util/StrUtil.h"
 
 using namespace std;
 namespace jw{
@@ -23,15 +24,16 @@ namespace jw{
 			return rtn;
 		}
 
-		long count = 0;// 
+		//long count = 0;// 
 		// 创建一个任务id（最好改为UUID）
 		wstring createTaskId(){
-			mapLock.lock();
-			wstringstream wss;
-			count++;
-			wss << "id_" << count;
-			mapLock.unlock();
-			return wss.str();
+			return jw::GenerateGuidW();
+			//mapLock.lock();
+			//wstringstream wss;
+			//count++;
+			//wss << "id_" << count;
+			//mapLock.unlock();
+			//return wss.str();
 		}
 
 		// 添加任务执行结果
