@@ -123,7 +123,7 @@ namespace jw{
 				frame->ExecuteJavaScript(js_event.str(), "", 0);
 			}
 
-			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:除非此消息的窗口的句柄}})
+			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:触发此消息的窗口的句柄}})
 			void sendAppActive(const CefRefPtr<CefFrame> frame, const long handler){
 				stringstream js_event;
 				js_event << "var e = new CustomEvent('JWebTopAppActive',{"
