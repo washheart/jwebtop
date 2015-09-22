@@ -50,7 +50,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "restore", new JJH_Restore());	      // restore(handler);//还原窗口，对应于hide函数
 	regist(jWebTop, "setTopMost", new JJH_SetTopMost());  // setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 	regist(jWebTop, "setWindowStyle", new JJH_SetWindowStyle());	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
-
+	regist(jWebTop, "setWindowExStyle", new JJH_SetWindowExStyle());
 
 	regist(jWebTop, "invokeRemote_Wait", new JJH_InvokeRemote_Wait());
 	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());

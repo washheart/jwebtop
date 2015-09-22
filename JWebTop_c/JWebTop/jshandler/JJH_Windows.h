@@ -78,7 +78,7 @@ class JJH_SetBound : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 4)return false;
-		jw::setBound(getHWND(object, arguments, 4), arguments[1]->GetIntValue(), arguments[2]->GetIntValue(), arguments[3]->GetIntValue(), arguments[4]->GetIntValue());
+		jw::setBound(getHWND(object, arguments, 4), arguments[0]->GetIntValue(), arguments[1]->GetIntValue(), arguments[2]->GetIntValue(), arguments[3]->GetIntValue());
 		return true;
 	}
 private:
@@ -202,18 +202,28 @@ public:
 private:
 	IMPLEMENT_REFCOUNTING(JJH_SetTopMost);
 };
-//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
+//setWindowStyle(style, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
 class JJH_SetWindowStyle : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 		if (arguments.size() < 1)return false;
-		jw::setWindowStyle(getHWND(object, arguments, 1), arguments[0]->GetIntValue());
+		jw::setWindowStyle(getHWND(object, arguments, 2), arguments[0]->GetIntValue());
 		return true;
 	}
 private:
 	IMPLEMENT_REFCOUNTING(JJH_SetWindowStyle);
 };
-
+//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
+class JJH_SetWindowExStyle : public CefV8Handler {
+public:
+	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		if (arguments.size() < 1)return false;
+		jw::setWindowExStyle(getHWND(object, arguments, 1), arguments[0]->GetIntValue());
+		return true;
+	}
+private:
+	IMPLEMENT_REFCOUNTING(JJH_SetWindowExStyle);
+};
 
 //loadUrl(url, handler);//加载网页，url为网页路径
 class JJH_LoadUrl : public CefV8Handler {

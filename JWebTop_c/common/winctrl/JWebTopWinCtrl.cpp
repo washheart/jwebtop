@@ -127,11 +127,13 @@ namespace jw{
 		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
 
-	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
-	void setWindowStyle(HWND hWnd, int exStyle){
-		HWND hWndTemp = hWnd;
-		DWORD dwExStyle = GetWindowLong(hWndTemp, GWL_EXSTYLE);//获取旧样式  
-		exStyle |= dwExStyle;//按位与将旧扩展样式去掉  
-		SetWindowLong(hWndTemp, GWL_EXSTYLE, exStyle);//设置新的扩展样式  
+	//setWindowStyle(style, handler);//高级函数，设置窗口额外属性，对应创建窗口的dwStyle。
+	void setWindowStyle(HWND hWnd, int style){
+		SetWindowLong(hWnd, GWL_STYLE, style);//设置新的扩展样式  
+	}
+
+	//setWindowExStyle(exStyle, handler);//高级函数，设置窗口额外属性，对应创建窗口的dwExStyle。
+	void setWindowExStyle(HWND hWnd, int exStyle){
+		SetWindowLong(hWnd, GWL_EXSTYLE, exStyle);//设置新的扩展样式  
 	}
 }
