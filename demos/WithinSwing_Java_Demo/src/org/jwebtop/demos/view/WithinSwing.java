@@ -10,18 +10,17 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.jwebtop.JWebTopBrowser;
+import org.jwebtop.JWebTopConfigs;
 import org.jwebtop.JWebTopNative;
+import org.jwebtop.WindowStyle;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
-
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * 测试嵌入浏览器到Swing窗口的例子<br/>
@@ -29,7 +28,7 @@ import com.alibaba.fastjson.JSONObject;
  * 
  * @author washheart@163.com
  */
-public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
+public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, WindowStyle {
 	protected static long RootBrowserHwnd = 0;
 
 	private static void initDll(String[] args) {
@@ -51,13 +50,32 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 
 	private JWebTopBrowser listWebtopView, detailWebtopView;
 	private WithinSwingCtrl ctrl;
+	private long modalBrowserDlgHWnd;
 	public static long frameHwnd;
 
-	private long createDlg(JFrame f) {
-		JDialog d = new JDialog(f, "测试嵌入浏览器在对话框中");
-		d.setSize(100, 200);
-		d.setVisible(true);
-		return JWebTopNative.getWindowHWND(d);
+	private void createDlg(JFrame f) {
+		// JDialog d = new JDialog(f, "测试嵌入浏览器在对话框中");
+		// d.setSize(100, 200);
+		// d.setVisible(true);
+		// return JWebTopNative.getWindowHWND(d);
+		JWebTopConfigs configs = new JWebTopConfigs();
+		configs.setParentWin(JWebTopNative.getWindowHWND(f));
+		configs.setUrl("http://www.baidu.com");
+		long style = WS_EX_TOOLWINDOW | WS_VISIBLE;
+		configs.setDwStyle(style);
+		configs.setW(400);
+		configs.setH(400);
+		this.modalBrowserDlgHWnd = JWebTopNative.createBrowser(configs);
+		f.setEnabled(false);// 将主窗口设置为不可用：相当于对话框是模态的
+
+	}
+
+	@Override
+	public void browserClosed(long browserHWnd) {
+		if (modalBrowserDlgHWnd == browserHWnd) {
+			this.setEnabled(true);// 将主窗口设置为可用
+			modalBrowserDlgHWnd = 0;
+		}
 	}
 
 	public WithinSwing() {
@@ -78,25 +96,10 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 				delNote();
 			}
 		}));
-		toolPanel.add(new JButton(new AbstractAction("调用JS并等待") {
+		toolPanel.add(new JButton(new AbstractAction("打开一个Modal浏览器") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String js = "testInvoke('java字符串')";
-				System.out.println("js = " + js);
-				String value = JWebTopNative.executeJS_Wait(RootBrowserHwnd, js);
-				System.out.println("value = " + value);
-			}
-		}));
-		toolPanel.add(new JButton(new AbstractAction("调用JSON并等待") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JSONObject rtn = new JSONObject();
-				rtn.put("method", "showDetail");
-				rtn.put("value", "java在调用JSON并等待");
-				String json = rtn.toJSONString();
-				System.out.println("json = " + json);
-				String value = JWebTopNative.executeJSON_Wait(RootBrowserHwnd, json);
-				System.out.println("value = " + value);
+				createDlg(WithinSwing.this);
 			}
 		}));
 		JSplitPane mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

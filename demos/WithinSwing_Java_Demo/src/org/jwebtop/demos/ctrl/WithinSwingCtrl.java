@@ -26,6 +26,8 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 
 	public interface WithinSwingCtrlHelper {
 		int[] getDetailRect();
+
+		void browserClosed(long browserHWnd);
 	}
 
 	private long listHandler, detailHandler;
@@ -88,6 +90,9 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 			sb.append(",h:").append(rect[3]);
 			sb.append("}");
 			return sb.toString();
+		} else if ("browserClosed".equals(method)) {
+			withinSwingCtrlHelper.browserClosed(browserHWnd);
+			return "";
 		}
 		return "";
 	}
