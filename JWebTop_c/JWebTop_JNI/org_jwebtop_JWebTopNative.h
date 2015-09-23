@@ -87,7 +87,10 @@ extern "C" {
 		(JNIEnv *, jclass, jlong browserHWnd);// 窗口是否显示
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 		(JNIEnv *, jclass, jlong browserHWnd);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
-
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetWindowStyle
+		(JNIEnv *, jclass, jlong browserHWnd, jint style);
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetWindowExStyle
+		(JNIEnv *, jclass, jlong browserHWnd, jint exStyle);
 	JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv *, jclass,jlong hWnd);
 #ifdef __cplusplus
 }

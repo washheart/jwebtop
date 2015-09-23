@@ -204,6 +204,15 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 	jw::setTopMost((HWND)browserHWnd);
 }
 
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetWindowStyle
+(JNIEnv *, jclass, jlong browserHWnd,jint style){
+	jw::setWindowStyle((HWND)browserHWnd,style);
+}
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetWindowExStyle
+(JNIEnv *, jclass, jlong browserHWnd, jint exStyle){
+	jw::setWindowExStyle((HWND)browserHWnd, exStyle);
+}
+
 JNIEXPORT jintArray Java_org_jwebtop_JWebTopNative_nGetWindowClient(JNIEnv * env, jclass, jlong hWnd){
 	WINDOWINFO winInfo;
 	GetWindowInfo((HWND)hWnd, &winInfo);// 获取窗口信息
