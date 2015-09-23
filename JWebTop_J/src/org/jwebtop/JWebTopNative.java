@@ -63,13 +63,7 @@ public final class JWebTopNative {
 
 	private static native void nSetTopMost(long browserHWnd);
 
-	private final static JWebTopNative INSTANCE = new JWebTopNative();
-
-	private JWebtopJSONDispater jsonHandler = null;
-
-	public static JWebTopNative getInstance() {
-		return INSTANCE;
-	}
+	private static JWebtopJSONDispater jsonHandler = null;
 
 	private JWebTopNative() {}
 
@@ -83,7 +77,7 @@ public final class JWebTopNative {
 	 *            此配置文件用于启动JWebTop进程（但，不立刻创建浏览器窗口，即使指定了url参数）
 	 * @return
 	 */
-	public void createJWebTop(String processPath, String configFile) {
+	public static void createJWebTop(String processPath, String configFile) {
 		if (jsonHandler == null) throw new JWebTopException("必须设置jsonHandler。");
 		String processPath2, appfile2;
 		try {
@@ -98,27 +92,27 @@ public final class JWebTopNative {
 		}
 	}
 
-	public long createBrowserByJSON(final String jWebTopConfigJSON) throws IOException {
+	public static long createBrowserByJSON(final String jWebTopConfigJSON) {
 		return nCreateBrowser(jWebTopConfigJSON);
 	}
 
-	public long createBrowserByAppFile(final String appfile){
+	public static long createBrowserByAppFile(final String appfile) {
 		JWebTopConfigs config = new JWebTopConfigs();
 		config.setAppDefFile(appfile);
 		return createBrowser(config);
 	}
 
-	public long createBrowserByAppFile(final String appfile, final long parenHwnd) {
+	public static long createBrowserByAppFile(final String appfile, final long parenHwnd) {
 		JWebTopConfigs config = new JWebTopConfigs();
 		config.setAppDefFile(appfile);
 		config.setParentWin(parenHwnd);
 		return createBrowser(config);
 	}
 
-	public long createBrowser(JWebTopConfigs configs) {
+	public static long createBrowser(JWebTopConfigs configs) {
 		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
 		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
-		return nCreateBrowser(jo.toString());
+		return createBrowserByJSON(jo.toString());
 	}
 
 	/**
@@ -131,7 +125,7 @@ public final class JWebTopNative {
 	}
 
 	// 关闭JWebTop的进程
-	public void exit() {
+	public static void exit() {
 		nExit();
 	}
 
@@ -178,13 +172,8 @@ public final class JWebTopNative {
 		nExecuteJSNoWait(browserHWnd, script);
 	}
 
-	String dispatch(long browserHWnd, String json) throws IOException {
-		jsonHandler.resetThreadClassLoader();
-		return jsonHandler.dispatcher(browserHWnd, json);
-	}
-
-	public void setJsonHandler(JWebtopJSONDispater jsonHandler) {
-		this.jsonHandler = jsonHandler;
+	public static void setJsonHandler(JWebtopJSONDispater jsonHandler) {
+		JWebTopNative.jsonHandler = jsonHandler;
 	}
 
 	/**
@@ -195,7 +184,8 @@ public final class JWebTopNative {
 	 */
 	static String invokeByJS(long browserHWnd, String json) {// 可以说private，但用public可以避免被优化掉
 		try {
-			return INSTANCE.dispatch(browserHWnd, json);
+			jsonHandler.resetThreadClassLoader();
+			return jsonHandler.dispatcher(browserHWnd, json);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			return "{success:false,msg:\"调用Java失败" + e.getMessage() + "\"}";

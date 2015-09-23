@@ -103,7 +103,7 @@ public class JWebTopBrowser extends JComponent {
 		config.setY(p.y);//
 		config.setW(size.width);
 		config.setH(size.height);
-		this.hWnd = JWebTopNative.getInstance().createBrowser(config);
+		this.hWnd = JWebTopNative.createBrowser(config);
 		return this.hWnd;
 	}
 

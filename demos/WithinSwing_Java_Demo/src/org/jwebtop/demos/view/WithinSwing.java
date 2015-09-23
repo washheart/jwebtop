@@ -101,7 +101,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 		}));
 		JSplitPane mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		mainPanel.setDividerLocation(200);
-		JWebTopNative.getInstance().setJsonHandler(this.ctrl);
+		JWebTopNative.setJsonHandler(this.ctrl);
 		this.listWebtopView = new JWebTopBrowser();
 		this.listWebtopView.setTopWindow(this);
 		this.detailWebtopView = new JWebTopBrowser();
@@ -122,7 +122,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 			System.out.println("\tpath = " + path);
 			String appFile = ctrl.getListAppFile();
 			System.out.println("\tappFile = " + appFile);
-			JWebTopNative.getInstance().createJWebTop(path, appFile);
+			JWebTopNative.createJWebTop(path, appFile);
 			RootBrowserHwnd = listWebtopView.createInernalBrowser(appFile, null, "列表页", null);
 			System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
 			ctrl.setListHandler(RootBrowserHwnd);
@@ -159,7 +159,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper {
 		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
 			if (JOptionPane.showConfirmDialog(this, "确认退出系统吗?", "退出系统", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 				ctrl.notifyWillClose();
-				JWebTopNative.getInstance().exit();
+				JWebTopNative.exit();
 				System.exit(0);//
 			} else {
 				return;
