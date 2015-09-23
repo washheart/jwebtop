@@ -120,6 +120,9 @@ bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	jw::ctx::removeBrowser(browser);
+	if (jw::dllex::ex()) {
+		jw::dllex::invokeRemote_NoWait(browser->GetHost()->GetWindowHandle(),"{\"method\":\"browserClosed\"}");
+	}
 }
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
