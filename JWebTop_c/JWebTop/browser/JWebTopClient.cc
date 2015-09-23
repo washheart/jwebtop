@@ -42,7 +42,7 @@ void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 		CefMessageRouterConfig config;
 		message_router_ = CefMessageRouterBrowserSide::Create(config);
 		// Register handlers with the router.
-		jc::CreateMessageHandlers(message_handler_set_);
+		jc::CreateBrowserSideMessageHandlers(message_handler_set_);
 		MessageHandlerSet::const_iterator it = message_handler_set_.begin();
 		for (; it != message_handler_set_.end(); ++it)
 			message_router_->AddHandler(*(it), false);

@@ -125,7 +125,7 @@ namespace jc/*jc=JWebTop Client*/{
 			return excuteJSON(request);
 		}
 	};
-	void CreateMessageHandlers(MessageHandlerSet& handlers) {
+	void CreateBrowserSideMessageHandlers(MessageHandlerSet& handlers) {
 		handlers.insert(new Handler());
 	}
 }

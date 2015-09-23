@@ -11,6 +11,6 @@ void createNewBrowser(JWebTopConfigs * configs);
 void createNewBrowser(JWebTopConfigs * configs, std::wstring taskId);
 namespace jc/*jc=JWebTop Client*/{
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;
-	void CreateMessageHandlers(MessageHandlerSet& handlers);
+	void CreateBrowserSideMessageHandlers(MessageHandlerSet& handlers);
 }
 #endif
