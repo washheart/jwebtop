@@ -61,6 +61,10 @@ public final class JWebTopNative {
 
 	private static native boolean nIsVisible(long browserHWnd);
 
+	private static native void nSetWindowStyle(long browserHWnd, int style);
+
+	private static native void nSetWindowExStyle(long browserHWnd, int exStyle);
+
 	private static native void nSetTopMost(long browserHWnd);
 
 	private static JWebtopJSONDispater jsonHandler = null;
@@ -304,6 +308,14 @@ public final class JWebTopNative {
 	// 窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 	public static void setTopMost(long browserHWnd) {
 		nSetTopMost(browserHWnd);
+	}
+
+	public static void setWindowStyle(long browserHWnd, int style) {
+		nSetWindowStyle(browserHWnd, style);
+	}
+
+	public static void setWindowExStyle(long browserHWnd, int exStyle) {
+		nSetWindowExStyle(browserHWnd, exStyle);
 	}
 
 	/**
