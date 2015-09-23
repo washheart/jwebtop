@@ -136,7 +136,7 @@ namespace jw{
 				////	hModule = ::GetModuleHandle(file_path.value().c_str());
 				////if (!hModule)
 				hModule = ::GetModuleHandle(NULL);
-				static TCHAR szAppName[] = TEXT("demo");
+				static TCHAR szAppName[] = TEXT("JWebTop_InputDialog");
 				static	WNDCLASS    wndclass;
 				if (!wndclass.lpfnWndProc){
 					wndclass.lpfnWndProc = WndProc;
