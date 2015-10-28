@@ -134,8 +134,7 @@ namespace jw{
 			wstring newjson = json.ToWString();
 			jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
 			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, (long)browserHWnd, taskId)){ // 发送任务到远程进程
-				lock->wait();		             		 		             // 等待任务完成
-				wstring result = lock->result;   		 		             // 取回执行结果
+				wstring result = lock->wait();     		 		             // 等待任务完成并取回执行结果
 				return CefString(result);									 // 返回数据
 			}
 			else{

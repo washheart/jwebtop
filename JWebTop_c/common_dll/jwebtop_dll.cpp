@@ -6,7 +6,7 @@
 #include "common/winctrl/JWebTopWinCtrl.h"
 
 #include "common/msgwin/MsgWin.h"
-typedef BOOL(WINAPI *lpfnSetLayeredWindowAttributes)(HWND hWnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
+//typedef BOOL(WINAPI *lpfnSetLayeredWindowAttributes)(HWND hWnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 
 extern HWND g_RemoteWinHWnd;
 extern HWND g_LocalWinHWnd;
@@ -50,8 +50,7 @@ EXPORT long WINAPI CreateJWebTop(wstring jprocessPath, wstring cfgFile){
 	cmds.append(L" ").append(cfgFile);	                         // 其他任务参数：configFile
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
 	thread t(thread_CreateJWebTop, cmds); t.detach();			 // 在新线程中完成启动操作
-	lock->wait();		             		 		             // 等待任务完成
-	wstring result = lock->result;   		 		             // 取回执行结果
+	wstring result = lock->wait();     		 		             // 等待任务完成并取回执行结果
 	long tmp = jw::parseLong(result);
 	if (tmp != 0) g_RemoteWinHWnd = (HWND)tmp;
 	return tmp;
@@ -65,8 +64,7 @@ EXPORT long WINAPI CreateJWebTopBrowser(wstring jWebTopConfigJSON){
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
 	jw::sendProcessMsg(g_RemoteWinHWnd, JWM_CREATEBROWSER, jWebTopConfigJSON, (long)g_LocalWinHWnd, taskId);
-	lock->wait();		             		 		             // 等待任务完成
-	wstring result = lock->result;   		 		             // 取回执行结果
+	wstring result = lock->wait();     		 		             // 等待任务完成并取回执行结果
 	return jw::parseLong(result);
 }
 
@@ -83,11 +81,10 @@ LPTSTR exeRemoteAndWait(long browserHWnd, wstring msg, DWORD msgId){
 	wstring taskId = jw::task::createTaskId();			         // 生成任务id
 	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
 	if (jw::sendProcessMsg((HWND)browserHWnd, msgId, msg, (long)g_LocalWinHWnd, taskId)){ // 发送任务到远程进程
-		lock->wait();		             		 		             // 等待任务完成
-		return LPTSTR(lock->result.c_str());   		 		             // 取回执行结果
+		return LPTSTR(lock->wait().c_str());   		 		     // 等待任务完成并取回执行结果
 	}
 	else{
-		jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
+		jw::task::removeTask(taskId);							// 消息发送失败移除现有消息
 		return NULL;											// 返回数据：注意这里是空字符串
 	}
 }

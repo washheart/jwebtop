@@ -17,21 +17,13 @@ namespace jw{
 		private:
 			mutex lock;
 			condition_variable g_queuecheck;
-			bool notified=false;// 用来标记是否已通知过（防止解锁通知在等待之前就发来，也为了在对象消耗时进行解锁）
-		public:
+			bool notified = false;// 用来标记是否已通知过（防止解锁通知在等待之前就发来，也为了在对象消耗时进行解锁）
 			wstring result;
-			ProcessMsgLock(){}
-			~ProcessMsgLock(){ if (!notified)notify(); };
-			void wait(){
-				if (notified)return;
-				unique_lock<mutex> locker(lock);
-				g_queuecheck.wait(locker);
-			}
-			void notify(){
-				unique_lock<mutex> locker(lock);
-				g_queuecheck.notify_all();
-				notified = true;
-			}
+		public:
+			ProcessMsgLock(wstring taskId){ this->taskId = taskId; }
+			~ProcessMsgLock(){ if (!notified)notify(L""); };
+			wstring wait();
+			void notify(wstring result);
 		};
 
 		// map<key,value>,key=已成功发送到远程的任务的id，value=任务执行完成后放置任务执行结果
