@@ -28,6 +28,8 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		int[] getDetailRect();
 
 		void browserClosed(long browserHWnd);
+
+		void detailCreated(long browserHWnd);
 	}
 
 	private long listHandler, detailHandler;
@@ -72,6 +74,7 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 			return getDetailAppFile();
 		} else if ("setDetailHandler".equals(method)) {
 			this.detailHandler = jo.getLong("value");
+			this.withinSwingCtrlHelper.detailCreated(this.detailHandler);
 			showDetail(null);
 		} else if ("showDetail".equals(method)) {
 			String name = jo.getString("value");
