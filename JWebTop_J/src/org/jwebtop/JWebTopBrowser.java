@@ -23,7 +23,12 @@ public class JWebTopBrowser extends JComponent {
 	}
 
 	private long getBrowserHwnd() {
+		System.out.println("this.hWnd = " + this.hWnd);
 		return this.hWnd;
+	}
+
+	public void setBrowserHwnd(long hWnd) {
+		this.hWnd = hWnd;
 	}
 
 	protected Window topWindow;
