@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_CSharp_DLL", "JWebT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWebTop_CSharp_Demo", "..\demos\JWebTop_CSharp_Demo\JWebTop_CSharp_Demo.csproj", "{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_MFC_DEMO", "..\demos\JWebTop_MFC_DEMO\JWebTop_MFC_DEMO.vcxproj", "{864F44D4-DD31-4D8A-B9FC-D056D21F642D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,6 +116,21 @@ Global
 		{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}.发布版本|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}.发布版本|Mixed Platforms.Build.0 = Release|Any CPU
 		{F54DAD0F-570F-45E9-8F9C-61A3BCC4476D}.发布版本|Win32.ActiveCfg = Release|Any CPU
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Debug|Win32.Build.0 = Debug|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Release|Any CPU.ActiveCfg = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Release|Win32.ActiveCfg = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.Release|Win32.Build.0 = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.发布版本|Any CPU.ActiveCfg = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.发布版本|Mixed Platforms.ActiveCfg = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.发布版本|Mixed Platforms.Build.0 = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.发布版本|Win32.ActiveCfg = Release|Win32
+		{864F44D4-DD31-4D8A-B9FC-D056D21F642D}.发布版本|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

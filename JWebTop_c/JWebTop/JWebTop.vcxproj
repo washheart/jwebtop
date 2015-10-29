@@ -227,6 +227,9 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\fastipc\Client.cpp" />
+    <ClCompile Include="..\common\fastipc\FastIPC.cpp" />
+    <ClCompile Include="..\common\fastipc\Server.cpp" />
     <ClCompile Include="..\common\JWebTopMsg.cpp" />
     <ClCompile Include="..\common\msgwin\MsgWin.cpp" />
     <ClCompile Include="..\common\process\MultiProcess.cpp" />
@@ -249,6 +252,9 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     <ClCompile Include="wndproc\JWebTopWndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\fastipc\Client.h" />
+    <ClInclude Include="..\common\fastipc\FastIPC.h" />
+    <ClInclude Include="..\common\fastipc\Server.h" />
     <ClInclude Include="..\common\JWebTopMsg.h" />
     <ClInclude Include="..\common\msgwin\MsgWin.h" />
     <ClInclude Include="..\common\process\MultiProcess.h" />

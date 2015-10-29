@@ -43,8 +43,11 @@
     <Filter Include="common\ui\dlgs">
       <UniqueIdentifier>{511d482b-038c-4e0b-aff0-0ac9f19f8e5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="jwebtop\browser\msgwin">
+    <Filter Include="common\msgwin">
       <UniqueIdentifier>{d5101867-28c7-4666-a40c-a777de317e67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\fastipc">
+      <UniqueIdentifier>{0d5890b2-3264-4a1f-bbfc-8a568feb961f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,7 +94,7 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="..\common\msgwin\MsgWin.cpp">
-      <Filter>jwebtop\browser\msgwin</Filter>
+      <Filter>common\msgwin</Filter>
     </ClCompile>
     <ClCompile Include="dllex\JWebTop_DLLEx.cpp">
       <Filter>jwebtop\dllex</Filter>
@@ -107,6 +110,15 @@
     </ClCompile>
     <ClCompile Include="browser\JWebTopScheme.cpp">
       <Filter>jwebtop\browser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\fastipc\Client.cpp">
+      <Filter>common\fastipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\fastipc\FastIPC.cpp">
+      <Filter>common\fastipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\fastipc\Server.cpp">
+      <Filter>common\fastipc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,7 +162,7 @@
       <Filter>common\task</Filter>
     </ClInclude>
     <ClInclude Include="..\common\msgwin\MsgWin.h">
-      <Filter>jwebtop\browser\msgwin</Filter>
+      <Filter>common\msgwin</Filter>
     </ClInclude>
     <ClInclude Include="dllex\JWebTop_DLLEx.h">
       <Filter>jwebtop\dllex</Filter>
@@ -166,6 +178,15 @@
     </ClInclude>
     <ClInclude Include="browser\JWebTopScheme.h">
       <Filter>jwebtop\browser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\fastipc\Client.h">
+      <Filter>common\fastipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\fastipc\FastIPC.h">
+      <Filter>common\fastipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\fastipc\Server.h">
+      <Filter>common\fastipc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
