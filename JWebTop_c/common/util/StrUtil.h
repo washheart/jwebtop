@@ -30,6 +30,7 @@ namespace jw{
 	wstring s2w(const string &s);
 
 	// 生成唯一性字符串
+	char* GenerateGuid();
 	std::string GenerateGuidA();
 	std::wstring GenerateGuidW();
 
