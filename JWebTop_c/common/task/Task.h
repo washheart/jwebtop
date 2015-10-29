@@ -19,6 +19,7 @@ namespace jw{
 			condition_variable g_queuecheck;
 			bool notified = false;// 用来标记是否已通知过（防止解锁通知在等待之前就发来，也为了在对象消耗时进行解锁）
 			wstring result;
+			wstring taskId;
 		public:
 			ProcessMsgLock(wstring taskId){ this->taskId = taskId; }
 			~ProcessMsgLock(){ if (!notified)notify(L""); };
