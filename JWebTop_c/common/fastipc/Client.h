@@ -2,6 +2,9 @@
 /// 定义fastipc的客户端
 /// 客户端是只能写数据给服务端。具体使用参见[Server.h]。
 ///  
+/// 源码：http://git.oschina.net/washheart/fastipc
+/// 源码：https://github.com/washheart/fastipc
+/// 说明：https://github.com/washheart/fastipc/wiki
 /// @version	1.0 
 /// @author		washheart@163.com
 /// @date       2015-10-22  

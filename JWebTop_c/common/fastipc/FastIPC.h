@@ -1,6 +1,9 @@
 //////////////////////////////////////////////////////////////////////////  
 /// 定义fastipc用到的数据结构和变量  
-///  
+/// 
+/// 源码：http://git.oschina.net/washheart/fastipc
+/// 源码：https://github.com/washheart/fastipc
+/// 说明：https://github.com/washheart/fastipc/wiki 
 /// @version	1.0 
 /// @author		washheart@163.com
 /// @date       2015-10-22  
@@ -71,6 +74,25 @@ namespace fastipc{
 		char			packId[PACK_ID_LEN];
 		DWORD			dataLen;
 		char*			data = NULL;
+		std::string	getPackId(){
+			char * uid;
+			uid = (char *)malloc(PACK_ID_LEN + 1);
+			memcpy(uid, this->packId, PACK_ID_LEN);
+			uid[PACK_ID_LEN] = '\0';
+			std::string rtn(uid);
+			delete uid;
+			return rtn;
+		}
+		std::string	getData(){
+			int len = this->dataLen;
+			char * tmp;
+			tmp = (char *)malloc(len + 1);
+			memcpy(tmp, this->data, len);
+			tmp[len] = '\0';
+			std::string rtn(tmp);
+			delete tmp;
+			return rtn;
+		}
 		~MemBlock(){ if (data)delete[] data;/*清理申请的内存*/ }
 	};
 	/// 生成服务端名称，此名称用来创建读写事件和内存文件，在创建fastipc的服务端时使用

@@ -1,5 +1,4 @@
 #include "Client.h"
-#include <algorithm>
 #include "common/util/StrUtil.h"
 namespace fastipc{
 	Client::Client(void){
@@ -56,7 +55,7 @@ namespace fastipc{
 		if (!memBuf)return ERR_ClientCreate;
 		if (len <= blockSize)return writeBlock(pBuff, len, NULL, MSG_TYPE_NORMAL); // 可以一次性写完
 		DWORD idx = 0, tmp = len%blockSize;
-		DWORD result = (DWORD)-1;
+		DWORD result = -1;
 		len = len - tmp;
 		char * id = jw::GenerateGuid();
 		len = len - blockSize;// 多减一次，避免在while循环内判断是否是最后的数据包

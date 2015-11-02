@@ -13,9 +13,11 @@ namespace fastipc{
 	};
 
 	void Server::close(void){
+		listener = NULL;
 		if (evtWrited) {// 关闭事件句柄
 			HANDLE handle = evtWrited;
 			evtWrited = NULL;
+			SetEvent(handle);
 			CloseHandle(handle);
 		}
 		if (evtReaded) {// 关闭事件句柄
@@ -68,36 +70,32 @@ namespace fastipc{
 
 
 	void Server::startRead(){
-		// 读取为单线程读取，所以不需要在设置state的前后进行状态位的检查
-		//if (memBuf->state != MEM_CAN_READ) continue;  // 当前共享区不是可读状态，可能正在使用，继续等待
-		//if (memBuf->state != MEM_IS_BUSY)continue;  // 如果设置后还是空闲状态，那么可能是被其他进程把数据读走了，此时继续等待 
-		while (memBuf){
-			DWORD dwWaitResult = WaitForSingleObject(evtWrited, INFINITE);// 等待写完事件
-			if (dwWaitResult == WAIT_OBJECT_0){
-				InterlockedCompareExchange(&memBuf->state, MEM_IS_BUSY, MEM_CAN_READ);// 通过原子操作来设置共享区的状态为读状态
-					MemBlock * rtn=NULL;
-					try{
-						rtn = new MemBlock();
-						rtn->dataLen = memBuf->dataLen;
-						rtn->msgType = memBuf->msgType;
-						rtn->data = (char *)malloc(memBuf->dataLen);
-						memcpy(rtn->data, memBuf->data, rtn->dataLen);
-						if (memBuf->msgType > MSG_TYPE_NORMAL){
-							ZeroMemory(rtn->packId, PACK_ID_LEN);
-							memcpy(rtn->packId, memBuf->packId, PACK_ID_LEN);
-						}
-						listener->onRead(rtn);
-						delete rtn;// 清理环境
-					}
-					catch (...){
-						delete rtn;// 清理环境
-					}
-				InterlockedExchange(&memBuf->state, MEM_CAN_WRITE);// 数据读取之后，设置为可写
-				SetEvent(evtReaded);
+		if (!evtWrited)return;
+		while (WaitForSingleObject(evtWrited, INFINITE) == WAIT_OBJECT_0){// 等待写完事件
+			if (!evtWrited)break;
+			// 读取为单线程读取，所以不需要在设置state的前后进行状态位的检查
+			//if (memBuf->state != MEM_CAN_READ) continue;  // 当前共享区不是可读状态，可能正在使用，继续等待
+			//if (memBuf->state != MEM_IS_BUSY)continue;  // 如果设置后还是空闲状态，那么可能是被其他进程把数据读走了，此时继续等待 
+			InterlockedCompareExchange(&memBuf->state, MEM_IS_BUSY, MEM_CAN_READ);// 通过原子操作来设置共享区的状态为读状态
+			MemBlock * rtn = NULL;
+			try{
+				rtn = new MemBlock();
+				rtn->dataLen = memBuf->dataLen;
+				rtn->msgType = memBuf->msgType;
+				rtn->data = (char *)malloc(memBuf->dataLen);
+				memcpy(rtn->data, memBuf->data, rtn->dataLen);
+				if (memBuf->msgType > MSG_TYPE_NORMAL){
+					ZeroMemory(rtn->packId, PACK_ID_LEN);
+					memcpy(rtn->packId, memBuf->packId, PACK_ID_LEN);
+				}
+				listener->onRead(rtn);
+				delete rtn;// 清理环境
 			}
-			else{
-				break;// 出错后结束循环操作
+			catch (...){
+				delete rtn;// 清理环境
 			}
+			InterlockedExchange(&memBuf->state, MEM_CAN_WRITE);// 数据读取之后，设置为可写
+			SetEvent(evtReaded);
 		}
 	};
 }
