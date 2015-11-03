@@ -82,8 +82,15 @@ namespace fastipc{
 				rtn = new MemBlock();
 				rtn->dataLen = memBuf->dataLen;
 				rtn->msgType = memBuf->msgType;
+				rtn->userMsgType = memBuf->userMsgType;
+				rtn->userValue = memBuf->userValue;
 				rtn->data = (char *)malloc(memBuf->dataLen);
 				memcpy(rtn->data, memBuf->data, rtn->dataLen);
+				int len = lstrlenA(memBuf->userShortStr);
+				if (len > 0){
+					ZeroMemory(rtn->userShortStr, PACK_ID_LEN);
+					memcpy(rtn->userShortStr, memBuf->userShortStr, len);
+				}
 				if (memBuf->msgType > MSG_TYPE_NORMAL){
 					ZeroMemory(rtn->packId, PACK_ID_LEN);
 					memcpy(rtn->packId, memBuf->packId, PACK_ID_LEN);

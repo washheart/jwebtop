@@ -1,4 +1,5 @@
 #include "Client.h"
+#include <algorithm>
 #include "common/util/StrUtil.h"
 namespace fastipc{
 	Client::Client(void){
@@ -51,38 +52,45 @@ namespace fastipc{
 		return 0;
 	};
 
-	DWORD Client::write(char *pBuff, DWORD len){
+	DWORD Client::write(LONG userMsgType, LONG userValue, char* userShortStr, char *pBuff, DWORD len){
 		if (!memBuf)return ERR_ClientCreate;
-		if (len <= blockSize)return writeBlock(pBuff, len, NULL, MSG_TYPE_NORMAL); // 可以一次性写完
+		if (len <= blockSize)return writeBlock(userMsgType, userValue, userShortStr, pBuff, len, NULL, MSG_TYPE_NORMAL); // 可以一次性写完
 		DWORD idx = 0, tmp = len%blockSize;
 		DWORD result = -1;
 		len = len - tmp;
 		char * id = jw::GenerateGuid();
 		len = len - blockSize;// 多减一次，避免在while循环内判断是否是最后的数据包
 		while (idx < len){// 将数据分为多个包来写
-			result = writeBlock(pBuff + idx, blockSize, id, MSG_TYPE_PART);
+			result = writeBlock(userMsgType, userValue, userShortStr, pBuff + idx, blockSize, id, MSG_TYPE_PART);
 			if (result != 0)return result;
 			idx += blockSize;
 		}
 		if (tmp == 0){// 正好被分为多个完整的数据包
-			result = writeBlock(pBuff + len, blockSize, id, MSG_TYPE_END); // 发送最后一个包，以及结束标记
+			result = writeBlock(userMsgType, userValue, userShortStr, pBuff + len, blockSize, id, MSG_TYPE_END); // 发送最后一个包，以及结束标记
 		}
 		else{
-			result = writeBlock(pBuff + len, blockSize, id, MSG_TYPE_PART); // 发送倒数第二个完整包，以及继续标记
-			result = writeBlock(pBuff + len + blockSize, tmp, id, MSG_TYPE_END); //发送剩余的包，以及结束标记
+			result = writeBlock(userMsgType, userValue, userShortStr, pBuff + len, blockSize, id, MSG_TYPE_PART); // 发送倒数第二个完整包，以及继续标记
+			result = writeBlock(userMsgType, userValue, userShortStr, pBuff + len + blockSize, tmp, id, MSG_TYPE_END); //发送剩余的包，以及结束标记
 		}
 		delete id;
 		return 0;
 	}
 
-	DWORD Client::writeBlock(char *pBuff, DWORD len, char* packId, int msgType){
+	DWORD Client::writeBlock(LONG userMsgType, LONG userValue, char* userShortStr, char *pBuff, DWORD len, char* packId, int msgType){
 	writeAble:
 		if (memBuf->state == MEM_CAN_WRITE){
 			InterlockedCompareExchange(&memBuf->state, MEM_IS_BUSY, MEM_CAN_WRITE);// 通过原子操作来设置共享区的状态为忙碌状态
 			if (memBuf->state != MEM_IS_BUSY)goto waitForWrite;	// 如果设置后不是忙碌状态，那么可能有其他线程在操作数据，此时继续等待 
 			memBuf->dataLen = len;
 			memBuf->msgType = msgType;
+			memBuf->userMsgType = userMsgType;
+			memBuf->userValue = userValue;
 			memcpy(memBuf->data, pBuff, len);
+			int taskIdLen = lstrlenA(userShortStr);
+			if (taskIdLen > 0){
+				ZeroMemory(memBuf->userShortStr, PACK_ID_LEN);
+				memcpy(memBuf->userShortStr, userShortStr, min(PACK_ID_LEN, taskIdLen));
+			}
 			if (msgType > MSG_TYPE_NORMAL){
 				ZeroMemory(memBuf->packId, PACK_ID_LEN);
 				memcpy(memBuf->packId, packId, min(PACK_ID_LEN, lstrlenA(packId)));

@@ -43,10 +43,13 @@
 namespace fastipc{
 	// 定义共享内存区数据结构
 	struct MemBuff{
+		LONG			userMsgType;				// 扩展一个字段，留给发送自定义消息类型
+		LONG			userValue;					// 扩展一个字段，留给发送简单的业务数据
+		char			userShortStr[PACK_ID_LEN];	// 扩展一个字段，留给发送简单的业务数据（长度小于100）
 
 		/// 内存状态，取值[MEM_CAN_WRITE，MEM_CAN_READ，MEM_IS_BUSY]
 		/// 初始状态为可写MEM_CAN_WRITE。
-		volatile LONG	state = MEM_CAN_WRITE;	
+		volatile LONG	state = MEM_CAN_WRITE;
 
 		/// 定义消息的类型，取值[MSG_TYPE_NORMAL，MSG_TYPE_PART，MSG_TYPE_END]
 		/// 初始状态为可写MSG_TYPE_NORMAL。
@@ -57,7 +60,7 @@ namespace fastipc{
 		//  LONG			packIdx;		
 
 		// 当一个大数据被拆分发送时，通过packId将拆分的块组织在一起，packId一般取uuid
-		char			packId[PACK_ID_LEN];	
+		char			packId[PACK_ID_LEN];
 
 		/// 当前内存共享区中的有效数据的长度 
 		DWORD			dataLen;
@@ -65,23 +68,33 @@ namespace fastipc{
 		/// 待传输的数据。
 		/// 注意不要被这里的数组长度所困扰，实际传错的数据长度有Server、Client的blockSize来控制。
 		/// 这里利用数组是结构体最后一个元素的特点来实现动态数组的功能，以便Server和Client能指定缓存区大小。
-		char			data[1];				
+		char			data[1];
 	};
 
 	// 定义数据读取后的数据结构，和MemBuf的主要区别在data是个指针（在本进程内用制作更好也方便）
 	struct _declspec(dllexport)  MemBlock{
+		LONG			userMsgType;				// 扩展一个字段，留给发送自定义消息类型
+		LONG			userValue;					// 扩展一个字段，留给发送简单的业务数据
+		char			userShortStr[PACK_ID_LEN];	// 扩展一个字段，留给发送简单的业务数据（长度小于100）
+
 		LONG			msgType;
 		char			packId[PACK_ID_LEN];
 		DWORD			dataLen;
 		char*			data = NULL;
-		std::string	getPackId(){
-			char * uid;
-			uid = (char *)malloc(PACK_ID_LEN + 1);
-			memcpy(uid, this->packId, PACK_ID_LEN);
-			uid[PACK_ID_LEN] = '\0';
-			std::string rtn(uid);
-			delete uid;
+		std::string	toString(char*	str){
+			char * tmp;
+			tmp = (char *)malloc(PACK_ID_LEN + 1);
+			memcpy(tmp, str, PACK_ID_LEN);
+			tmp[PACK_ID_LEN] = '\0';
+			std::string rtn(tmp);
+			delete tmp;
 			return rtn;
+		}
+		std::string	getUserShortStr(){
+			return toString(this->userShortStr);
+		}
+		std::string	getPackId(){
+			return toString(this->packId);
 		}
 		std::string	getData(){
 			int len = this->dataLen;

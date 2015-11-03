@@ -39,11 +39,14 @@ namespace fastipc{
 		/// 关闭客户端
 		void close(void);
 
-		/// 写数据到共享内存，当数据的长度大于MEM_SIZE时会拆分为多个MemBuff来发送
+		/// 写数据到共享内存，当数据的长度大于MEM_SIZE时会拆分为多个MemBuff来发送	
+		/// @param userMsgType	（扩展）用户消息类型
+		/// @param userValue	（扩展）用户简短数据
+		/// @param userShortStr	（扩展）用户简短数据	
 		/// @param pBuff 待发送的数据
 		/// @param len	 需要发送的长度
 		/// @return 0=成功；其他值表示失败，具体常量参见FastIPC.h中的ERR_*常量
-		DWORD write(char *pBuff, DWORD len);		// 
+		DWORD write(LONG userMsgType, LONG userValue, char* userShortStr, char *pBuff, DWORD len);		// 
 
 		/// 客户端状态是否已准备好
 		/// @return true=准备好
@@ -51,12 +54,15 @@ namespace fastipc{
 
 	private:
 		/// 写数据到共享内存
+		/// @param userMsgType	（扩展）用户消息类型
+		/// @param userValue	（扩展）用户简短数据
+		/// @param userShortStr	（扩展）用户简短数据	
 		/// @param pBuff	待发送的数据
 		/// @param len		需要发送的长度，len是小于等于MEM_SIZE的
 		/// @param packId	当发送大数据时，根据此id将多个MemBuff组合在一起
 		/// @param msgType	发送的数据的类型
 		/// @return 0=成功；其他值表示失败，具体常量参见FastIPC.h中的ERR_*常量
-		DWORD Client::writeBlock(char *pBuff, DWORD len, char* packId, int msgType);
+		DWORD Client::writeBlock(LONG userMsgType, LONG userValue, char* userShortStr, char *pBuff, DWORD len, char* packId, int msgType);
 	};
 }
 #endif
