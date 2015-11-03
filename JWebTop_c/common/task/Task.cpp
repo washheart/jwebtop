@@ -44,13 +44,6 @@ namespace jw{
 		// 创建一个任务id（最好改为UUID）
 		wstring createTaskId(){
 			return jw::GenerateGuidW();
-			//static long count = 0;// 
-			//mapLock.lock();
-			//wstringstream wss;
-			//count++;
-			//wss << "id_" << count;
-			//mapLock.unlock();
-			//return wss.str();
 		}
 
 		// 添加任务执行结果
@@ -90,18 +83,22 @@ namespace jw{
 
 		// 把所有锁都给解锁：此方法当且仅当在进程退出时执行
 		void unlockAndClearAll(){
+#ifdef JWebTopLog
 			wstringstream wss;
 			wss << L"所有未解的锁数量=";
 			wss << WaitTasks.size();
 			wss << L"\r\n";
 			writeLog(wss.str());
+#endif
 			WaitTaskMap::iterator it = WaitTasks.begin();
 			while (WaitTasks.end() != it) {
 				try{// 通过try-catch保证每次解锁失败不影响其他的解锁
+#ifdef JWebTopLog
 					wss.clear();
 					wss << L"\t"
 						<< " taskId=" << it->first << "\r\n";
 					writeLog(wss.str());
+#endif
 					it->second->notify(L"");
 				}
 				catch (...){}
