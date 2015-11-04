@@ -19,7 +19,7 @@ using namespace std;
 // 否则将返回appPath+relativePath
 CefString JWebTopConfigs::getAbsolutePath(std::wstring relativePath){
 	wstring _appPath=appPath.ToWString();
-	return jw::os::file::getAbsolutePath(_appPath, relativePath);
+	return jw::os::file::getAbsolutePath(relativePath, _appPath);
 }
 // 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
 std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine){
