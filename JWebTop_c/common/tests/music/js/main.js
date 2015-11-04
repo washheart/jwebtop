@@ -425,6 +425,9 @@ time.onclick=function(){
 	}
 	return false;
 }
+closeBtn.onclick=function(){
+	AlloyDesktop.close();
+}
 var readyHandler=function(){
 	AlloyDesktop.move(100,100);
 	AlloyDesktop.setSize(270,80);
