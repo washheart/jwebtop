@@ -1,12 +1,12 @@
-#ifndef __MYUTIL_H__
-#define __MYUTIL_H__
+#ifndef __MYUTIL__str_H__
+#define __MYUTIL__str_H__
 #include <xstring>
 #include <windows.h>
 using namespace std;
 
 namespace jw{
-	wstring&   replace_allW(wstring& str, const wstring& old_value, const wstring& new_value);
-	string&    replace_all (string&  str, const string&  old_value, const string&  new_value);
+	_declspec(dllexport) wstring&   replace_allW(wstring& str, const wstring& old_value, const wstring& new_value);
+	_declspec(dllexport) string&    replace_all(string&  str, const string&  old_value, const string&  new_value);
 	//string&   replace_all_distinct(string&   str, const   string&   old_value, const   string&   new_value);
 
 	//wstring&   replace_all(wstring&   str, const   wstring&   old_value, const   wstring&   new_value);
@@ -26,22 +26,22 @@ namespace jw{
 	//// 将wchar_t转换为char
 	//char* wch2chr(wchar_t* wp);
 
-	string w2s(const wstring &ws);
-	wstring s2w(const string &s);
+	_declspec(dllexport) string w2s(const wstring &ws);
+	_declspec(dllexport) wstring s2w(const string &s);
 
 	// 生成唯一性字符串
-	char* GenerateGuid();
-	std::string GenerateGuidA();
-	std::wstring GenerateGuidW();
+	_declspec(dllexport) char* GenerateGuid();
+	_declspec(dllexport) std::string GenerateGuidA();
+	_declspec(dllexport) std::wstring GenerateGuidW();
 
 	// 获取当前的日期和时间，格式：yyyy-mm-dd hh:MM:ss
-	std::string getDateTime();
+	_declspec(dllexport) std::string getDateTime();
 
-	long parseLong64(const wstring &ws);
-	long parseLong(const wstring &ws);
-	int parseInt(const wstring &ws);
+	_declspec(dllexport) long parseLong64(const wstring &ws);
+	_declspec(dllexport) long parseLong(const wstring &ws);
+	_declspec(dllexport) int parseInt(const wstring &ws);
 
 	// 读取文件内容到result中（append方式），读取成功返回1，失败返回0
-	int readfile(wstring file, string &result);
+	_declspec(dllexport) int readfile(wstring file, string &result);
 }
 #endif

@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{813edc5a-1c15-4613-aced-05d138c51554}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\fastipc">
+      <UniqueIdentifier>{ee3e81de-dea2-434f-b7a7-3fcc9b51a598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\util">
+      <UniqueIdentifier>{60a3ad7d-5b60-49a0-94a1-7bf51bdff852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\winctrl">
+      <UniqueIdentifier>{c0a9c721-8281-4c05-95ac-4a117dbd2388}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\os">
+      <UniqueIdentifier>{4328935f-5b49-47b0-aeca-9f736c5ee4d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\tests">
+      <UniqueIdentifier>{e64d5c47-21e7-45c7-961d-87ea665de9e4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\fastipc\Client.cpp">
+      <Filter>common\fastipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\fastipc\FastIPC.cpp">
+      <Filter>common\fastipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\fastipc\Server.cpp">
+      <Filter>common\fastipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\util\StrUtil.cpp">
+      <Filter>common\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp">
+      <Filter>common\winctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\os\OS.cpp">
+      <Filter>common\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tests\TestUtil.cpp">
+      <Filter>common\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\fastipc\Client.h">
+      <Filter>common\fastipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\fastipc\FastIPC.h">
+      <Filter>common\fastipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\fastipc\Server.h">
+      <Filter>common\fastipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\util\StrUtil.h">
+      <Filter>common\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h">
+      <Filter>common\winctrl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\os\OS.h">
+      <Filter>common\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tests\TestUtil.h">
+      <Filter>common\tests</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

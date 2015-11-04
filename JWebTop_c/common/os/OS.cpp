@@ -3,7 +3,6 @@
 #include "common/util/StrUtil.h"
 #include "common/tests/TestUtil.h"
 
-
 using namespace std;
 namespace jw{
 	namespace os{

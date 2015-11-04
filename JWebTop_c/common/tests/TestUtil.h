@@ -5,7 +5,7 @@
 #include <string>
 using namespace std;
 
-void writeLog(wstring str)	;
-void writeLog(string s);
+_declspec(dllexport) void writeLog(wstring str)	;
+_declspec(dllexport) void writeLog(string s);
 #endif
 #endif

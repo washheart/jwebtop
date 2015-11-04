@@ -28,6 +28,7 @@ namespace fastipc{
 		virtual void onRead(MemBlock* memBlock){}
 	};
 
+	template  class __declspec(dllexport) std::map < std::string, MemBlock* >;
 	// 已经将数据进行了组装，不用考虑其他的了
 	class _declspec(dllexport) RebuildedBlockListener :public ReadListener{
 	private:
@@ -42,7 +43,7 @@ namespace fastipc{
 		}
 	public:
 		virtual void onRebuildedRead(MemBlock* memBlock){}
-	//private:
+		//private:
 		// 当有服务端读取到数据后，会调用此方法通知等待者进行处理
 		// memBlock在分发后会由服务器销毁，外部调用者无需清理操作
 		void onRead(MemBlock* readed){
@@ -64,7 +65,7 @@ namespace fastipc{
 						rebuildBlocks.insert(std::pair<std::string, MemBlock*>(packId, tmpBlock));
 					}
 					int len = readed->dataLen;
-					tmpBlock->data = (char*)realloc(tmpBlock->data, tmpBlock->dataLen+len);
+					tmpBlock->data = (char*)realloc(tmpBlock->data, tmpBlock->dataLen + len);
 					memcpy((tmpBlock->data + tmpBlock->dataLen), readed->data, len);// 追加拷贝数据
 					tmpBlock->dataLen = tmpBlock->dataLen + len;
 					if (readed->msgType == MSG_TYPE_END){

@@ -4,8 +4,7 @@
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
-using namespace std;
-
+//
 namespace jw{
 	// setToCenter(handler);// 让窗口显示在屏幕正中
 	void setCenter(HWND hWnd){
@@ -97,7 +96,7 @@ namespace jw{
 		ShowWindow(hWnd, SW_HIDE);
 	}
 	// max(handler);//最大化窗口
-	void max(HWND hWnd){
+	void maxWin(HWND hWnd){
 		//setBound(hWnd, 0, 0, GetSystemMetrics(SM_CXFULLSCREEN), GetSystemMetrics(SM_CYFULLSCREEN) + GetSystemMetrics(SM_CYCAPTION));
 		ShowWindow(hWnd, SW_MAXIMIZE);
 	}
