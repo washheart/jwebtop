@@ -109,6 +109,7 @@
     <ClInclude Include="..\common\fastipc\Client.h" />
     <ClInclude Include="..\common\fastipc\FastIPC.h" />
     <ClInclude Include="..\common\fastipc\Server.h" />
+    <ClInclude Include="..\common\JWebTopMsg.h" />
     <ClInclude Include="..\common\os\OS.h" />
     <ClInclude Include="..\common\tests\TestUtil.h" />
     <ClInclude Include="..\common\util\StrUtil.h" />

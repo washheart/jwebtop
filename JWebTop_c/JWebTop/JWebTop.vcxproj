@@ -245,7 +245,6 @@ copy ..\$(Configuration)\JWebTopCommon.dll  $(ProjectDir)\$(Configuration)\JWebT
     <ClCompile Include="wndproc\JWebTopWndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\JWebTopMsg.h" />
     <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\ui\dlgs\InputDialog.h" />
     <ClInclude Include="browser\JWebTopApp.h" />

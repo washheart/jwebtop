@@ -98,9 +98,6 @@
     <ClInclude Include="wndproc\JWebTopWndProc.h">
       <Filter>jwebtop\wndproc</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\JWebTopMsg.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="dllex\JWebTop_DLLEx.h">
       <Filter>jwebtop\dllex</Filter>
     </ClInclude>

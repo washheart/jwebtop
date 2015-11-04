@@ -433,7 +433,6 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).dll  $(SolutionDir)..\demos\JW
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\common\JWebTopMsg.h" />
-    <ClInclude Include="..\common\msgwin\MsgWin.h" />
     <ClInclude Include="..\common\process\MultiProcess.h" />
     <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\tests\TestUtil.h" />
@@ -444,7 +443,6 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).dll  $(SolutionDir)..\demos\JW
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\JWebTopMsg.cpp" />
-    <ClCompile Include="..\common\msgwin\MsgWin.cpp" />
     <ClCompile Include="..\common\process\MultiProcess.cpp" />
     <ClCompile Include="..\common\task\Task.cpp" />
     <ClCompile Include="..\common\tests\TestUtil.cpp" />

@@ -22,9 +22,6 @@
     <Filter Include="common\task">
       <UniqueIdentifier>{0c3a63df-7e90-4360-bd55-8ee687460edd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\msgwin">
-      <UniqueIdentifier>{0bfc4a0a-f5c7-4009-843a-26c2e662b0f8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common_dll\jwebtop_dll.cpp">
@@ -49,9 +46,6 @@
     <ClCompile Include="..\common\task\Task.cpp">
       <Filter>common\task</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\msgwin\MsgWin.cpp">
-      <Filter>common\msgwin</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common_dll\jwebtop_dll.h">
@@ -74,9 +68,6 @@
     </ClInclude>
     <ClInclude Include="..\common\task\Task.h">
       <Filter>common\task</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\msgwin\MsgWin.h">
-      <Filter>common\msgwin</Filter>
     </ClInclude>
     <ClInclude Include="jwebtop_4csharp.h" />
   </ItemGroup>

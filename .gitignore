@@ -1,5 +1,6 @@
 # ingnore all files
 !.gitignore
+/jwebtop_c/ipch
 /jwebtop_c/Debug/*
 /jwebtop_c/JWebTop/Debug/*
 /jwebtop_c/JWebTop/Release/*
