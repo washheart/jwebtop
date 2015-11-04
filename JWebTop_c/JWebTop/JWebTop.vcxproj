@@ -152,7 +152,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;dbghelp.lib;psapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;dbghelp.lib;psapi.lib;..\$(Configuration)\JWebTopCommon.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -168,7 +168,9 @@
     <PostBuildEvent>
       <Command>Xcopy  "$(SolutionDir)common\tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y
 del $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Q
-copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Y</Command>
+copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Y
+copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\JWebTopCommon.dll /Y
+copy ..\$(Configuration)\JWebTopCommon.dll  $(ProjectDir)\$(Configuration)\JWebTopCommon.dll /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">
@@ -227,17 +229,8 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\fastipc\Client.cpp" />
-    <ClCompile Include="..\common\fastipc\FastIPC.cpp" />
-    <ClCompile Include="..\common\fastipc\Server.cpp" />
-    <ClCompile Include="..\common\JWebTopMsg.cpp" />
-    <ClCompile Include="..\common\msgwin\MsgWin.cpp" />
-    <ClCompile Include="..\common\process\MultiProcess.cpp" />
     <ClCompile Include="..\common\task\Task.cpp" />
-    <ClCompile Include="..\common\tests\TestUtil.cpp" />
     <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp" />
-    <ClCompile Include="..\common\util\StrUtil.cpp" />
-    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
     <ClCompile Include="browser\JWebTopApp.cpp" />
     <ClCompile Include="browser\JWebTopCommons.cpp" />
     <ClCompile Include="browser\JWebTopClient.cc" />
@@ -252,17 +245,9 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     <ClCompile Include="wndproc\JWebTopWndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\fastipc\Client.h" />
-    <ClInclude Include="..\common\fastipc\FastIPC.h" />
-    <ClInclude Include="..\common\fastipc\Server.h" />
     <ClInclude Include="..\common\JWebTopMsg.h" />
-    <ClInclude Include="..\common\msgwin\MsgWin.h" />
-    <ClInclude Include="..\common\process\MultiProcess.h" />
     <ClInclude Include="..\common\task\Task.h" />
-    <ClInclude Include="..\common\tests\TestUtil.h" />
     <ClInclude Include="..\common\ui\dlgs\InputDialog.h" />
-    <ClInclude Include="..\common\util\StrUtil.h" />
-    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
     <ClInclude Include="browser\JWebTopApp.h" />
     <ClInclude Include="browser\JWebTopCommons.h" />
     <ClInclude Include="browser\JWebTopClient.h" />
@@ -274,6 +259,11 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     <ClInclude Include="jshandler\JSDialogHandler.h" />
     <ClInclude Include="jshandler\JWebTopJSHanlder.h" />
     <ClInclude Include="wndproc\JWebTopWndProc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JWebTopCommon\JWebTopCommon.vcxproj">
+      <Project>{6bd8e842-723a-47ba-83a4-fa357465dc13}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -187,8 +187,6 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
-	case WM_COPYDATA:
-		return jw::dllex::onBrowserWinWmCopyData(hWnd, message, wParam, lParam);
 	case WM_SIZE:
 		jw::js::events::sendSize(bwInfo->browser->GetMainFrame(), LOWORD(lParam), HIWORD(lParam));
 		break;// End case-WM_SIZE
@@ -270,7 +268,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		if (hIcon)SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
 	}
 	if (configs.max){// 需要按最大化的方式来显示
-		jw::max(hWnd);
+		jw::maxWin(hWnd);
 	}
 	HWND bWnd = GetNextWindow(hWnd, GW_CHILD);// 得到真实的浏览器窗口
 	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);

@@ -166,7 +166,7 @@ private:
 class JJH_Max : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		jw::max(getHWND(object, arguments, 0));
+		jw::maxWin(getHWND(object, arguments, 0));
 		return true;
 	}
 private:

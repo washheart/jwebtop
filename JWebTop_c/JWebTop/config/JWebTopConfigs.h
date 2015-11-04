@@ -67,21 +67,19 @@ public:
 	JWebTopConfigs(){}
 	~JWebTopConfigs(){}
 
+	// 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
+	static std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine);
+	// 从数据定义文件读取
+	static JWebTopConfigs * loadConfigs(std::wstring appDefFile);
+
 	// 根据相对路径获取绝对路径
 	// 如果relativePath已经是绝对路径，则直接返回
 	// 否则将返回appPath+relativePath
 	CefString getAbsolutePath(std::wstring relativePath);
 
-	// 得到程序启动目录
-	static std::wstring GetExePath();
-	// 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
-	static std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine);
-	// 从数据定义文件读取
-	static JWebTopConfigs * loadConfigs(std::wstring appDefFile);
-	// // 根据命令行执行启动进程的参数的解析
-	static JWebTopConfigs * parseCreateJWebTopCmdLine(LPTSTR szCmdLine, std::wstring &taskId);
-	// 根据命令行执行创建浏览器的参数的解析
-	static JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(std::wstring cmd);
+
+	// 按JSON字符串格式，生成JWebTopConfigs
+	static JWebTopConfigs * JWebTopConfigs::loadAsJSON(std::wstring jsonString);
 };
 
 

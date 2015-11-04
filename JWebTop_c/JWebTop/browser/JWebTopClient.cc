@@ -12,6 +12,7 @@
 #include "JWebTop/wndproc/JWebTopWndProc.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "common/util/StrUtil.h"
+#include "common/os/OS.h"
 #include "JWebTop/jshandler/JJH_Windows.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
@@ -201,7 +202,7 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 				<< "\r\n";
 		}
 		else{
-			appendFile = configs->getAbsolutePath(appendFile).ToWString();
+			appendFile = configs->getAbsolutePath(appendFile);
 			string appendJS;
 			if (jw::readfile(appendFile, ref(appendJS))){
 				extensionCode << "\r\n" << appendJS << "\r\n";

@@ -13,41 +13,23 @@
     <Filter Include="common">
       <UniqueIdentifier>{eafbce3d-04a9-4074-b61c-bf066c5b9e97}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\tests">
-      <UniqueIdentifier>{83533c7e-2865-45c2-b014-6db11f2d7f63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\util">
-      <UniqueIdentifier>{4a962bb5-b67c-4460-88f0-5e9f40f0b1f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\winctrl">
-      <UniqueIdentifier>{8e52f096-6ad9-4287-b714-d40b4cfd37e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="jwebtop\config">
       <UniqueIdentifier>{0ca933e2-3234-4412-acc4-b3d0c2bd5ae8}</UniqueIdentifier>
     </Filter>
     <Filter Include="jwebtop\wndproc">
       <UniqueIdentifier>{a5a0abef-2d58-4034-adb1-b568f42e7dc1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\process">
-      <UniqueIdentifier>{40726deb-62ab-4982-af06-1c4f6d9054cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\task">
-      <UniqueIdentifier>{2eb9f872-8eee-4b82-aa36-7cfc5aebefd3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="jwebtop\dllex">
       <UniqueIdentifier>{42e6ccac-b7cd-4ab1-b032-e94d31986cb6}</UniqueIdentifier>
     </Filter>
     <Filter Include="common\ui">
-      <UniqueIdentifier>{b0b7b54a-3fb9-419c-b138-bfe783f3cb2b}</UniqueIdentifier>
+      <UniqueIdentifier>{b3c4cf95-8bec-4612-aaa1-e8000053aa89}</UniqueIdentifier>
     </Filter>
     <Filter Include="common\ui\dlgs">
-      <UniqueIdentifier>{511d482b-038c-4e0b-aff0-0ac9f19f8e5f}</UniqueIdentifier>
+      <UniqueIdentifier>{f3ddc2ec-b80b-4f5d-b664-70edf456deaf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\msgwin">
-      <UniqueIdentifier>{d5101867-28c7-4666-a40c-a777de317e67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\fastipc">
-      <UniqueIdentifier>{0d5890b2-3264-4a1f-bbfc-8a568feb961f}</UniqueIdentifier>
+    <Filter Include="common\task">
+      <UniqueIdentifier>{ad4d16c3-df52-490e-93da-8014dd4f855c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,32 +51,11 @@
     <ClCompile Include="jshandler\JWebTopJSHanlder.cpp">
       <Filter>jwebtop\jshandler</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\tests\TestUtil.cpp">
-      <Filter>common\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\util\StrUtil.cpp">
-      <Filter>common\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp">
-      <Filter>common\winctrl</Filter>
-    </ClCompile>
     <ClCompile Include="config\JWebTopConfigs.cpp">
       <Filter>jwebtop\config</Filter>
     </ClCompile>
     <ClCompile Include="wndproc\JWebTopWndProc.cpp">
       <Filter>jwebtop\wndproc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\process\MultiProcess.cpp">
-      <Filter>common\process</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\task\Task.cpp">
-      <Filter>common\task</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\JWebTopMsg.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\msgwin\MsgWin.cpp">
-      <Filter>common\msgwin</Filter>
     </ClCompile>
     <ClCompile Include="dllex\JWebTop_DLLEx.cpp">
       <Filter>jwebtop\dllex</Filter>
@@ -105,20 +66,14 @@
     <ClCompile Include="jshandler\JSDialogHandler.cc">
       <Filter>jwebtop\jshandler</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp">
-      <Filter>common\ui\dlgs</Filter>
-    </ClCompile>
     <ClCompile Include="browser\JWebTopScheme.cpp">
       <Filter>jwebtop\browser</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\fastipc\Client.cpp">
-      <Filter>common\fastipc</Filter>
+    <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp">
+      <Filter>common\ui\dlgs</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\fastipc\FastIPC.cpp">
-      <Filter>common\fastipc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\fastipc\Server.cpp">
-      <Filter>common\fastipc</Filter>
+    <ClCompile Include="..\common\task\Task.cpp">
+      <Filter>common\task</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,32 +92,14 @@
     <ClInclude Include="jshandler\JJH_Windows.h">
       <Filter>jwebtop\jshandler</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\tests\TestUtil.h">
-      <Filter>common\tests</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\util\StrUtil.h">
-      <Filter>common\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h">
-      <Filter>common\winctrl</Filter>
-    </ClInclude>
     <ClInclude Include="config\JWebTopConfigs.h">
       <Filter>jwebtop\config</Filter>
     </ClInclude>
     <ClInclude Include="wndproc\JWebTopWndProc.h">
       <Filter>jwebtop\wndproc</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\process\MultiProcess.h">
-      <Filter>common\process</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\JWebTopMsg.h">
       <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\task\Task.h">
-      <Filter>common\task</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\msgwin\MsgWin.h">
-      <Filter>common\msgwin</Filter>
     </ClInclude>
     <ClInclude Include="dllex\JWebTop_DLLEx.h">
       <Filter>jwebtop\dllex</Filter>
@@ -173,20 +110,14 @@
     <ClInclude Include="jshandler\JSDialogHandler.h">
       <Filter>jwebtop\jshandler</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\ui\dlgs\InputDialog.h">
-      <Filter>common\ui\dlgs</Filter>
-    </ClInclude>
     <ClInclude Include="browser\JWebTopScheme.h">
       <Filter>jwebtop\browser</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\fastipc\Client.h">
-      <Filter>common\fastipc</Filter>
+    <ClInclude Include="..\common\ui\dlgs\InputDialog.h">
+      <Filter>common\ui\dlgs</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\fastipc\FastIPC.h">
-      <Filter>common\fastipc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\fastipc\Server.h">
-      <Filter>common\fastipc</Filter>
+    <ClInclude Include="..\common\task\Task.h">
+      <Filter>common\task</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

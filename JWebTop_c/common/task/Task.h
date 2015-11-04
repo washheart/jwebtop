@@ -10,9 +10,10 @@
 using namespace std;
 namespace jw{
 	namespace task{
-
+		//template  class __declspec(dllexport) std::allocator<wchar_t>;
+		//template  class __declspec(dllexport) std::map < std::string, ProcessMsgLock* >;
 		// 锁、任务执行结果包装类
-		class ProcessMsgLock
+		class /*_declspec(dllexport)*/ ProcessMsgLock
 		{
 		private:
 			mutex lock;

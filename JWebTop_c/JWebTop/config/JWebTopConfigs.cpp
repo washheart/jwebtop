@@ -7,48 +7,29 @@
 #include <strsafe.h>
 #include "include/cef_parser.h"
 #include "common/util/StrUtil.h"
+#include "common/os/OS.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
 using namespace std;
 
-// 根据文件名获取问路径
-wstring GetFilePath(wstring appDefFile){
-	const int BUFSIZE = 4096;
-	TCHAR  buffer[BUFSIZE] = TEXT("");
-	GetFullPathName(LPCWSTR(appDefFile.data()), BUFSIZE, buffer, NULL);// 获取文件的绝对路径
-	wstring pp(buffer);
-	int p = pp.find_last_of('\\');
-	if (p != -1)pp = pp.substr(0, p + 1);
-	return pp;
-}
+// 根据相对路径获取绝对路径
+// 如果relativePath已经是绝对路径，则直接返回
+// 否则将返回appPath+relativePath
 CefString JWebTopConfigs::getAbsolutePath(std::wstring relativePath){
-	if (relativePath.find(L":") == -1){// 如果指定的路径是相对路径
-		std::wstring _path(appPath);
-		relativePath = _path.append(relativePath);
-	}
-	return CefString(relativePath);
+	wstring _appPath=appPath.ToWString();
+	return jw::os::file::getAbsolutePath(_appPath, relativePath);
 }
-
-// 得到程序启动目录
-std::wstring JWebTopConfigs::GetExePath(){
-	TCHAR   szPath[1000];
-	GetModuleFileName(NULL, szPath, MAX_PATH);
-	std::wstring path(szPath);
-	path = path.substr(0, path.find_last_of('\\') + 1);
-	return path;
-}
-
 // 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
 std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine){
 	if (lpCmdLine == NULL || lstrlen(lpCmdLine) == 0){// 未指定启动文件，检查下是否通过启动参数指定了appDefFile
-		return JWebTopConfigs::GetExePath() + L"index.app";// 取程序所在目录下的index.app文件;
+		return jw::os::file::GetExePath() + L"index.app";// 取程序所在目录下的index.app文件;
 	}
 	else{// 取启动参数作为appDefFile路径
 		std::wstring tmp(lpCmdLine);
 		if (tmp.find(L":") == -1){// 如果指定的路径是相对路径
-			return JWebTopConfigs::GetExePath() + lpCmdLine;
+			return jw::os::file::GetExePath() + lpCmdLine;
 		}
 		return wstring(lpCmdLine);
 	}
@@ -63,7 +44,7 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	LPCTSTR path = appDefFile.data();
 	if (_waccess(path, 0) != 0)return configs;                                                   // 如果文件不存在
 	configs->appDefFile = CefString(appDefFile);
-	configs->appPath = GetFilePath(appDefFile);
+	configs->appPath = jw::os::file::GetFilePath(appDefFile);
 	TCHAR url[1000], appendJs[1000], name[100], iconPath[1000];
 	GetPrivateProfileString(L"BASE", L"url", NULL, url, 1000, appDefFile.data());
 	configs->url = CefString(url);                                                                // 需要打开的地址 
@@ -130,23 +111,8 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	return configs;
 }
 
-extern HWND g_RemoteWinHWnd;  // 远程进程的消息窗口HWND
-
-// 根据命令行执行启动进程的参数的解析
-JWebTopConfigs * JWebTopConfigs::parseCreateJWebTopCmdLine(LPTSTR szCmdLine,wstring &taskId){
-	if (szCmdLine == NULL || lstrlen(szCmdLine) == 0 || szCmdLine[0] != ':'){// 不以:开头，认为是普通的文件
-		return JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(szCmdLine));
-	}
-	int argc = 0;
-	LPTSTR * args = CommandLineToArgvW(szCmdLine, &argc);
-	//// args[0]===特殊符号“:”
-	g_RemoteWinHWnd = (HWND)jw::parseLong(args[1]);
-	taskId= wstring(args[2]);
-	return loadConfigs(JWebTopConfigs::getAppDefFile(args[3]));
-}
-
 // 根据命令行执行创建浏览器的参数的解析
-JWebTopConfigs * JWebTopConfigs::parseCreateBrowserCmdLine(wstring jsonString){
+JWebTopConfigs * JWebTopConfigs::loadAsJSON(wstring jsonString){
 	if (jsonString.length() == 0)return loadConfigs(JWebTopConfigs::getAppDefFile(NULL));
 	CefRefPtr<CefValue> v = CefParseJSON(CefString(jsonString), JSON_PARSER_RFC);  // 进行解析
 	if (v == NULL)return loadConfigs(JWebTopConfigs::getAppDefFile(NULL));

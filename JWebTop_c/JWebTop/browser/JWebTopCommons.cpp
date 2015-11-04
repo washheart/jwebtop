@@ -11,6 +11,7 @@
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 #include "common/task/Task.h"
+#include "common/os/OS.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -198,5 +199,8 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 	browser_settings.universal_access_from_file_urls = cef_state_t::STATE_ENABLED;
 	browser_settings.file_access_from_file_urls = cef_state_t::STATE_ENABLED;
 	// ´´½¨ä¯ÀÀÆ÷´°¿Ú
-	CefBrowserHost::CreateBrowser(window_info, handler.get(), configs->getAbsolutePath(configs->url.ToWString()), browser_settings, NULL);
+	CefBrowserHost::CreateBrowser(
+		window_info, handler.get(), 
+		configs->getAbsolutePath(configs->url.ToWString()),
+		browser_settings, NULL);
 }

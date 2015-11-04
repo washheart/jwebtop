@@ -11,7 +11,17 @@
 #include "JWebTop/config/JWebTopConfigs.h"
 namespace jw{
 	namespace ctx{
+		// 根据JSON来配置和启动JWebTop
+		void startJWebTopByJSON(std::wstring cfgJson);
+		// 根据文件来配置和启动JWebTop
+		void startJWebTopByFile(std::wstring cfgFile);
+		// 关闭cef相关的设置
+		void closeJWebtopContext();
+
+
 		JWebTopConfigs * getDefaultConfigs();
+
+			 
 		void setDefaultConfigs(JWebTopConfigs *);
 
 		int getBrowserCount();
