@@ -7,61 +7,19 @@
     <Filter Include="jwebtop">
       <UniqueIdentifier>{6836dc99-0bc0-444c-81ab-70df4acf0458}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common">
-      <UniqueIdentifier>{21a2dd2a-6a09-4b06-b719-871a589ca764}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\tests">
-      <UniqueIdentifier>{1674c460-35f0-41e9-97b7-a0ebcd98c3ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\util">
-      <UniqueIdentifier>{a0aa33d1-f2d6-46be-adf4-154abe89a82f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\winctrl">
-      <UniqueIdentifier>{15f36faf-7805-45cc-8f6b-506d271052b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\process">
-      <UniqueIdentifier>{d10347c3-20ce-4dbb-afc5-6cff4058f243}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\task">
-      <UniqueIdentifier>{4fbb2432-a9bc-4cb5-849a-11c2d762f1cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common\msgwin">
-      <UniqueIdentifier>{12bbe271-798d-49a1-9349-e2dca9f760b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common_dll">
-      <UniqueIdentifier>{1b4e1610-46b7-40a6-ad01-162a698fef31}</UniqueIdentifier>
+    <Filter Include="fastipc">
+      <UniqueIdentifier>{fcfbb3f5-5112-43b1-8242-1ac280c9d926}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\tests\TestUtil.cpp">
-      <Filter>common\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\util\StrUtil.cpp">
-      <Filter>common\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp">
-      <Filter>common\winctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\process\MultiProcess.cpp">
-      <Filter>common\process</Filter>
-    </ClCompile>
     <ClCompile Include="javautils.cpp">
       <Filter>jwebtop</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\task\Task.cpp">
-      <Filter>common\task</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\JWebTopMsg.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\msgwin\MsgWin.cpp">
-      <Filter>common\msgwin</Filter>
     </ClCompile>
     <ClCompile Include="jwebtop_jni.cpp">
       <Filter>jwebtop</Filter>
     </ClCompile>
-    <ClCompile Include="..\common_dll\jwebtop_dll.cpp">
-      <Filter>common_dll</Filter>
+    <ClCompile Include="fastipc\FastIPC_JNI.cpp">
+      <Filter>fastipc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,29 +41,8 @@
     <ClInclude Include="javautils.h">
       <Filter>jwebtop</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\tests\TestUtil.h">
-      <Filter>common\tests</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\util\StrUtil.h">
-      <Filter>common\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h">
-      <Filter>common\winctrl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\process\MultiProcess.h">
-      <Filter>common\process</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\task\Task.h">
-      <Filter>common\task</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\JWebTopMsg.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\msgwin\MsgWin.h">
-      <Filter>common\msgwin</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common_dll\jwebtop_dll.h">
-      <Filter>common_dll</Filter>
+    <ClInclude Include="fastipc\org_fastipc_FastIPCNative.h">
+      <Filter>fastipc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

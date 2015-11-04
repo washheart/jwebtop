@@ -74,7 +74,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\third_party\wtl\include;.;..\..\..\third_party\directxsdk\files\Include;..\..\..\third_party\platformsdk_win7\files\Include;$(VSInstallDir)\VC\atlmfc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.$(SolutionDir);$(ProjectDir);.\..\..\third_party\wtl\include;.;..\..\..\third_party\directxsdk\files\Include;..\..\..\third_party\platformsdk_win7\files\Include;$(VSInstallDir)\VC\atlmfc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /we4389 %(AdditionalOptions)</AdditionalOptions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -176,7 +176,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /we4389 %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -206,7 +206,7 @@
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;dbghelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;dbghelp.lib;psapi.lib;..\$(Configuration)\JWebTopCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/safeseh /dynamicbase /ignore:4199 /ignore:4221 /nxcompat %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>
@@ -252,7 +252,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /we4389 %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -428,26 +428,12 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\JWebTopMsg.h" />
-    <ClInclude Include="..\common\msgwin\MsgWin.h" />
-    <ClInclude Include="..\common\process\MultiProcess.h" />
-    <ClInclude Include="..\common\task\Task.h" />
-    <ClInclude Include="..\common\tests\TestUtil.h" />
-    <ClInclude Include="..\common\util\StrUtil.h" />
-    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
-    <ClInclude Include="..\common_dll\jwebtop_dll.h" />
+    <ClInclude Include="fastipc\org_fastipc_FastIPCNative.h" />
     <ClInclude Include="javautils.h" />
     <ClInclude Include="org_jwebtop_JWebTopNative.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\JWebTopMsg.cpp" />
-    <ClCompile Include="..\common\msgwin\MsgWin.cpp" />
-    <ClCompile Include="..\common\process\MultiProcess.cpp" />
-    <ClCompile Include="..\common\task\Task.cpp" />
-    <ClCompile Include="..\common\tests\TestUtil.cpp" />
-    <ClCompile Include="..\common\util\StrUtil.cpp" />
-    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
-    <ClCompile Include="..\common_dll\jwebtop_dll.cpp" />
+    <ClCompile Include="fastipc\FastIPC_JNI.cpp" />
     <ClCompile Include="javautils.cpp" />
     <ClCompile Include="jwebtop_jni.cpp" />
   </ItemGroup>
@@ -459,6 +445,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\JWebTop_DLL\JWebTop_DLL.vcxproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JWebTopCommon\JWebTopCommon.vcxproj">
+      <Project>{6bd8e842-723a-47ba-83a4-fa357465dc13}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
