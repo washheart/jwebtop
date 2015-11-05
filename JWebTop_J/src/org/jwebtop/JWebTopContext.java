@@ -11,7 +11,7 @@ import org.fastipc.FastIPCException;
 import org.fastipc.FastIPCNative;
 import org.fastipc.FastIPCReadListener;
 import org.fastipc.FastIPCServer;
-import org.jwebtop.TaskUtil.ProcessMsgLock;
+import org.jwebtop.TaskContainer.ProcessMsgLock;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -54,6 +54,7 @@ public class JWebTopContext implements FastIPCReadListener {
 
 	private JWebtopJSONDispater jsonHandler = null;
 	private ClassLoader commonlassLoader;
+	private TaskContainer tc = new TaskContainer();
 
 	// private String processPath;
 
@@ -123,10 +124,10 @@ public class JWebTopContext implements FastIPCReadListener {
 	public long createBrowser(JWebTopConfigs configs) {
 		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
 		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
-		String taskId = TaskUtil.createTaskId();
-		ProcessMsgLock task = TaskUtil.addTask(taskId);
+		String taskId = tc.createTaskId();
+		ProcessMsgLock task = tc.addTask(taskId);
 		createBrowserByJSON(taskId, jo.toString());
-		return Long.parseLong(task.waitResult());
+		return Long.parseLong(task.waitResult(tc));
 	}
 
 	/**
@@ -167,6 +168,7 @@ public class JWebTopContext implements FastIPCReadListener {
 	public void closeContext() {
 		if (client == null) return;
 		client.write(JWM_CEF_ExitAPP, 0, null, null);
+		if (tc != null) tc.unlockAndClearAll();
 		if (server != null) server.close();
 		if (client != null) client.close();
 	}
@@ -203,10 +205,10 @@ public class JWebTopContext implements FastIPCReadListener {
 				client.write(JWM_RESULT_RETURN, userValue, userShortStr, result); // 发送结果到远程进程
 				break;
 			case JWM_RESULT_RETURN:
-				if (userShortStr != null && userShortStr.length() > 0) TaskUtil.putTaskResult(userShortStr, data);
+				if (userShortStr != null && userShortStr.length() > 0) tc.putTaskResult(userShortStr, data);
 				break;
 			case JWM_BROWSER_CREATED:
-				if (userShortStr != null && userShortStr.length() > 0) TaskUtil.putTaskResult(userShortStr, String.valueOf(userValue));
+				if (userShortStr != null && userShortStr.length() > 0) tc.putTaskResult(userShortStr, String.valueOf(userValue));
 				jsonHandler.jWebTopBrowserCreated(userShortStr, userValue);
 				break;
 			case JWM_IPC_CLIENT_OK:
@@ -245,13 +247,13 @@ public class JWebTopContext implements FastIPCReadListener {
 	}
 
 	private String exeRemoteAndWait(long browserHWnd, String msg, int msgId) {
-		String taskId = TaskUtil.createTaskId(); // 生成任务id
-		ProcessMsgLock lock = TaskUtil.addTask(taskId); // 放置任务到任务池
+		String taskId = tc.createTaskId(); // 生成任务id
+		ProcessMsgLock lock = tc.addTask(taskId); // 放置任务到任务池
 		try {
 			client.write(msgId, browserHWnd, taskId, msg); // 发送任务到远程进程
-			return lock.waitResult(); // 等待任务完成并取回执行结果
+			return lock.waitResult(tc); // 等待任务完成并取回执行结果
 		} catch (Throwable th) {
-			TaskUtil.removeTask(taskId); // 消息发送失败移除现有消息
+			tc.removeTask(taskId); // 消息发送失败移除现有消息
 			throw new JWebTopException("exeRemoteAndWait出错", th); // 返回数据：注意这里是空字符串
 		}
 	}
@@ -318,10 +320,10 @@ public class JWebTopContext implements FastIPCReadListener {
 	 * @return 返回是JSON字符串数据
 	 */
 	public String executeJSON_Wait(long browserHWnd, String jsonstring) {
-		String taskId = TaskUtil.createTaskId();
-		ProcessMsgLock task = TaskUtil.addTask(taskId);
+		String taskId = tc.createTaskId();
+		ProcessMsgLock task = tc.addTask(taskId);
 		client.write(JWM_JSON_EXECUTE_WAIT, browserHWnd, taskId, jsonstring);
-		return task.waitResult();
+		return task.waitResult(tc);
 	}
 
 	/**
@@ -342,10 +344,10 @@ public class JWebTopContext implements FastIPCReadListener {
 	 * @return 返回是字符串数据
 	 */
 	public String executeJS_Wait(long browserHWnd, String script) {
-		String taskId = TaskUtil.createTaskId();
-		ProcessMsgLock task = TaskUtil.addTask(taskId);
+		String taskId = tc.createTaskId();
+		ProcessMsgLock task = tc.addTask(taskId);
 		client.write(JWM_JS_EXECUTE_WAIT, browserHWnd, taskId, script);
-		return task.waitResult();
+		return task.waitResult(tc);
 	}
 
 	/**

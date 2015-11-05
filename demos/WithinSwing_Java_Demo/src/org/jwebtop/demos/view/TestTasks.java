@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.jwebtop.TaskUtil;
-import org.jwebtop.TaskUtil.ProcessMsgLock;
+import org.jwebtop.TaskContainer;
+import org.jwebtop.TaskContainer.ProcessMsgLock;
 
 /**
  * 测试自定义任务锁<br>
@@ -17,6 +17,7 @@ import org.jwebtop.TaskUtil.ProcessMsgLock;
  */
 public class TestTasks {
 	private final static int MaxExecuteTime = 500;
+	static TaskContainer tc = new TaskContainer();
 
 	static class TaskExcuteThread extends Thread {
 		private ProcessMsgLock task;
@@ -36,7 +37,7 @@ public class TestTasks {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			TaskUtil.putTaskResult(taskId, taskId);
+			tc.putTaskResult(taskId, taskId);
 			System.out.println("   Excute(" + v + ")  " + taskId);
 		}
 	}
@@ -53,7 +54,7 @@ public class TestTasks {
 		@Override
 		public void run() {
 			System.out.println("WaitTask  " + taskId);
-			String result = task.waitResult();
+			String result = task.waitResult(tc);
 			System.out.println("WaitTask  " + result + " " + taskId.equals(result));
 		}
 	}
@@ -63,7 +64,7 @@ public class TestTasks {
 		List<TaskWaitThread> waits = new LinkedList<TestTasks.TaskWaitThread>();
 		for (int i = 0; i < tasks; i++) {
 			String taskId = "T" + i;
-			ProcessMsgLock task = TaskUtil.addTask(taskId);
+			ProcessMsgLock task = tc.addTask(taskId);
 			TaskWaitThread t1 = new TaskWaitThread(taskId, task);
 			t1.start();
 			waits.add(t1);

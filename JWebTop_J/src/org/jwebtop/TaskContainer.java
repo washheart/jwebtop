@@ -13,7 +13,7 @@ import java.util.UUID;
  * 
  * @author washheart@163.com
  */
-public class TaskUtil {
+public class TaskContainer {
 
 	// 锁、任务执行结果包装类
 	public static class ProcessMsgLock {
@@ -31,7 +31,7 @@ public class TaskUtil {
 		}
 
 		// 等待执行结果
-		public String waitResult() {
+		public String waitResult(TaskContainer tc) {
 			if (notified) return result;
 			try {
 				synchronized (this) {
@@ -40,7 +40,7 @@ public class TaskUtil {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			removeTask(this.taskId);
+			tc.removeTask(this.taskId);
 			return this.result;
 		}
 
@@ -55,16 +55,16 @@ public class TaskUtil {
 	};
 
 	// map<key,value>,key=已成功发送到远程的任务的id，value=任务执行完成后放置任务执行结果
-	private final static Map<String, ProcessMsgLock> WaitTasks = new HashMap<String, TaskUtil.ProcessMsgLock>();
-	private final static Object mapLock = new Object(); // 所有针对map的操作都要锁定
+	private final Map<String, ProcessMsgLock> WaitTasks = new HashMap<String, TaskContainer.ProcessMsgLock>();
+	private final Object mapLock = new Object(); // 所有针对map的操作都要锁定
 
 	// 生成任务的id
-	public static String createTaskId() {
+	public String createTaskId() {
 		return UUID.randomUUID().toString();
 	}
 
 	// 添加一个等待任务到任务列表
-	public static ProcessMsgLock addTask(String taskId) {
+	public ProcessMsgLock addTask(String taskId) {
 		ProcessMsgLock lock = new ProcessMsgLock(taskId);
 		synchronized (mapLock) {
 			try {
@@ -77,7 +77,7 @@ public class TaskUtil {
 	}
 
 	// 移除已完成的任务
-	public static void removeTask(String taskId) {
+	public void removeTask(String taskId) {
 		synchronized (mapLock) {
 			try {
 				WaitTasks.remove(taskId);// 移除某任务
@@ -87,7 +87,7 @@ public class TaskUtil {
 		}
 	}
 
-	private static ProcessMsgLock getTask(String taskId) {
+	private ProcessMsgLock getTask(String taskId) {
 		ProcessMsgLock rtn = null;
 		synchronized (mapLock) {
 			try {
@@ -100,7 +100,7 @@ public class TaskUtil {
 	}
 
 	// 将任务执行结果保存进来，保存后会调用notify通知等待的程序：一般是在另外一个线程中调用
-	public static boolean putTaskResult(String taskId, String taskResult) {
+	public boolean putTaskResult(String taskId, String taskResult) {
 		ProcessMsgLock lock = getTask(taskId);
 		if (lock == null) return false;
 		lock.notify(taskResult);
@@ -108,7 +108,7 @@ public class TaskUtil {
 	}
 
 	// 把所有锁都给解锁：此方法当且仅当在进程退出时执行
-	public static void unlockAndClearAll() {
+	public void unlockAndClearAll() {
 		Set<Entry<String, ProcessMsgLock>> entries = WaitTasks.entrySet();
 		for (Entry<String, ProcessMsgLock> entry : entries) {
 			try {// 通过try-catch保证每次解锁失败不影响其他的解锁
@@ -118,5 +118,11 @@ public class TaskUtil {
 			}
 		}
 		WaitTasks.clear();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		unlockAndClearAll();
+		super.finalize();
 	}
 }
