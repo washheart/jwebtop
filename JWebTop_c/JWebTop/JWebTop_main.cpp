@@ -24,7 +24,7 @@ CefSettings settings;                      // CEF全局设置
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
-	if ((lpCmdLine[0] == ':')){		
+	if ((lpCmdLine[0] == ':')){
 		int argc = 0;
 		LPTSTR * args = CommandLineToArgvW(lpCmdLine, &argc);
 		if (argc > 4){// 从dll发来的处理
@@ -32,12 +32,12 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 			DWORD	processId = jw::parseLong(args[1]);
 			DWORD	blockSize = jw::parseLong(args[2]);
 			wstring serverName = (args[3]);
-			int r=jw::dllex::startIPCServer(serverName, blockSize, processId);
+			int r = jw::dllex::startIPCServer(serverName, blockSize, processId);
 			if (r != 0)return r;
 			jw::ctx::startJWebTopByFile(args[4]);
 			return 0;
 		}
-		MessageBox(NULL, L"创建IPC时必须在启动参数上指定服务端的名称！", L"消息", 0); return -1;
+		MessageBox(NULL, L"无法启动浏览器进程（参数不对）！", L"消息", 0); return -1;
 	}
 	else{
 		jw::ctx::startJWebTopByFile(lpCmdLine);
@@ -49,7 +49,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 int APIENTRY wWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPTSTR    lpCmdLine,
- 	int       nCmdShow) {
+	int       nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	startJWebTop(hInstance, lpCmdLine);
