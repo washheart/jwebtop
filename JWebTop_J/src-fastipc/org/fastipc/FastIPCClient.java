@@ -11,8 +11,6 @@ package org.fastipc;
 public final class FastIPCClient {
 	private int nativeClient = 0;// 指向fastipc::Client实例的指针
 
-	public FastIPCClient() {}
-
 	public void create(String serverName, int blockSize) {
 		nativeClient = FastIPCNative.createClient(serverName, blockSize);
 	}
