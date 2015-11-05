@@ -9,47 +9,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-	///*
-	// * 对应org.jwebtop.JWebTopNative类的nCreateJWebTop方法
-	// * 该方法用于创建一个浏览器窗口
-	// * processPath 待执行的JWebTop.exe的全路径。比如d:\c\JWebTop.exe，当然JWebTop可以命名为其他名字。
-	// * configFile  此配置文件用于启动JWebTop进程（但，不立刻创建浏览器窗口，即使指定了url参数）
-	// */
-	//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
-	//	(JNIEnv *, jclass, jstring processPath, jstring configFile);
-
-	//// jni方法：退出JWebTop进程
-	//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit(JNIEnv *, jclass);
-
-	///*
-	//* 对应org.jwebtop.JWebTopNative类的nCreateBrowser方法
-	//* 该方法用于创建一个浏览器窗口
-	//* jWebTopConfigJSON 浏览器配置信息JSON(JWebTopConfigs.h)
-	//*
-	//* return 返回创建的浏览器窗口的句柄
-	//*/
-	//JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
-	//	(JNIEnv * env, jclass, jstring jWebTopConfigJSON);
-
- //  /*
-	//* 对应org.jwebtop.JWebTopNative类的nCloseBrowser方法
-	//* 该方法用于关闭一个浏览器窗口
-	//* browserHWnd  浏览器窗口句柄
-	//*/
-	//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCloseBrowser
-	//	(JNIEnv * env, jclass, jlong browserHWnd);
-	///*
-	// * 下面四个方法用于执行浏览器脚本
-	// */
-	//JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSWait
-	//	(JNIEnv *, jclass, jlong browserHWnd, jstring script);
-	//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSNoWait
-	//	(JNIEnv *, jclass, jlong browserHWnd, jstring script);
-	//JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
-	//	(JNIEnv *, jclass, jlong browserHWnd, jstring json);
-	//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONNoWait
-	//	(JNIEnv *, jclass, jlong browserHWnd, jstring json);
+	// 创建一个新进程，返回的数据为进程中主线程的id
+	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine);
+	
+	/*
+	* 获取当前进程id
+	*
+	* return 返回当前进程id
+	*/
+	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nGetProcessID
+		(JNIEnv * env, jclass);
 
 	// jni方法：设置窗口大小
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize

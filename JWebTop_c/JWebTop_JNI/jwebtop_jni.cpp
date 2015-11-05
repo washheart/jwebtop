@@ -7,98 +7,30 @@
 #include "common/winctrl/JWebTopWinCtrl.h"
 
 #include "org_jwebtop_JWebTopNative.h"
-#include "common_dll/jwebtop_dll.h"
 #include "javautils.h"
+#include "common/os/OS.h"
+#include "common/tests/TestUtil.h"
 typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 using namespace std;
+// 创建一个新进程，返回的数据为进程中主线程的id
+JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine){
+#ifdef JWebTopLog
+	setLogFileName(L"jwebtop_dll.log");
+	writeLog(L"JNI开始启动新进程\r\n");
+#endif
+	wstring exe = jstring2wstring(env, subProcess), cmd = jstring2wstring(env, szCmdLine);
+	return jw::os::process::createSubProcess(LPTSTR(exe.c_str()), LPTSTR(cmd.c_str()));
+}
 
-//JavaVM* g_jvm;               // 保存全局的虚拟机环境
-//jclass g_nativeClass;        // 记录全局的本地类变量
-//jmethodID g_invokeByJS;      // 从C端回调Java的方法
-//extern HWND g_RemoteWinHWnd;
-//
-//// 实现回调java程序的方法
-//wstring invokeByBrowser(long browserHWnd, wstring json){
-//	JNIEnv *env;
-//	bool detachEnv = false;
-//	if (g_jvm->GetEnv((void **)&env, JNI_VERSION_1_6) < 0){
-//		if (g_jvm->AttachCurrentThread((void **)&env, NULL) < 0){
-//			return wstring();
-//		}
-//		else{
-//			detachEnv = true;// 如果是Attach上的env，那么需要detach
-//		}
-//	}
-//	jstring sss = env->NewStringUTF(CefString(json).ToString().c_str());
-//	jstring str = (jstring)env->CallStaticObjectMethod(g_nativeClass, g_invokeByJS, (jlong)browserHWnd, sss);
-//	env->DeleteLocalRef(sss);
-//	CefString result(env->GetStringUTFChars(str, false));
-//	env->DeleteLocalRef(str);
-//	if (detachEnv)g_jvm->DetachCurrentThread();
-//	return result.ToWString();
-//}
-//
-//// jni方法：创建JWebTop进程
-//// 这里暂时没有办法用JSON的方式来传递配置：因为用cmd方式发送数据时，系统会默认把参数中的双引号给去掉（或者，先创建窗口，再创建浏览器？）
-//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCreateJWebTop
-//(JNIEnv * env, jclass nativeClass, jstring jprocessPath, jstring configFile){
-//	if (g_RemoteWinHWnd != NULL)return /*(jlong)g_RemoteWinHWnd*/;
-//	if (g_invokeByJS == NULL){// 第一次被java端调用
-//		env->GetJavaVM(&g_jvm);// 获取当前的虚拟机环境并保存下来		
-//		g_nativeClass = (jclass)(env->NewGlobalRef(nativeClass));// 将一个对象设置为全局对象，此处将nativeClasss设置为全局对象
-//		g_invokeByJS = env->GetStaticMethodID(g_nativeClass, "invokeByJS", "(JLjava/lang/String;)Ljava/lang/String;");// 取出要调用的方法
-//	}
-//	wstring processPath = jstring2wstring(env, jprocessPath); 
-//	wstring cfgFile = jstring2wstring(env, configFile);
-//	CreateJWebTop(processPath, cfgFile);
-//}
-//// jni方法：退出JWebTop进程
-//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExit(JNIEnv *, jclass){
-//	ExitJWebTop();
-//}
-//
-///*
-//* 对应org.jwebtop.JWebTopNative类的nCreateBrowser方法
-//* 该方法用于创建一个浏览器窗口
-//* jWebTopConfigJSON 浏览器配置信息JSON
-//*/
-//JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateBrowser
-//(JNIEnv * env, jclass, jstring jWebTopConfigJSON){
-//	wstring cmds = jstring2wstring(env, jWebTopConfigJSON);
-//	return CreateJWebTopBrowser(cmds);
-//}
-//
-///*
-// * 对应org.jwebtop.JWebTopNative类的nCloseBrowser方法
-// * 该方法用于关闭一个浏览器窗口
-// * browserHWnd  浏览器窗口句柄
-// */
-//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nCloseBrowser
-//(JNIEnv * env, jclass, jlong browserHWnd){
-//	CloseJWebTopBrowser(browserHWnd);
-//}
-//
-//JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSWait
-//(JNIEnv * env, jclass, jlong browserHWnd, jstring script){
-//	return wstring2jstring(env, JWebTopExecuteJSWait(browserHWnd, jstring2wstring(env, script)));
-//}
-//
-//JNIEXPORT jstring JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONWait
-//(JNIEnv * env, jclass, jlong browserHWnd, jstring json){
-//	return wstring2jstring(env, JWebTopExecuteJSONWait(browserHWnd, jstring2wstring(env, json)));
-//}
-//
-//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSNoWait
-//(JNIEnv * env, jclass, jlong browserHWnd, jstring script){
-//	JWebTopExecuteJSNoWait(browserHWnd, jstring2wstring(env, script));
-//}
-//
-//// jni方法：执行脚本且不等待返回结果
-//JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nExecuteJSONNoWait
-//(JNIEnv * env, jclass, jlong browserHWnd, jstring json){
-//	JWebTopExecuteJSONNoWait(browserHWnd, jstring2wstring(env, json));
-//}
-
+/*
+* 获取当前进程id
+*
+* return 返回当前进程id
+*/
+JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nGetProcessID
+(JNIEnv * env, jclass){
+	return GetCurrentProcessId();
+}
 // jni方法：设置窗口大小
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetSize
 (JNIEnv * env, jclass, jlong browserHWnd, jint w, jint h){

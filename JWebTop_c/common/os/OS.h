@@ -21,7 +21,7 @@ namespace jw{
 
 		namespace process{
 			// 创建一个新进程，返回的数据为进程中主线程的id
-			DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine);
+			_declspec(dllexport) DWORD createSubProcess(LPTSTR subProcess, LPTSTR szCmdLine);
 		};// End process namespace
 	}// End os namespace
 }// End jw namespace

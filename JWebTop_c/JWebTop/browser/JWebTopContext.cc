@@ -118,12 +118,10 @@ namespace jw{
 #endif
 			if (exit_code >= 0) return;	// 子进程在这里完成，并返回							
 			CefRunMessageLoop();// 运行CEF消息监听，直到CefQuitMessageLoop()方法被调用
+			writeLog("主消息循环（CefRunMessageLoop）已退出。。。。。");
 			closeJWebtopContext();
 		}
-		// 根据JSON来配置和启动JWebTop
-		void startJWebTopByJSON(std::wstring cfgJSON){
-			startJWebTopByCfg(JWebTopConfigs::loadAsJSON(cfgJSON));
-		}
+
 		// 根据文件来配置和启动JWebTop
 		void startJWebTopByFile(std::wstring cfgFile){
 			startJWebTopByCfg(JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(LPTSTR(cfgFile.c_str()))));

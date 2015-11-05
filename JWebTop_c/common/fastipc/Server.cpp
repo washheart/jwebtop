@@ -87,8 +87,8 @@ namespace fastipc{
 				rtn->data = (char *)malloc(memBuf->dataLen);
 				memcpy(rtn->data, memBuf->data, rtn->dataLen);
 				int len = lstrlenA(memBuf->userShortStr);
+				ZeroMemory(rtn->userShortStr, PACK_ID_LEN);
 				if (len > 0){
-					ZeroMemory(rtn->userShortStr, PACK_ID_LEN);
 					memcpy(rtn->userShortStr, memBuf->userShortStr, len);
 				}
 				if (memBuf->msgType > MSG_TYPE_NORMAL){

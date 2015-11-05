@@ -95,6 +95,12 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PostBuildEvent>
+      <Command>copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\JWebTopCommon.dll /Y
+copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop\$(Configuration)\JWebTopCommon.dll /Y
+copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop_JNI\$(Configuration)\JWebTopCommon.dll /Y
+copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop_CSharp_Lib\bin\$(Configuration)\JWebTopCommon.dll /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\fastipc\Client.cpp" />

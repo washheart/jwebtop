@@ -23,6 +23,13 @@ using namespace std;
 namespace jw{
 	namespace dllex{
 		bool isEx = false;
+
+		fastipc::Server server;
+		fastipc::Client client;
+
+		bool ex(){ return isEx; }
+		void setAsEx(){ isEx = true; }
+
 		void closeWebTopEx();
 
 		void __onRead(LONG userMsgType, LONG userValue, std::string taskIds, std::string datas){
@@ -31,7 +38,7 @@ namespace jw{
 			switch (userMsgType){
 			case JWM_RESULT_RETURN:
 				jw::task::putTaskResult(taskId, data); // 通知等待线程，远程任务已完成，结果已取回
-				return; 
+				return;
 			case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 			case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 			{
@@ -44,26 +51,23 @@ namespace jw{
 										 bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg);// 直接发送到render进程去执行
 										 break;
 			}
-			case JWM_JSON_EXECUTE_RETURN:{ 
+			case JWM_JSON_EXECUTE_RETURN:{
 											 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-				data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
-				bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-				break; }
+											 data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
+											 bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
+											 break; }
 			case JWM_JS_EXECUTE_RETURN:{
 										   BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 										   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
 										   break;
 			}
 			case JWM_CLOSEBROWSER:
-				jb::close((HWND)parseLong(data));
+				jb::close((HWND)userValue);
 			case JWM_CREATEBROWSER_JSON:
 				createNewBrowser(JWebTopConfigs::loadAsJSON(data), taskId);
 				return;
 			case JWM_CREATEBROWSER_FILE:
 				createNewBrowser(JWebTopConfigs::loadConfigs(data), taskId);
-				return;
-			case JWM_CFGJWEBTOP_JSON:
-				jw::ctx::startJWebTopByJSON( data);
 				return;
 			case JWM_CFGJWEBTOP_FILE:
 				jw::ctx::startJWebTopByFile(data);
@@ -75,57 +79,89 @@ namespace jw{
 
 		class EXEReadListener :public fastipc::RebuildedBlockListener{
 			void onRebuildedRead(fastipc::MemBlock* memBlock){
+#ifdef JWebTopLog
+				std::wstringstream wss;
+				wss << L"Readed "
+					<< L" userMsgType=" << memBlock->userMsgType
+					<< L" userValue=" << memBlock->userValue
+					<< L" userShortStr=" << jw::s2w(memBlock->getUserShortStr())
+					<< L" pBuff=" << jw::s2w(memBlock->getData())
+					<< L"||\r\n";
+				writeLog(wss.str());
+#endif
 				thread t(__onRead, memBlock->userMsgType, memBlock->userValue, memBlock->getUserShortStr(), memBlock->getData());
 				t.detach();// 在一个分离线程中完成其他操作，避免阻塞数据的收发
 			}
 		};
 
-		fastipc::Server server;
-		fastipc::Client client;
-
-		bool ex(){ return isEx; }
-		void setAsEx(){ isEx = true; }
 		void __startIPCServer(){
 			server.startRead();
 		}
-		int startIPCServer(wstring &serverName, DWORD blockSize, DWORD processId){
-			int r = client.create(serverName, blockSize);
-			if (r != 0)return r;
-			r=server.create(fastipc::genServerName(serverName), blockSize);
-			if (r != 0)return r;
-			server.setListener(new EXEReadListener());// 设置侦听器
-			thread t(__startIPCServer);
-			t.detach();
-			// 通知dll端，子进程已创建，可以进行浏览器的初始化了
-			client.write(JWM_IPC_CLIENT_OK, 0, NULL, NULL, 0);
+		void __waitProcess(DWORD processId){
 			// 等待远程进程结束
 			try{
 				HANDLE hHandle = OpenProcess(SYNCHRONIZE, false, processId);// 降低权限，否则有些情况下OpendProcess失败（比如xp）
 				WaitForSingleObject(hHandle, INFINITE);// 等待远程进程结束
+				closeWebTopEx();
 			}
 			catch (...){
+#ifdef JWebTopLog
+				writeLog("等待远程进程结束出错。。。。。\r\n");
+#endif
 			}
-			closeWebTopEx();
+		}
+		int startIPCServer(wstring &serverName, DWORD blockSize, DWORD processId){
+			int r = client.create(serverName, blockSize);
+			if (r != 0)return r;
+			r = server.create(fastipc::genServerName(serverName), blockSize);
+			if (r != 0)return r;
+			server.setListener(new EXEReadListener());// 设置侦听器
+			thread startServer(__startIPCServer);
+			startServer.detach();								// 在新线程中启动exe端的FastIPC监听
+			client.write(JWM_IPC_CLIENT_OK, 0, NULL, NULL, 0);	// 通知dll端，子进程已创建，可以进行浏览器的初始化了
+			thread waitProcess(__waitProcess, processId);		// 在新线程中启动等待远程进程结束的监听
+			waitProcess.detach();
 			return 0;
 		}
 		void closeWebTopEx(){
 			jw::ctx::CloseAllBrowsers(true);// 关闭所有浏览器
 			server.close();					// 关闭ipc侦听
 			CefQuitMessageLoop();			// 退出cef消息循环
-			jw::ctx::closeJWebtopContext();	// 清理cef其他侦听
+			PostQuitMessage(0);				// 发送退出当前线程的消息
 		}
 		void OnContextInitialized(){
-			client.write(JWM_CEF_APP_INITED,0, NULL, NULL, 0); // CEF浏览器已初始完成
-		}	
+			client.write(JWM_CEF_APP_INITED, 0, NULL, NULL, 0); // CEF浏览器已初始完成
+		}
 
 		void sendBrowserCreatedMessage(wstring taskId, long browserHWnd){
+#ifdef JWebTopLog
+			std::wstringstream wss;
+			wss << L"Writed "
+				<< L" sendBrowserCreatedMessage"
+				<< L" taskId=" << taskId
+				<< L" browserHWnd=" << browserHWnd
+				<< L"||\r\n";
+			writeLog(wss.str());
+#endif
 			client.write(JWM_BROWSER_CREATED, browserHWnd, LPSTR(jw::w2s(taskId).c_str()), NULL, 0);
 		}
 
 		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, long senderHWND, wstring taskId){
 			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
 			if (bw == NULL)return false;
-			return client.write(msgId, (long)browserHWnd, LPSTR(jw::w2s(taskId).c_str()), LPSTR(jw::w2s(msg).c_str()),0) == 0;
+#ifdef JWebTopLog
+			std::wstringstream wss;
+			wss << L"Writed "
+				<< L" sendJWebTopProcessMsg"
+				<< L" taskId=" << taskId
+				<< L" browserHWnd=" << browserHWnd
+				<< L" msgId=" << msgId
+				<< L" msg=" << msg
+				<< L"||\r\n";
+			writeLog(wss.str());
+#endif
+			string tmp = jw::w2s(msg);
+			return client.write(msgId, (long)browserHWnd, LPSTR(jw::w2s(taskId).c_str()), LPSTR(tmp.c_str()), tmp.size()) == 0;
 		}
 
 		void syncExecuteJS(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message){
@@ -176,5 +212,5 @@ namespace jw{
 			wstring newjson = json.ToWString();
 			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, (long)browserHWnd, wstring()); // 发送任务到远程进程
 		}
-	}	
+	}
 }

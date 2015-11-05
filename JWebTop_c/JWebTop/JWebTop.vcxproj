@@ -161,16 +161,16 @@
       <SubSystem>Windows</SubSystem>
       <Version>
       </Version>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PostBuildEvent>
       <Command>Xcopy  "$(SolutionDir)common\tests\music" "$(ProjectDir)$(Configuration)\" /S /D /Y
+copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)\JWebTop_JNI\$(Configuration)\$(ProjectName).exe /Y
 del $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Q
-copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Y
-copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\JWebTopCommon.dll /Y
-copy ..\$(Configuration)\JWebTopCommon.dll  $(ProjectDir)\$(Configuration)\JWebTopCommon.dll /Y</Command>
+copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).exe /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">

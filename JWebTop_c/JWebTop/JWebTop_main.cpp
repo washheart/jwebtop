@@ -24,15 +24,17 @@ CefSettings settings;                      // CEF全局设置
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
-	if ((lpCmdLine[0] == '\1')){
+	if ((lpCmdLine[0] == ':')){		
 		int argc = 0;
 		LPTSTR * args = CommandLineToArgvW(lpCmdLine, &argc);
-		if (argc > 3){// 从dll发来的处理
+		if (argc > 4){// 从dll发来的处理
 			jw::dllex::setAsEx();
 			DWORD	processId = jw::parseLong(args[1]);
 			DWORD	blockSize = jw::parseLong(args[2]);
 			wstring serverName = (args[3]);
-			jw::dllex::startIPCServer(serverName, blockSize, processId);
+			int r=jw::dllex::startIPCServer(serverName, blockSize, processId);
+			if (r != 0)return r;
+			jw::ctx::startJWebTopByFile(args[4]);
 			return 0;
 		}
 		MessageBox(NULL, L"创建IPC时必须在启动参数上指定服务端的名称！", L"消息", 0); return -1;

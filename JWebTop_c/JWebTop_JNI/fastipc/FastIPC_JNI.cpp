@@ -8,9 +8,12 @@
 /// @date       2015-10-31  
 ////////////////////////////////////////////////////////////////////////// 
 #include "org_fastipc_FastIPCNative.h"
+#include <sstream>
 #include "jni_jdk1_6_24/jni.h"
 #include "common/fastipc/Server.h"
 #include "common/fastipc/Client.h"
+#include "common/tests/TestUtil.h"
+#include "common/util/StrUtil.h"
 #include "javautils.h"
 
 JavaVM* g_jvm_server;               // 保存全局的虚拟机环境
@@ -22,12 +25,8 @@ public:
 	int setListener(JNIEnv * env, jobject listener){
 		jclass cls = env->GetObjectClass(listener);// 获得Java类  
 		this->callBack = env->GetMethodID(cls, "OnRead",
-			//	LONG			msgType;
-			//	char			packId[PACK_ID_LEN];
-			//	DWORD			dataLen;
-			//	char*			data = NULL;
-			//  对应的签名是：int,String,String
-			"(ILjava/lang/String;[B)V");//或得该回调方法句柄
+			// 对应的签名是：int,String,int,long,String,byte[]
+			"(ILjava/lang/String;IJLjava/lang/String;[B)V");//或得该回调方法句柄
 		if (this->callBack == NULL)return -1;
 		this->jlistener = listener;
 		return 0;
@@ -35,6 +34,16 @@ public:
 	// 当有服务端读取到数据后，会调用此方法通知等待者进行处理
 	// memBlock在分发后会由服务器销毁，外部调用者无需清理操作
 	 void onRead(fastipc::MemBlock* memBlock) override{
+#ifdef JWebTopLog
+		 std::wstringstream wss;
+		 wss << L"Readed "
+			 << L" userMsgType=" << memBlock->userMsgType
+			 << L" userValue=" << memBlock->userValue
+			 << L" userShortStr=" << jw::s2w(memBlock->getUserShortStr())
+			 << L" pBuff=" << jw::s2w(memBlock->getData())
+			 << L"||\r\n";
+		 writeLog(wss.str());
+#endif
 		 JNIEnv *env;
 		 bool detachEnv = false;
 		 if (g_jvm_server->GetEnv((void **)&env, JNI_VERSION_1_6) < 0){
@@ -55,8 +64,19 @@ public:
 		 jbyteArray bytes = NULL;  //下面一系列操作把btPath转成jbyteArray 返回出去
 		 bytes = env->NewByteArray(len);
 		 env->SetByteArrayRegion(bytes, 0, len, (jbyte *)memBlock->data);
+
+		 jstring userShortValue = env->NewStringUTF(memBlock->userShortStr);
+		 jclass cls = env->GetObjectClass(jlistener);// 获得Java类  
+		 //jmethodID m2 = env->GetMethodID(cls, "OnRead", "()V");//或得该回调方法句柄
+		 //env->CallVoidMethod(this->jlistener, m2);
+		 //jmethodID m3 = env->GetMethodID(cls, "OnRead", "(Ljava/lang/String;)V");//或得该回调方法句柄
+		 //env->CallVoidMethod(this->jlistener, m3, userShortValue);
+		 this->callBack = env->GetMethodID(cls, "OnRead",
+			 // 对应的签名是：int,String,int,long,String,byte[]
+			 "(ILjava/lang/String;IJLjava/lang/String;[B)V");//或得该回调方法句柄
 		 env->CallVoidMethod(this->jlistener, this->callBack,
-			 memBlock->msgType, packId, bytes); //回调该方法，并且传递参数值		 
+			 (jint)memBlock->msgType, packId, 
+			 (jint)memBlock->userMsgType, (jlong)memBlock->userValue, userShortValue, bytes); //回调该方法，并且传递参数值		 
 		 if (detachEnv)g_jvm_server->DetachCurrentThread();
 
 		 // 通过对象方式实现动态参数。优点：很动态；缺点：设置数据都需要通过反射方式，性能不好
@@ -159,22 +179,41 @@ JNIEXPORT jintArray JNICALL Java_org_fastipc_FastIPCNative_nCreateClient
 JNIEXPORT jint JNICALL Java_org_fastipc_FastIPCNative_nWriteClient
 (JNIEnv * env, jclass, jint nativeClient, jint userMsgType, jlong userValue, jstring userShortStr, jstring data){
 	fastipc::Client * client = (fastipc::Client *) nativeClient;
+	char * shortStr = NULL;
+	char * str = NULL;
+	int len = 0;
 	// data
-	const char * tmp = env->GetStringUTFChars(data, false);
-	int len = lstrlenA(tmp);
-	char * str = new char[len];
-	memcpy(str, tmp, len);
-	env->ReleaseStringUTFChars(data, tmp);
+	if (data != NULL){
+		const char * tmp = env->GetStringUTFChars(data, false);
+		len = lstrlenA(tmp);
+		str = new char[len+1];
+		memcpy(str, tmp, len);
+		str[len] = '\0';
+		env->ReleaseStringUTFChars(data, tmp);
+	}
 	// userShortStr
-	const char * tmp2 = env->GetStringUTFChars(userShortStr, false);
-	int len2 = lstrlenA(tmp);
-	char * shortStr = new char[len2];
-	memcpy(shortStr, tmp2, len);
-	env->ReleaseStringUTFChars(userShortStr, tmp2);
-	//
-	client->write(userMsgType,userValue,shortStr,str,len);
+	if (userShortStr != NULL){
+		const char * tmp2 = env->GetStringUTFChars(userShortStr, false);
+		int len2 = lstrlenA(tmp2);
+		shortStr = new char[len2+1];
+		memcpy(shortStr, tmp2, len2);
+		shortStr[len2] = '\0';
+		env->ReleaseStringUTFChars(userShortStr, tmp2);
+	}
+	// 写到客户端，并清理当前申请的内存
+#ifdef JWebTopLog
+	std::wstringstream wss;
+	wss << L"Writed "
+		<< L" userMsgType=" << userMsgType
+		<< L" userValue=" << userValue;
+	if (shortStr != NULL)wss << L" userShortStr=" << shortStr;
+	if (str != NULL)wss << L" data=" << str;
+		wss<< L"||\r\n";
+	writeLog(wss.str());
+#endif
+	client->write(userMsgType, userValue, shortStr, str, len);
 	delete[] str; 
-	delete[] userShortStr;
+	delete[] shortStr;
 	return 0;
 }
 /*

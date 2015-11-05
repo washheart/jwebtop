@@ -21,7 +21,7 @@ void JWebTopApp::OnContextInitialized() {
 	jw::jb::RegisterSchemeHandlers();// 注册jwebtop://协议到浏览器
 	if (jw::dllex::ex()){// 如果是从dll调用，不创建浏览器
 		jw::dllex::OnContextInitialized();
-		//if (!g_configs->url.empty())createNewBrowser(g_configs);
+		//createNewBrowser(jw::ctx::getDefaultConfigs());
 	}
 	else{// 如果不是从dll调用，那么直接创建浏览器
 		createNewBrowser(jw::ctx::getDefaultConfigs());
