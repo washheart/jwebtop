@@ -19,7 +19,7 @@ class JWebTopClient : public CefClient,
 	public CefRequestHandler,
 	public CefContextMenuHandler{
 private:
-	JWebTopConfigs * configs=NULL; // 构建浏览器时的配置信息
+	JWebTopConfigs * configs = NULL; // 构建浏览器时的配置信息
 	wstring taskId;                // DLL方式时对应创建浏览器的任务ID
 	CefRefPtr<JSDialogHandler> dialog_handler_;
 public:
@@ -43,10 +43,10 @@ public:
 	virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() OVERRIDE{
 		return this;
 	}
-	 virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE{
-		 //return this;
-		 return dialog_handler_;
-	 }
+	virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE{
+		//return this;
+		return dialog_handler_;
+	}
 
 	bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefProcessId source_process,
@@ -63,7 +63,7 @@ public:
 		CefRefPtr<CefFrame> frame,
 		ErrorCode errorCode,
 		const CefString& errorText,
-		const CefString& failedUrl) OVERRIDE;  
+		const CefString& failedUrl) OVERRIDE;
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
 		int httpStatusCode);
@@ -75,7 +75,7 @@ public:
 		bool is_redirect) OVERRIDE;
 	void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 		TerminationStatus status) OVERRIDE;
-	
+
 	bool GetAuthCredentials(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
 		bool isProxy,
@@ -84,8 +84,6 @@ public:
 		const CefString& realm,
 		const CefString& scheme,
 		CefRefPtr<CefAuthCallback> callback) OVERRIDE;
-
-	bool IsClosing() const { return is_closing_; }
 
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
 	//virtual bool OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
@@ -98,18 +96,13 @@ public:
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
 
 	// CefContextMenuHandler------------------------------------------------------------------------------
-	 void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+	void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
 		CefRefPtr<CefContextMenuParams> params,
 		CefRefPtr<CefMenuModel> model) OVERRIDE{
 		model->Clear();// 移除所有默认菜单
-	 }
+	}
 private:
-	//// List of existing browser windows. Only accessed on the CEF UI thread.
-	//typedef std::list<CefRefPtr<CefBrowser> > BrowserList;
-	//BrowserList browser_list_;
-	bool is_closing_;
-
 	// 和render进程进行通信的相关变量
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;
 	CefRefPtr<CefMessageRouterBrowserSide> message_router_;

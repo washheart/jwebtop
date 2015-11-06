@@ -13,9 +13,9 @@ addEventListener("JWebTopMove",function(v){
 	dispatchEvent(e);
 });
 function invokeByDLL(jsonValue){
-	 // alert(jsonValue);
-	 invokeByJava(jsonValue);
-	return "已经调用了js代码invokeByDLL————"+jsonValue.value;
+	// alert(jsonValue);
+	invokeByJava(jsonValue);
+	return jsonValue.value;
 }
 
 function testInvoke(str){

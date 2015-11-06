@@ -25,8 +25,7 @@ namespace jw{
 	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 }
 JWebTopClient::JWebTopClient()
-: is_closing_(false)
-, dialog_handler_(new JSDialogHandler()){
+: dialog_handler_(new JSDialogHandler()){
 }
 
 JWebTopClient::~JWebTopClient() {}
@@ -104,15 +103,10 @@ bool JWebTopClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
 }
 bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
-
-	// Closing the main window requires special handling. See the DoClose()
-	// documentation in the CEF header for a detailed destription of this
-	// process.
-	if (jw::ctx::getBrowserCount() == 1) {
-		// Set a flag to indicate that the window close should be allowed.
-		is_closing_ = true;
+	HWND hWnd = browser->GetHost()->GetWindowHandle();
+	if (hWnd != NULL || getBrowserWindowInfo(hWnd) == NULL){
+		OnBeforeClose(browser);
 	}
-
 	// Allow the close. For windowed browsers this will result in the OS close
 	// event being sent.
 	return false;

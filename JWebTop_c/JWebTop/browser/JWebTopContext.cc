@@ -37,6 +37,13 @@ namespace jw{
 		}
 
 		void removeBrowser(CefRefPtr<CefBrowser> browser) {
+#ifdef JWebTopLog
+			wstringstream log;
+			log << L"JWebTopClient::OnBeforeClose 尚存[" << browser_list_.size() << L"]个,"
+				<< L"正在关闭的URL地址：" << browser->GetMainFrame()->GetURL().ToWString().c_str()
+				<< L"\r\n";
+			writeLog(log.str());
+#endif
 			// Remove from the list of existing browsers.
 			BrowserList::iterator bit = browser_list_.begin();
 			for (; bit != browser_list_.end(); ++bit) {
@@ -45,13 +52,6 @@ namespace jw{
 					break;
 				}
 			}
-#ifdef JWebTopLog
-			wstringstream log;
-			log << L"JWebTopClient::OnBeforeClose 尚存[" << browser_list_.size() << L"]个,"
-				<< L"正在关闭的URL地址：" << browser->GetMainFrame()->GetURL().ToWString().c_str()
-				<< L"\r\n";
-			writeLog(log.str());
-#endif
 			if (!jw::dllex::ex() && browser_list_.empty()) {
 				// All browser windows have closed. Quit the application message loop.
 				CefQuitMessageLoop();
@@ -60,13 +60,11 @@ namespace jw{
 
 
 		void CloseAllBrowsers(bool force_close) {
-			//if (!CefCurrentlyOn(TID_UI)) {
-			//	MessageBox(NULL, L"只能在UI进程执行全部关闭的操作", L"错误", 0);
-			//	// Execute on the UI thread.
-			//	//CefPostTask(TID_UI, base::Bind(&CloseAllBrowsers, this, force_close));
-			//	CefPostTask(TID_UI, base::Bind(&CloseAllBrowsers, this, force_close));
-			//	return;
-			//}
+#ifdef JWebTopLog
+			wstringstream log;
+			log << L"关闭全部浏览器，目前有[" << browser_list_.size() << L"]个\r\n";
+			writeLog(log.str());
+#endif
 			if (browser_list_.empty()) return;
 			BrowserList::const_iterator it = browser_list_.begin();
 			for (; it != browser_list_.end(); ++it)

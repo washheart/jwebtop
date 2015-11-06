@@ -28,11 +28,8 @@ html,body {
 	<script type="text/javascript">
 		// 被java回调的js函数
 		function invokeByJava(jo) {
-			setTimeout("invodeByJava_(jo)",0);
-		}
-		function invokeByJava_(jo) {
-			if (!jo || !jo.method)
-				return;
+			if (!jo || !jo.method)return;
+			alert(jo.method)
 			if (jo.method == 'noteAdded') {// 节点已添加，需要更新
 				document.getElementById("ul_list").innerHTML += createNoteItem(
 						jo.value, true);

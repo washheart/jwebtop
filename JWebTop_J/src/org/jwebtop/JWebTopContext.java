@@ -44,6 +44,7 @@ public class JWebTopContext implements FastIPCReadListener {
 			JWM_DLL_EXECUTE_WAIT = __JWM + 221, // CEF调用DLL端：需要执行并等待的任务
 			JWM_DLL_EXECUTE_RETURN = __JWM + 222, // CEF调用DLL端：需要执行但CEF无需等待的任务
 			JWM_RESULT_RETURN = __JWM + 231;
+	public static long WIN_HWND = 0;
 	private Map<String, ByteArrayOutputStream> FastIPCReceivedCaches = new HashMap<String, ByteArrayOutputStream>();
 	private FastIPCServer server = null;
 	private FastIPCClient client = null;
@@ -103,6 +104,7 @@ public class JWebTopContext implements FastIPCReadListener {
 				+ " " + Integer.toString(blockSize)// 通过FastIPC进行通信时，缓存区的大小
 				+ " " + serverName // 通过FastIPC进行通信时，双方的交互标记
 				+ " \"" + cfgFile + "\"" // 配置文件的路径
+				+ " " + JWebTopContext.WIN_HWND//
 		;
 		JWebTopNative.createSubProcess(processPath, cmds);
 
@@ -246,35 +248,6 @@ public class JWebTopContext implements FastIPCReadListener {
 		}
 	}
 
-	private String exeRemoteAndWait(long browserHWnd, String msg, int msgId) {
-		String taskId = tc.createTaskId(); // 生成任务id
-		ProcessMsgLock lock = tc.addTask(taskId); // 放置任务到任务池
-		try {
-			client.write(msgId, browserHWnd, taskId, msg); // 发送任务到远程进程
-			return lock.waitResult(tc); // 等待任务完成并取回执行结果
-		} catch (Throwable th) {
-			tc.removeTask(taskId); // 消息发送失败移除现有消息
-			throw new JWebTopException("exeRemoteAndWait出错", th); // 返回数据：注意这里是空字符串
-		}
-	}
-
-	String JWebTopExecuteJSWait(long browserHWnd, String script) {
-		return exeRemoteAndWait(browserHWnd, script, JWM_JS_EXECUTE_WAIT);
-	}
-
-	String JWebTopExecuteJSONWait(long browserHWnd, String json) {
-		return exeRemoteAndWait(browserHWnd, json, JWM_JSON_EXECUTE_WAIT);
-	}
-
-	void JWebTopExecuteJSNoWait(long browserHWnd, String script) {
-		client.write(JWM_JS_EXECUTE_RETURN, browserHWnd, null, script); // 发送任务到远程进程
-	}
-
-	// jni方法：执行脚本且不等待返回结果
-	void JWebTopExecuteJSONNoWait(long browserHWnd, String json) {
-		client.write(JWM_JSON_EXECUTE_RETURN, browserHWnd, null, json); // 发送任务到远程进程
-	}
-
 	// jni方法：退出JWebTop进程
 	void ExitJWebTop() {
 		client.write(JWM_CEF_ExitAPP, 0, null, null); // 发送任务到远程进程
@@ -333,7 +306,7 @@ public class JWebTopContext implements FastIPCReadListener {
 	 * @param jsonstring
 	 */
 	public void executeJSON_NoWait(long browserHWnd, String jsonstring) {
-		client.write(JWM_JS_EXECUTE_RETURN, browserHWnd, null, jsonstring);
+		client.write(JWM_JSON_EXECUTE_RETURN, browserHWnd, null, jsonstring);
 	}
 
 	/**

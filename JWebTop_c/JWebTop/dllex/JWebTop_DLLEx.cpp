@@ -124,9 +124,13 @@ namespace jw{
 			return 0;
 		}
 		void closeWebTopEx(){
-			isEx = false;					// 标记为非ex模式，以便退出cef侦听
-			jw::ctx::CloseAllBrowsers(true);// 关闭所有浏览器
-			server.close();					// 关闭ipc侦听
+#ifdef JWebTopLog
+			writeLog(L"closeWebTopEx............\r\n");
+#endif
+			isEx = false;						 // 标记为非ex模式，以便退出cef侦听
+			if (client.isStable())client.close();// 关闭ipc侦听
+			if (server.isStable())server.close();// 关闭ipc侦听
+			jw::ctx::CloseAllBrowsers(true);	 // 关闭所有浏览器
 		}
 		void OnContextInitialized(){
 			client.write(JWM_CEF_APP_INITED, 0, NULL, NULL, 0); // CEF浏览器已初始完成

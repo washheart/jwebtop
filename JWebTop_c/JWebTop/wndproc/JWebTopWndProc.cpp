@@ -202,6 +202,9 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_NCHITTEST:
 		if (bwInfo->rWnd != NULL)return topWinNCHITTEST(hWnd, message, wParam, lParam);
 		break;
+	case WM_NCDESTROY:
+		BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
+		break;
 	}// End switch-message
 	if (bwInfo == NULL)return DefWindowProc(hWnd, message, wParam, lParam);
 	return CallWindowProc((WNDPROC)bwInfo->oldMainProc, hWnd, message, wParam, lParam);
@@ -211,20 +214,6 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	BrowserWindowInfo * bwInfo = getBrowserWindowInfo(hWnd);
 	// 可以对必要的信息进行预先处理，需要拦截的消息就可以不用发给浏览器了stringstream s;
 	switch (message) {
-	case WM_PARENTNOTIFY:
-	{
-							UINT msg2 = LOWORD(wParam);
-							if (msg2 == WM_DESTROY){
-								if (bwInfo == NULL){
-									DefWindowProc(hWnd, message, wParam, lParam);
-								}
-								else{
-									SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldBrowserProc);// 设置回原来的处理函数
-									BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
-								}
-							}
-	}
-		break;
 	case WM_KILLFOCUS:
 		bwInfo->isDraging = false; // 失去焦点时，停止拖动
 		break;
@@ -250,6 +239,23 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 		break;
 	case WM_NCHITTEST:
 		if (bwInfo->rWnd != NULL)return transparentNCHITTEST(hWnd, lParam);
+		break;
+	case WM_NCDESTROY:
+		BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
+		break;
+	case WM_PARENTNOTIFY:
+	{
+							UINT msg2 = LOWORD(wParam);
+							if (msg2 == WM_DESTROY){
+								if (bwInfo == NULL){
+									DefWindowProc(hWnd, message, wParam, lParam);
+								}
+								else{
+									SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldBrowserProc);// 设置回原来的处理函数
+									BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
+								}
+							}
+	}
 		break;
 	}// End switch-message
 	if (bwInfo == NULL)return DefWindowProc(hWnd, message, wParam, lParam);

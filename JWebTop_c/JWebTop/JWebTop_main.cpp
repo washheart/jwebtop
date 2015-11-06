@@ -23,7 +23,7 @@
 CefSettings settings;                      // CEF全局设置
 // 应用程序入口
 int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
-	MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
+	//MessageBox(NULL, L"用于附加进程的中断", L"中断", 0);
 	if ((lpCmdLine[0] == ':')){
 		int argc = 0;
 		LPTSTR * args = CommandLineToArgvW(lpCmdLine, &argc);

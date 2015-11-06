@@ -125,6 +125,8 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		try {
 			JOptionPane.showMessageDialog(this, "wait");
 			WithinSwing.frameHwnd = JWebTopNative.getWindowHWND(this);
+			JWebTopContext.WIN_HWND = WithinSwing.frameHwnd;
+
 			System.out.println("Java窗口handler = " + WithinSwing.frameHwnd + " hex=0x" + Long.toHexString(WithinSwing.frameHwnd));
 			String path = "JWebTop.exe";
 			System.out.println("\tpath = " + path);
@@ -152,6 +154,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 	// 新增日记
 	protected void addNote() {
 		String name = JOptionPane.showInputDialog(this, "请输入名称：");
+		if (name == null) return;
 		name = name.trim();
 		if (name.length() == 0) return;
 		ctrl.addNote(name);
