@@ -26,6 +26,7 @@ public class JWebTopContext implements FastIPCReadListener {
 	private final static int//
 			__JWM = 100, // 定义MPMSG_MINI和MPMSG_LARGE中msgId的起始值
 			JWM_IPC_CLIENT_OK = __JWM + 101, // IPC对应的客户端已成功创建
+			JWM_SEAT_ERR_URL = __JWM + 102, // 设置错误页面
 			// JWM_STARTJWEBTOP = __JWM + 301, // 启动JWebTop进程
 			// JWM_CFGJWEBTOP_FILE = __JWM + 302, //
 			// JWM_CFGJWEBTOP_JSON = __JWM + 303, //
@@ -52,12 +53,11 @@ public class JWebTopContext implements FastIPCReadListener {
 	private int blockSize;
 
 	// private String cfgFile = null/* 通过配置文件初始化JWebTop */, cfgJSON = null/* 通过JSON初始化JWebTop */;
+	// private String processPath;
 
 	private JWebtopJSONDispater jsonHandler = null;
 	private ClassLoader commonlassLoader;
 	private TaskContainer tc = new TaskContainer();
-
-	// private String processPath;
 
 	public static void initDLL(String dllDir) {
 		File dllFile = new File(dllDir, "JWebTopCommon.dll");
@@ -72,7 +72,15 @@ public class JWebTopContext implements FastIPCReadListener {
 		System.load(dllFile.getAbsolutePath());
 	}
 
+	private final String TASK_ID_CreateJWebTop = "TASK_ID_CreateJWebTop";
+
 	public void createJWebTopByCfgFile(String processPath, String cfgFile) {
+		ProcessMsgLock task = tc.addTask(TASK_ID_CreateJWebTop);
+		createJWebTopByCfgFile_async(processPath, cfgFile);
+		task.waitResult(tc);
+	}
+
+	public void createJWebTopByCfgFile_async(String processPath, String cfgFile) {
 		if (server != null) return;
 		if (jsonHandler == null) throw new JWebTopException("必须设置jsonHandler。");
 		try {
@@ -107,7 +115,6 @@ public class JWebTopContext implements FastIPCReadListener {
 				+ " " + JWebTopContext.WIN_HWND//
 		;
 		JWebTopNative.createSubProcess(processPath, cmds);
-
 		// String[] cmds = {//
 		// processPath// 要启动的程序的路径
 		// , ":"// “:”作为特殊符号告诉JWebTop主程序，还有其他参数要解析。因为“:”不可能出现在文件路径的开通
@@ -117,38 +124,100 @@ public class JWebTopContext implements FastIPCReadListener {
 		// , cfgFile // 配置文件的路径
 		// };
 		// try {
-		// Runtime.getRuntime().exec(cmds, null, null);
+		// Runtime.getRuntime().exec(cmds, null, null);// 这种方式创建的线程，最终会导致java的主线程无法退出？？？
 		// } catch (Throwable e) {
 		// e.printStackTrace();
 		// }
 	}
 
-	public long createBrowser(JWebTopConfigs configs) {
-		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
-		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
+	/**
+	 * 根据配置文件创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
+	 * 
+	 * @param browerCfgFile
+	 * @return 创建的浏览器的句柄
+	 */
+	public long createBrowserByFile(String browerCfgFile) {
+		if (client == null) throw new JWebTopException("尚未完成初始化");
 		String taskId = tc.createTaskId();
 		ProcessMsgLock task = tc.addTask(taskId);
-		createBrowserByJSON(taskId, jo.toString());
+		_createBrowser(JWM_CREATEBROWSER_FILE, taskId, browerCfgFile);
 		return Long.parseLong(task.waitResult(tc));
 	}
 
 	/**
-	 * 根据配置文件创建浏览器
+	 * 设置一个错误页面
 	 * 
-	 * @param browerCfgFile
-	 * @param listener
+	 * @param url
 	 */
-	public void createBrowserByFile(String broserUuid, String browerCfgFile) {
+	public void setErrorUrl(String url) {
+		client.write(JWM_SEAT_ERR_URL, 0, null, url);
+	}
+
+	/**
+	 * 根据配置对象来创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
+	 * 
+	 * @param configs
+	 *            配置浏览器的对象
+	 * @return 创建的浏览器的句柄
+	 */
+	public long createBrowser(JWebTopConfigs configs) {
+		if (client == null) throw new JWebTopException("尚未完成初始化");
+		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
+		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
+		return createBrowserByJSON(jo.toString());
+	}
+
+	/**
+	 * 根据JSON配置字符串创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
+	 * 
+	 * @param browerCfgJSON
+	 *            JSON配置字符串
+	 * @return 创建的浏览器的句柄
+	 */
+	public long createBrowserByJSON(String browerCfgJSON) {
+		if (client == null) throw new JWebTopException("尚未完成初始化");
+		String taskId = tc.createTaskId();
+		ProcessMsgLock task = tc.addTask(taskId);
+		_createBrowser(JWM_CREATEBROWSER_JSON, taskId, browerCfgJSON);
+		return Long.parseLong(task.waitResult(tc));
+	}
+
+	/**
+	 * 根据配置文件创建浏览器，此方法异步执行，浏览器成功创建后，会回调JWebtopJSONDispater的jWebTopBrowserCreated方法
+	 * 
+	 * @param broserUuid
+	 *            创建浏览器时指定一个uuid，以便回调方法中确认是否是自己的浏览器
+	 * @param browerCfgFile
+	 *            配置浏览器的文件
+	 */
+	public void createBrowserByFile_async(String broserUuid, String browerCfgFile) {
 		if (client == null) throw new JWebTopException("尚未完成初始化");
 		_createBrowser(JWM_CREATEBROWSER_FILE, broserUuid, browerCfgFile);
 	}
 
 	/**
-	 * 根据JSON配置文件创建浏览器
+	 * 根据配置对象来创建浏览器，此方法异步执行，浏览器成功创建后，会回调JWebtopJSONDispater的jWebTopBrowserCreated方法
 	 * 
-	 * @param browerCfgFile
+	 * @param broserUuid
+	 *            创建浏览器时指定一个uuid，以便回调方法中确认是否是自己的浏览器
+	 * @param configs
+	 *            配置浏览器的对象
 	 */
-	public void createBrowserByJSON(String broserUuid, String browerCfgJSON) {
+	public void createBrowser_async(String broserUuid, JWebTopConfigs configs) {
+		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
+		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
+		createBrowserByJSON_async(broserUuid, jo.toString());
+	}
+
+	/**
+	 * 根据JSON字符串来创建浏览器，此方法异步执行，浏览器成功创建后，会回调JWebtopJSONDispater的jWebTopBrowserCreated方法
+	 * 
+	 * @param broserUuid
+	 *            创建浏览器时指定一个uuid，以便回调方法中确认是否是自己的浏览器
+	 * @param browerCfgJSON
+	 *            配置浏览器的JSON字符串
+	 */
+	public void createBrowserByJSON_async(String broserUuid, String browerCfgJSON) {
 		if (client == null) throw new JWebTopException("尚未完成初始化");
 		_createBrowser(JWM_CREATEBROWSER_JSON, broserUuid, browerCfgJSON);
 	}
@@ -218,6 +287,7 @@ public class JWebTopContext implements FastIPCReadListener {
 				client.create(FastIPCNative.genServerName(serverName), blockSize);
 				break;
 			case JWM_CEF_APP_INITED:
+				tc.putTaskResult(TASK_ID_CreateJWebTop, "");// 特殊处理
 				jsonHandler.jWebTopContextInited();
 				break;
 			default:

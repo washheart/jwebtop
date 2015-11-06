@@ -4,6 +4,7 @@
 #define __JWM        100    // 定义一个消息起始值
 
 #define JWM_IPC_CLIENT_OK		(__JWM+101)  // IPC对应的客户端已成功创建
+#define JWM_SEAT_ERR_URL		(__JWM+102)  // 设置错误页面
 
 #define JWM_STARTJWEBTOP		(__JWM+301)  // 启动JWebTop进程
 #define JWM_CFGJWEBTOP_FILE		(__JWM+302)  // 

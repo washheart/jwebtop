@@ -72,6 +72,9 @@ namespace jw{
 			case JWM_CFGJWEBTOP_FILE:
 				jw::ctx::startJWebTopByFile(data);
 				return;
+			case JWM_SEAT_ERR_URL:
+				JWebTopConfigs::setErrorURL(data);
+				return;
 			case JWM_CEF_ExitAPP:
 				closeWebTopEx();
 			}

@@ -128,7 +128,13 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 
 	// Don't display an error for downloaded files.
 	if (errorCode == ERR_ABORTED) return;
-	frame->LoadString(L"<html><body><h2>出错了（地址：" + failedUrl.ToWString()+ L"）！</h2></body></html>", failedUrl);
+	CefString errorUrl(JWebTopConfigs::getErrorURL());
+	if (!errorUrl.empty() && 0 != errorUrl.compare(failedUrl)){
+		frame->LoadURL(errorUrl);
+	}
+	else{
+		frame->LoadString(L"<html><body><h2>出错了（地址：" + failedUrl.ToWString() + L"）！</h2></body></html>", failedUrl);
+	}
 }
 
 // 判断附加的js是否需要以引用方式添加

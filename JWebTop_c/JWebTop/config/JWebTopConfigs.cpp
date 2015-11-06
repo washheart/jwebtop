@@ -13,6 +13,13 @@
 #include "common/tests/TestUtil.h"
 #endif
 using namespace std;
+wstring errorUrl;
+void JWebTopConfigs::setErrorURL(wstring url){
+	errorUrl = url;
+}
+ wstring JWebTopConfigs::getErrorURL(){
+	 return errorUrl;
+}
 
 // 根据相对路径获取绝对路径
 // 如果relativePath已经是绝对路径，则直接返回

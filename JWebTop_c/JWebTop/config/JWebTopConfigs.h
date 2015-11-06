@@ -77,6 +77,8 @@ public:
 	// 否则将返回appPath+relativePath
 	CefString getAbsolutePath(std::wstring relativePath);
 
+	static void JWebTopConfigs::setErrorURL(std::wstring url);
+	static std::wstring JWebTopConfigs::getErrorURL();
 
 	// 按JSON字符串格式，生成JWebTopConfigs
 	static JWebTopConfigs * JWebTopConfigs::loadAsJSON(std::wstring jsonString);

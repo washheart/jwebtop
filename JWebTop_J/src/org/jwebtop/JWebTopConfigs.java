@@ -43,6 +43,8 @@ public class JWebTopConfigs {
 	private String name;// 窗口名称
 	private String icon; // 窗口图标
 
+	private String errorUrl; // 错误页面的地址(browser on error时使用）
+
 	private String dwStyleS; // 附加窗口样式，默认(0)不应用任何附加窗口样式
 	private String dwExStyleS; // 附加扩展窗口样式，默认(0)不应用任何附加扩展窗口样式
 
@@ -129,6 +131,14 @@ public class JWebTopConfigs {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public String getErrorUrl() {
+		return errorUrl;
+	}
+
+	public void setErrorUrl(String errorUrl) {
+		this.errorUrl = errorUrl;
 	}
 
 	public void setDwStyle(long dwStyle) {
