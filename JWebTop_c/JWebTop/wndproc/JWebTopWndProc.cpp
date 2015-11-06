@@ -276,6 +276,23 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	if (configs.max){// 需要按最大化的方式来显示
 		jw::maxWin(hWnd);
 	}
+	else{// 检查坐标和宽高是否与设定相同，如果不同则重新设
+		writeLog(L"检查坐标和宽高是否与设定相同，如果不同则重新设\r\n");
+		RECT rc = winInfo.rcWindow;
+		if ((p_configs->x != -1 && p_configs->x != rc.left)					
+			|| (p_configs->y != -1 && p_configs->y != rc.top)				
+			|| (p_configs->w != -1 && p_configs->w != (rc.right - rc.left))	
+			|| (p_configs->h != -1 && p_configs->h != (rc.bottom- rc.top))
+			){
+			writeLog(L"------重新设置---检查坐标和宽高是否与设定相同，如果不同则重新设\r\n");
+			jw::setBound(hWnd
+				, (p_configs->x != -1 ? p_configs->x : rc.left)
+				, (p_configs->y != -1 ? p_configs->y : rc.top)
+				, (p_configs->w != -1 ? p_configs->w : (rc.right - rc.left))
+				, (p_configs->h != -1 ? p_configs->h : (rc.bottom - rc.top))
+				);
+		}
+	}
 	HWND bWnd = GetNextWindow(hWnd, GW_CHILD);// 得到真实的浏览器窗口
 	LONG preWndProc = GetWindowLongPtr(bWnd, GWLP_WNDPROC);
 	if (preWndProc != (LONG)JWebTop_BrowerWndProc){

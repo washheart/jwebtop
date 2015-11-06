@@ -4,4 +4,4 @@
 
 std::string jstring2string(JNIEnv * env, jstring jstr);
 std::wstring jstring2wstring(JNIEnv * env, jstring jstr);
-jstring wstring2jstring(JNIEnv * env, wstring wstr);
+//jstring wstring2jstring(JNIEnv * env, wstring wstr);

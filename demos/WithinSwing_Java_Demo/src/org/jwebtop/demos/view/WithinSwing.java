@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.jwebtop.JWebTopBrowser;
+import org.jwebtop.JWebTopConfigs;
 import org.jwebtop.JWebTopContext;
 import org.jwebtop.JWebTopNative;
 import org.jwebtop.WindowStyle;
@@ -60,19 +61,16 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 	public static long frameHwnd;
 
 	private void createDlg(JFrame f) {
-		// // JDialog d = new JDialog(f, "测试嵌入浏览器在对话框中");
-		// // d.setSize(100, 200);
-		// // d.setVisible(true);
-		// // return JWebTopNative.getWindowHWND(d);
-		// JWebTopConfigs configs = new JWebTopConfigs();
-		// configs.setParentWin(JWebTopNative.getWindowHWND(f));
-		// configs.setUrl("http://www.baidu.com");
-		// long style = WS_EX_TOOLWINDOW | WS_VISIBLE;
-		// configs.setDwStyle(style);
-		// configs.setW(400);
-		// configs.setH(400);
-		// this.modalBrowserDlgHWnd = JWebTopNative.createBrowser(configs);
-		// f.setEnabled(false);// 将主窗口设置为不可用：相当于对话框是模态的
+		JWebTopConfigs configs = new JWebTopConfigs();
+		configs.setParentWin(JWebTopNative.getWindowHWND(f));
+		configs.setUrl("http://www.baidu.com");
+		long style = WS_EX_TOOLWINDOW | WS_VISIBLE;
+		configs.setDwStyle(style);
+		configs.setMax(0);
+		configs.setW(400);
+		configs.setH(400);
+		this.modalBrowserDlgHWnd = ctx.createBrowser(configs);
+		f.setEnabled(false);// 将主窗口设置为不可用：相当于对话框是模态的
 	}
 
 	@Override

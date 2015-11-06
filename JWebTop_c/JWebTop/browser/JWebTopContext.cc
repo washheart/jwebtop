@@ -65,7 +65,10 @@ namespace jw{
 			log << L"关闭全部浏览器，目前有[" << browser_list_.size() << L"]个\r\n";
 			writeLog(log.str());
 #endif
-			if (browser_list_.empty()) return;
+			if (browser_list_.empty()){
+				CefQuitMessageLoop();
+				return;
+			}
 			BrowserList::const_iterator it = browser_list_.begin();
 			for (; it != browser_list_.end(); ++it)
 				(*it)->GetHost()->CloseBrowser(force_close);
@@ -116,7 +119,6 @@ namespace jw{
 #endif
 			if (exit_code >= 0) return;	// 子进程在这里完成，并返回							
 			CefRunMessageLoop();// 运行CEF消息监听，直到CefQuitMessageLoop()方法被调用
-			writeLog("主消息循环（CefRunMessageLoop）已退出。。。。。");
 			closeJWebtopContext();
 		}
 

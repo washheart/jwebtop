@@ -144,8 +144,8 @@ Global
 		{6BD8E842-723A-47BA-83A4-FA357465DC13}.Release|Win32.ActiveCfg = Release|Win32
 		{6BD8E842-723A-47BA-83A4-FA357465DC13}.Release|Win32.Build.0 = Release|Win32
 		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Any CPU.ActiveCfg = Release|Win32
-		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Mixed Platforms.ActiveCfg = Release|Win32
-		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Mixed Platforms.Build.0 = Release|Win32
+		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Mixed Platforms.ActiveCfg = 发布版本|Win32
+		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Mixed Platforms.Build.0 = 发布版本|Win32
 		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Win32.ActiveCfg = Release|Win32
 		{6BD8E842-723A-47BA-83A4-FA357465DC13}.发布版本|Win32.Build.0 = Release|Win32
 	EndGlobalSection

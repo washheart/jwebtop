@@ -3,8 +3,6 @@
 #include <sstream>
 #include <string>
 #include "include/cef_browser.h"
-//#include "include/cef_resource_handler.h"
-//#include "include/cef_request.h"
 #include "JWebTop/config/JWebTopConfigs.h"
 
 using namespace std;
