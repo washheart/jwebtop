@@ -24,8 +24,9 @@ namespace jw{
 		public:
 			ProcessMsgLock(wstring taskId){ this->taskId = taskId; }
 			~ProcessMsgLock(){ if (!notified)notify(L""); };
-			wstring wait(DWORD microseconds = 0);// 等待执行结果
-			void notify(wstring result);		 // 设置执行结果
+			wstring wait();					 // 等待执行结果：按defaultWaitTime进行等待
+			wstring wait(DWORD microseconds);// 等待执行结果
+			void notify(wstring result);	 // 设置执行结果
 		};
 
 		// map<key,value>,key=已成功发送到远程的任务的id，value=任务执行完成后放置任务执行结果
@@ -45,6 +46,9 @@ namespace jw{
 
 		// 把所有锁都给解锁：此方法当且仅当在进程退出时执行
 		void unlockAndClearAll();
+
+		// 设置任务的默认等待时间，如果不设置所有的等待任务会一直等下去（容易造成死锁）
+		void setDefaultTaskWiatTime(DWORD defaultWaitTime);
 	}
 }
 #endif

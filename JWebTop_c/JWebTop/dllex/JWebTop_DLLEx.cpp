@@ -30,7 +30,8 @@ namespace jw{
 		bool ex(){ return isEx; }
 		void setAsEx(){ isEx = true; }
 
-		void closeWebTopEx();
+		void closeWebTopEx(); 
+		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, wstring taskId);
 
 		void __onRead(LONG userMsgType, LONG userValue, std::string taskIds, std::string datas){
 			std::wstring taskId = jw::s2w(taskIds);
@@ -41,16 +42,23 @@ namespace jw{
 				return;
 			case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 			case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-			{
-										 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-										 CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create("waitjs");
-										 CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
-										 args->SetInt(0, userMsgType);
-										 args->SetString(1, data);
-										 args->SetString(2, taskId);
-										 bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg);// 直接发送到render进程去执行
-										 break;
-			}
+			//{
+				try{
+					BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
+					CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create("waitjs");
+					CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
+					args->SetInt(0, userMsgType);
+					args->SetString(1, data);
+					args->SetString(2, taskId);
+					if (!bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg)){// 直接发送到render进程去执行
+						sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
+					}
+				}
+				catch (...){
+					sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
+				}
+				break;
+		//}
 			case JWM_JSON_EXECUTE_RETURN:{
 											 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 											 data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
@@ -72,8 +80,11 @@ namespace jw{
 			case JWM_CFGJWEBTOP_FILE:
 				jw::ctx::startJWebTopByFile(data);
 				return;
-			case JWM_SEAT_ERR_URL:
+			case JWM_SET_ERR_URL:
 				JWebTopConfigs::setErrorURL(data);
+				return;
+			case JWM_SET_TASK_WAIT_TIME:
+				jw::task::setDefaultTaskWiatTime(userValue);
 				return;
 			case JWM_CEF_ExitAPP:
 				closeWebTopEx();
@@ -152,7 +163,7 @@ namespace jw{
 			client.write(JWM_BROWSER_CREATED, browserHWnd, LPSTR(jw::w2s(taskId).c_str()), NULL, 0);
 		}
 
-		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, long senderHWND, wstring taskId){
+		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, wstring taskId){
 			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
 			if (bw == NULL)return false;
 #ifdef JWebTopLog
@@ -175,36 +186,39 @@ namespace jw{
 			wstring taskInfo = args->GetString(1).ToWString();
 			wstring remoteTaskId = args->GetString(2);
 			//long remoteHWnd = args->GetInt(3);
-			CefString rtn;
-			CefRefPtr<CefV8Context>  v8 = browser->GetMainFrame()->GetV8Context();
 			long browserHWnd = 0;
-			if (v8 != NULL){
-				int msgId = args->GetInt(0);
-				if (v8->Enter()){
-					CefRefPtr<CefV8Value> reval;
-					CefRefPtr<CefV8Exception> exception;
-					if (msgId == JWM_JSON_EXECUTE_WAIT){
-						taskInfo = L"invokeByDLL(" + taskInfo + L")";// 包装json为js调用 
+			CefString rtn;
+			try{
+				CefRefPtr<CefV8Context>  v8 = browser->GetMainFrame()->GetV8Context();
+				if (v8 != NULL){
+					int msgId = args->GetInt(0);
+					if (v8->Enter()){
+						CefRefPtr<CefV8Value> reval;
+						CefRefPtr<CefV8Exception> exception;
+						if (msgId == JWM_JSON_EXECUTE_WAIT){
+							taskInfo = L"invokeByDLL(" + taskInfo + L")";// 包装json为js调用 
+						}
+						if (v8->Eval(taskInfo, reval, exception)){// 执行JS
+							rtn = reval->GetStringValue();
+						}
+						CefRefPtr<CefV8Value> global = v8->GetGlobal();
+						CefRefPtr<CefV8Value> jwebtop = global->GetValue(CefString("JWebTop"));
+						CefRefPtr<CefV8Value> handler = jwebtop->GetValue("handler");
+						browserHWnd = handler->GetIntValue();// 从JWebTop.handler获取窗口句柄
+						v8->Exit();
 					}
-					if (v8->Eval(taskInfo, reval, exception)){// 执行JS
-						rtn = reval->GetStringValue();
-					}
-					CefRefPtr<CefV8Value> global = v8->GetGlobal();
-					CefRefPtr<CefV8Value> jwebtop = global->GetValue(CefString("JWebTop"));
-					CefRefPtr<CefV8Value> handler = jwebtop->GetValue("handler");
-					browserHWnd = handler->GetIntValue();// 从JWebTop.handler获取窗口句柄
-					v8->Exit();
 				}
 			}
+			catch (...){}// 不管发生什么情况，都需要把taskId返回回去，否则会造成系统在那里死死的等待
 			wstring result = rtn.ToWString();
-			sendJWebTopProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, result, (long)browserHWnd, remoteTaskId); // 发送结果到远程进程
+			sendJWebTopProcessMsg((HWND)browserHWnd, JWM_RESULT_RETURN, result, remoteTaskId); // 发送结果到远程进程
 		}
 
 		CefString invokeRemote_Wait(HWND browserHWnd, CefString json){
 			wstring taskId = jw::task::createTaskId();			         // 生成任务id
 			wstring newjson = json.ToWString();
 			jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池
-			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, (long)browserHWnd, taskId)){ // 发送任务到远程进程
+			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, taskId)){ // 发送任务到远程进程
 				wstring result = lock->wait();     		 		             // 等待任务完成并取回执行结果
 				return CefString(result);									 // 返回数据
 			}
@@ -216,7 +230,7 @@ namespace jw{
 
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json){
 			wstring newjson = json.ToWString();
-			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, (long)browserHWnd, wstring()); // 发送任务到远程进程
+			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, wstring()); // 发送任务到远程进程
 		}
 	}
 }

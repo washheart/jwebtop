@@ -7,7 +7,13 @@
 using namespace std;
 namespace jw{
 	namespace task{
+		DWORD g_defaultWaitTime = 0;
+		void setDefaultTaskWiatTime(DWORD defaultWaitTime){
 
+		}
+		wstring ProcessMsgLock::wait(){
+			return wait(g_defaultWaitTime);
+		}
 		wstring ProcessMsgLock::wait(DWORD microseconds){
 			if (notified)return result;
 			unique_lock<mutex> locker(lock);
