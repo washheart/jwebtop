@@ -8,10 +8,15 @@ using namespace std;
 namespace jw{
 	namespace task{
 
-		wstring ProcessMsgLock::wait(){
+		wstring ProcessMsgLock::wait(DWORD microseconds){
 			if (notified)return result;
 			unique_lock<mutex> locker(lock);
-			g_queuecheck.wait(locker);
+			if (microseconds > 0){
+				g_queuecheck.wait_until(locker, chrono::system_clock::now() + chrono::microseconds(microseconds));
+			}
+			else{
+				g_queuecheck.wait(locker);
+			}
 			removeTask(this->taskId);
 			return result;
 		}

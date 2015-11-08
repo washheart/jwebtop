@@ -24,8 +24,8 @@ namespace jw{
 		public:
 			ProcessMsgLock(wstring taskId){ this->taskId = taskId; }
 			~ProcessMsgLock(){ if (!notified)notify(L""); };
-			wstring wait();				// 等待执行结果
-			void notify(wstring result);// 获取执行结果
+			wstring wait(DWORD microseconds = 0);// 等待执行结果
+			void notify(wstring result);		 // 设置执行结果
 		};
 
 		// map<key,value>,key=已成功发送到远程的任务的id，value=任务执行完成后放置任务执行结果
