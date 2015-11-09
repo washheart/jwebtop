@@ -438,8 +438,6 @@
     <ClCompile Include="jwebtop_jni.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="jni_jdk1_6_24\jawt.h" />
-    <ClInclude Include="jni_jdk1_6_24\jawt_md.h" />
     <ClInclude Include="jni_jdk1_6_24\jni.h" />
     <ClInclude Include="jni_jdk1_6_24\jni_md.h" />
   </ItemGroup>

@@ -12,7 +12,9 @@
 #include "jni_jdk1_6_24/jni.h"
 #include "common/fastipc/Server.h"
 #include "common/fastipc/Client.h"
+#ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
+#endif
 #include "common/util/StrUtil.h"
 #include "javautils.h"
 

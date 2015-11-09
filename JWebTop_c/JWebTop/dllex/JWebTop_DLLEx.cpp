@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <ShellAPI.h> 
 #include <thread>
 #include <sstream>
 #include "JWebTop_DLLEx.h"

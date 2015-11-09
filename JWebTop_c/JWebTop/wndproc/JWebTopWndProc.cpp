@@ -4,8 +4,6 @@
 #include <WindowsX.h>
 #include "JWebTop/browser/JWebTopCommons.h"
 #include "common/util/StrUtil.h"
-#include "common/winctrl/JWebTopWinCtrl.h"
-#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include <comdef.h>
 #include <algorithm>
 #include <gdiplus.h>

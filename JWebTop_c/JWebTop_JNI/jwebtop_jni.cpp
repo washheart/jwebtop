@@ -1,16 +1,16 @@
 // JNI主体实现
 #include "jni_jdk1_6_24\jni.h"
-#include <Shlwapi.h>
 #include "common/task/Task.h"
-#include "common/JWebTopMsg.h"
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 
 #include "org_jwebtop_JWebTopNative.h"
 #include "javautils.h"
 #include "common/os/OS.h"
+#ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
-typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
+#endif
+//typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 using namespace std;
 // 创建一个新进程，返回的数据为进程中主线程的id
 JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine){
@@ -136,8 +136,8 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost
 }
 
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetWindowStyle
-(JNIEnv *, jclass, jlong browserHWnd,jint style){
-	jw::setWindowStyle((HWND)browserHWnd,style);
+(JNIEnv *, jclass, jlong browserHWnd, jint style){
+	jw::setWindowStyle((HWND)browserHWnd, style);
 }
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetWindowExStyle
 (JNIEnv *, jclass, jlong browserHWnd, jint exStyle){

@@ -1,14 +1,9 @@
 #include "JWebTopScheme.h"
 #include "include/cef_parser.h"
 #include "include/wrapper/cef_helpers.h"
-#include "JWebTopCommons.h"
-#include "JWebTopContext.h"
-#include "JWebTop/config/JWebTopConfigs.h"
-#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "common/util/StrUtil.h"
 
 namespace jw{
-	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 	namespace jb{
 		//void ToLower(wstring &str){
 		//	int len = str.length();

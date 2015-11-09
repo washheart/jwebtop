@@ -23,12 +23,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="jni_jdk1_6_24\jawt.h">
-      <Filter>jni_jdk1_6_24</Filter>
-    </ClInclude>
-    <ClInclude Include="jni_jdk1_6_24\jawt_md.h">
-      <Filter>jni_jdk1_6_24</Filter>
-    </ClInclude>
     <ClInclude Include="jni_jdk1_6_24\jni.h">
       <Filter>jni_jdk1_6_24</Filter>
     </ClInclude>

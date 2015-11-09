@@ -246,6 +246,7 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)\JWebTop_JN
     <ClCompile Include="wndproc\JWebTopWndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\JWebTopMsg.h" />
     <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\ui\dlgs\InputDialog.h" />
     <ClInclude Include="browser\JWebTopApp.h" />
@@ -264,9 +265,6 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)\JWebTop_JN
     <ProjectReference Include="..\JWebTopCommon\JWebTopCommon.vcxproj">
       <Project>{6bd8e842-723a-47ba-83a4-fa357465dc13}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -116,8 +116,8 @@
     <ClInclude Include="..\common\task\Task.h">
       <Filter>common\task</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClInclude Include="..\common\JWebTopMsg.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

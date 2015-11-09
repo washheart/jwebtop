@@ -17,11 +17,9 @@ namespace jw{
 		void startJWebTopByFile(std::wstring cfgFile);
 		// 关闭cef相关的设置
 		void closeJWebtopContext();
-
-
+		
 		JWebTopConfigs * getDefaultConfigs();
-
-			 
+					 
 		void setDefaultConfigs(JWebTopConfigs *);
 
 		int getBrowserCount();

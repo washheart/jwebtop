@@ -9,10 +9,7 @@
 #include "include/cef_app.h"
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
-#include "JWebTop/wndproc/JWebTopWndProc.h"
-#include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "common/util/StrUtil.h"
-#include "common/os/OS.h"
 #include "JWebTop/jshandler/JJH_Windows.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
