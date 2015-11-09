@@ -75,19 +75,20 @@ namespace jw{
 #endif
 					sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
 				}
-				break;
+				return;
 			case JWM_JSON_EXECUTE_RETURN:{
 											 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 											 data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
 											 bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-											 break; }
+											 return; }
 			case JWM_JS_EXECUTE_RETURN:{
 										   BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 										   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-										   break;
+										   return;
 			}
 			case JWM_CLOSEBROWSER:
 				jb::close((HWND)userValue);
+				return;
 			case JWM_CREATEBROWSER_JSON:
 				createNewBrowser(JWebTopConfigs::loadAsJSON(data), taskId);
 				return;
@@ -105,6 +106,7 @@ namespace jw{
 				return;
 			case JWM_CEF_ExitAPP:
 				closeWebTopEx();
+				return;
 			}
 		}
 
