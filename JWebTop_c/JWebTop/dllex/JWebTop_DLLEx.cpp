@@ -19,6 +19,7 @@
 #include "common/tests/TestUtil.h"
 #endif
 
+//#define FLAG_TASK_TIMER 100
 using namespace std;
 namespace jw{
 	namespace dllex{
@@ -30,8 +31,9 @@ namespace jw{
 		bool ex(){ return isEx; }
 		void setAsEx(){ isEx = true; }
 
-		void closeWebTopEx(); 
+		void closeWebTopEx();
 		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, wstring taskId);
+		//wstring getFlagTaskId(wstring  taskId){ return taskId + L"_Flag"; }
 
 		void __onRead(LONG userMsgType, LONG userValue, std::string taskIds, std::string datas){
 			std::wstring taskId = jw::s2w(taskIds);
@@ -42,7 +44,6 @@ namespace jw{
 				return;
 			case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 			case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-			//{
 				try{
 					BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 					CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create("waitjs");
@@ -50,15 +51,31 @@ namespace jw{
 					args->SetInt(0, userMsgType);
 					args->SetString(1, data);
 					args->SetString(2, taskId);
+					wstring flagTaskId = taskId + L"_flag";
+					//jw::task::ProcessMsgLock * flagTask = jw::task::addTask(flagTaskId);// 
 					if (!bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg)){// 直接发送到render进程去执行
+#ifdef JWebTopLog
+						writeLog(L"发送JS到render进程失败，taskId="); writeLog(taskId); writeLog(L"\r\n");
+#endif
 						sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
+//					}
+//					else{
+//						wstring  flagResult = flagTask->wait(FLAG_TASK_TIMER);// 等待FLAG_TASK_TIMER毫秒
+//						if (L"1" != flagResult){// 此任务没有被正常处理，正常情况下FLAG_TASK_TIMER毫秒足够render进程接收任务了
+//#ifdef JWebTopLog
+//							writeLog(L"发送到render进程的JS未正常处理，taskId="); writeLog(taskId); writeLog(L"\r\n");
+//#endif
+//							sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
+//						}
 					}
 				}
 				catch (...){
+#ifdef JWebTopLog
+					writeLog(L"执行JS出现异常，taskId="); writeLog(taskId); writeLog(L"\r\n");
+#endif
 					sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
 				}
 				break;
-		//}
 			case JWM_JSON_EXECUTE_RETURN:{
 											 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 											 data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
@@ -164,8 +181,6 @@ namespace jw{
 		}
 
 		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, wstring taskId){
-			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
-			if (bw == NULL)return false;
 #ifdef JWebTopLog
 			std::wstringstream wss;
 			wss << L"Writed "
@@ -175,7 +190,9 @@ namespace jw{
 				<< L" msgId=" << msgId
 				<< L" msg=" << msg
 				<< L"||\r\n";
-			writeLog(wss.str());
+			writeLog(wss.str());		
+			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
+			if(bw==NULL)writeLog(L"消息出现异常，sendJWebTopProcessMsg时bw==null,taskId"); writeLog(taskId); writeLog(L"\r\n");
 #endif
 			string tmp = jw::w2s(msg);
 			return client.write(msgId, (long)browserHWnd, LPSTR(jw::w2s(taskId).c_str()), LPSTR(tmp.c_str()), tmp.size()) == 0;
@@ -185,6 +202,7 @@ namespace jw{
 			CefRefPtr<CefListValue> args = message->GetArgumentList();
 			wstring taskInfo = args->GetString(1).ToWString();
 			wstring remoteTaskId = args->GetString(2);
+			//jw::task::putTaskResult(getFlagTaskId(remoteTaskId), L"1");// 通知等待任务，js已被正常接收
 			//long remoteHWnd = args->GetInt(3);
 			long browserHWnd = 0;
 			CefString rtn;

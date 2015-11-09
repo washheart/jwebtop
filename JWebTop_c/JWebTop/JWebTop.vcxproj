@@ -265,6 +265,9 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)\JWebTop_JN
       <Project>{6bd8e842-723a-47ba-83a4-fa357465dc13}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
