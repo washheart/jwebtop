@@ -23,10 +23,12 @@ import com.alibaba.fastjson.JSONObject;
  * @author washheart@163.com
  */
 public class JWebTopContext implements FastIPCReadListener {
+	private final static String TASK_ID_CreateJWebTop = "TASK_ID_CreateJWebTop";
 	private final static int//
 			__JWM = 100, // 定义MPMSG_MINI和MPMSG_LARGE中msgId的起始值
 			JWM_IPC_CLIENT_OK = __JWM + 101, // IPC对应的客户端已成功创建
-			JWM_SEAT_ERR_URL = __JWM + 102, // 设置错误页面
+			JWM_SET_ERR_URL = __JWM + 102, // 设置错误页面
+			JWM_SET_TASK_WAIT_TIME = (__JWM + 103), // 执行等待任务时的最大等待时间（毫秒）
 			// JWM_STARTJWEBTOP = __JWM + 301, // 启动JWebTop进程
 			// JWM_CFGJWEBTOP_FILE = __JWM + 302, //
 			// JWM_CFGJWEBTOP_JSON = __JWM + 303, //
@@ -45,7 +47,7 @@ public class JWebTopContext implements FastIPCReadListener {
 			JWM_DLL_EXECUTE_WAIT = __JWM + 221, // CEF调用DLL端：需要执行并等待的任务
 			JWM_DLL_EXECUTE_RETURN = __JWM + 222, // CEF调用DLL端：需要执行但CEF无需等待的任务
 			JWM_RESULT_RETURN = __JWM + 231;
-	public static long WIN_HWND = 0;
+	// public static long WIN_HWND = 0;
 	private Map<String, ByteArrayOutputStream> FastIPCReceivedCaches = new HashMap<String, ByteArrayOutputStream>();
 	private FastIPCServer server = null;
 	private FastIPCClient client = null;
@@ -71,8 +73,6 @@ public class JWebTopContext implements FastIPCReadListener {
 		}
 		System.load(dllFile.getAbsolutePath());
 	}
-
-	private final String TASK_ID_CreateJWebTop = "TASK_ID_CreateJWebTop";
 
 	public void createJWebTopByCfgFile(String processPath, String cfgFile) {
 		ProcessMsgLock task = tc.addTask(TASK_ID_CreateJWebTop);
@@ -112,7 +112,7 @@ public class JWebTopContext implements FastIPCReadListener {
 				+ " " + Integer.toString(blockSize)// 通过FastIPC进行通信时，缓存区的大小
 				+ " " + serverName // 通过FastIPC进行通信时，双方的交互标记
 				+ " \"" + cfgFile + "\"" // 配置文件的路径
-				+ " " + JWebTopContext.WIN_HWND//
+				// + " " + JWebTopContext.WIN_HWND//
 		;
 		JWebTopNative.createSubProcess(processPath, cmds);
 		// String[] cmds = {//
@@ -150,7 +150,17 @@ public class JWebTopContext implements FastIPCReadListener {
 	 * @param url
 	 */
 	public void setErrorUrl(String url) {
-		client.write(JWM_SEAT_ERR_URL, 0, null, url);
+		client.write(JWM_SET_ERR_URL, 0, null, url);
+	}
+
+	/**
+	 * 设置任务的默认等待时间，如果不设置所有的等待任务会一直等下去（容易造成死锁）
+	 * 
+	 * @param defaultWaitTime
+	 */
+	public void setTaskWaitTime(long defaultWaitTime) {
+		client.write(JWM_SET_TASK_WAIT_TIME, defaultWaitTime, null, null);
+		tc.setTaskWaitTime(defaultWaitTime);
 	}
 
 	/**
@@ -267,12 +277,18 @@ public class JWebTopContext implements FastIPCReadListener {
 
 		@Override
 		public void run() {
+			// System.out.println("Readed msgId=" + userMsgType + " userValue=" + userValue + " taskId=" + userShortStr + " msg=" + userShortStr);
 			switch (userMsgType) {
 			case JWM_DLL_EXECUTE_RETURN:
 				jsonHandler.dispatcher(userValue, data);
 				break;
 			case JWM_DLL_EXECUTE_WAIT:
-				String result = jsonHandler.dispatcher(userValue, data); // 取回执行结果
+				String result = "";
+				try {
+					result = jsonHandler.dispatcher(userValue, data); // 取回执行结果
+				} catch (Throwable th) {
+					th.printStackTrace();// 不管发生什么情况，都需要把taskId返回回去，否则会造成系统在那里死死的等待
+				}
 				client.write(JWM_RESULT_RETURN, userValue, userShortStr, result); // 发送结果到远程进程
 				break;
 			case JWM_RESULT_RETURN:

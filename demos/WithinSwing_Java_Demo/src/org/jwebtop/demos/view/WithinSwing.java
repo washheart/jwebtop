@@ -123,7 +123,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		try {
 			JOptionPane.showMessageDialog(this, "wait");
 			WithinSwing.frameHwnd = JWebTopNative.getWindowHWND(this);
-			JWebTopContext.WIN_HWND = WithinSwing.frameHwnd;
+			// JWebTopContext.WIN_HWND = WithinSwing.frameHwnd;
 
 			System.out.println("Java窗口handler = " + WithinSwing.frameHwnd + " hex=0x" + Long.toHexString(WithinSwing.frameHwnd));
 			String path = "JWebTop.exe";

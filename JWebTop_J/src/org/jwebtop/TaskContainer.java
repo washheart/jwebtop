@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * 通过锁实现多线程任务的等待/通知功能，使其看上去像是单进程<br>
@@ -32,10 +31,15 @@ public class TaskContainer {
 
 		// 等待执行结果
 		public String waitResult(TaskContainer tc) {
+			return waitResult(tc, tc.defaultWaitTime);
+		}
+
+		// 等待执行结果
+		public String waitResult(TaskContainer tc, long waitTime) {
 			if (notified) return result;
 			try {
 				synchronized (this) {
-					this.wait();
+					this.wait(waitTime);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -59,8 +63,12 @@ public class TaskContainer {
 	private final Object mapLock = new Object(); // 所有针对map的操作都要锁定
 
 	// 生成任务的id
+	private long tid = 0;
+	private long defaultWaitTime;
+
 	public String createTaskId() {
-		return UUID.randomUUID().toString();
+		// return UUID.randomUUID().toString();
+		return "J_J_" + (++tid);
 	}
 
 	// 添加一个等待任务到任务列表
@@ -124,5 +132,14 @@ public class TaskContainer {
 	protected void finalize() throws Throwable {
 		unlockAndClearAll();
 		super.finalize();
+	}
+
+	/**
+	 * 设置任务的默认等待时间，如果不设置所有的等待任务会一直等下去（容易造成死锁）
+	 * 
+	 * @param defaultWaitTime
+	 */
+	public void setTaskWaitTime(long defaultWaitTime) {
+		this.defaultWaitTime = defaultWaitTime;
 	}
 }
