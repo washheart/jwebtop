@@ -277,7 +277,7 @@ public class JWebTopContext implements FastIPCReadListener {
 
 		@Override
 		public void run() {
-			// System.out.println("Readed msgId=" + userMsgType + " userValue=" + userValue + " taskId=" + userShortStr + " msg=" + userShortStr);
+			// System.out.println("Readed msgId=" + userMsgType + " userValue=" + userValue + " taskId=" + userShortStr + " msg=" + data);
 			switch (userMsgType) {
 			case JWM_DLL_EXECUTE_RETURN:
 				jsonHandler.dispatcher(userValue, data);

@@ -9,28 +9,31 @@ namespace jw{
 	namespace task{
 		DWORD g_defaultWaitTime = 0;
 		void setDefaultTaskWiatTime(DWORD defaultWaitTime){
-
+			g_defaultWaitTime = defaultWaitTime;
 		}
 		wstring ProcessMsgLock::wait(){
 			return wait(g_defaultWaitTime);
 		}
 		wstring ProcessMsgLock::wait(DWORD microseconds){
-			if (notified)return result;
-			unique_lock<mutex> locker(lock);
-			if (microseconds > 0){
-				g_queuecheck.wait_until(locker, chrono::system_clock::now() + chrono::microseconds(microseconds));
+			if (!notified){						// 如果已经通知过，直接返回通知的结果
+				unique_lock<mutex> locker(lock);// 建立锁并锁上（析构时自动解锁）
+				if (!notified){					// 上锁后再检查下状态位，避免early notify
+					if (microseconds > 0){		// 如果有指定超时时间，那么使用超时等待方式
+						g_queuecheck.wait_until(locker, chrono::system_clock::now() + chrono::microseconds(microseconds));
+					}
+					else{						// 否则一直等待，直到解锁notify的到来
+						g_queuecheck.wait(locker);
+					}
+				}
 			}
-			else{
-				g_queuecheck.wait(locker);
-			}
-			removeTask(this->taskId);
-			return result;
+			removeTask(this->taskId);			// 移除保存的任务锁
+			return this->result;
 		}
 		void ProcessMsgLock::notify(wstring result){
-			this->result = result;
-			unique_lock<mutex> locker(lock);
-			g_queuecheck.notify_all();
-			notified = true;
+			this->result = result;				// 设置任务锁的执行结果
+			notified = true;					// 上锁之前先把标志位改了，因为此时结果已设置
+			unique_lock<mutex> locker(lock);	// 建立锁并锁上（析构时自动解锁）
+			g_queuecheck.notify_all();			// 通知所有等待锁：任务完成了
 		}
 
 		WaitTaskMap WaitTasks; // 保存所有已创建的任务信息	

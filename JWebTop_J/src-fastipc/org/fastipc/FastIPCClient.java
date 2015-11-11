@@ -1,6 +1,5 @@
 package org.fastipc;
 
-
 /**
  * FastIPC的客户端。<br/>
  * 源码：https://github.com/washheart/fastipc<br/>
@@ -17,7 +16,7 @@ public final class FastIPCClient {
 	}
 
 	public void write(int userMsgType, long userValue, String userShortStr, String data) {
-		// System.out.println("Writed msgId=" + userMsgType + " userValue=" + userValue + " taskId=" + userShortStr + " msg=" + userShortStr);
+		// System.out.println("Writed msgId=" + userMsgType + " userValue=" + userValue + " taskId=" + userShortStr + " msg=" + data);
 		FastIPCNative.write(nativeClient, userMsgType, userValue, userShortStr, data);
 	}
 

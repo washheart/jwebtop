@@ -36,13 +36,14 @@ public class TaskContainer {
 
 		// 等待执行结果
 		public String waitResult(TaskContainer tc, long waitTime) {
-			if (notified) return result;
-			try {
-				synchronized (this) {
-					this.wait(waitTime);
+			if (!notified) {
+				try {
+					synchronized (this) {
+						if (!notified) this.wait(waitTime);// 进入同步块后也检查一下，避免eraly notify现象
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 			tc.removeTask(this.taskId);
 			return this.result;
@@ -51,10 +52,10 @@ public class TaskContainer {
 		// 结果取回后进行通知
 		public void notify(String result) {
 			this.result = result;
+			notified = true;
 			synchronized (this) {
 				this.notifyAll();
 			}
-			notified = true;
 		}
 	};
 

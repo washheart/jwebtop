@@ -31,16 +31,26 @@ namespace jw{
 		void setAsEx(){ isEx = true; }
 
 		void closeWebTopEx();
-		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, wstring taskId);
+		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring& msg, wstring& taskId);
 		//wstring getFlagTaskId(wstring  taskId){ return taskId + L"_Flag"; }
 
-		void __onRead(LONG userMsgType, LONG userValue, std::string taskIds, std::string datas){
+		void __onRead(LONG userMsgType, LONG userValue, std::string& taskIds, std::string& datas){
 			std::wstring taskId = jw::s2w(taskIds);
 			std::wstring data = jw::s2w(datas);
+#ifdef JWebTopLog
+			std::wstringstream wss;
+			wss << L"start__onRead "
+				<< L" userMsgType=" << userMsgType
+				<< L" userValue=" << userValue
+				<< L" userShortStr=" << taskId
+				<< L" pBuff=" << data
+				<< L"||\r\n";
+			writeLog(wss.str());
+#endif
 			switch (userMsgType){
 			case JWM_RESULT_RETURN:
 				jw::task::putTaskResult(taskId, data); // 通知等待线程，远程任务已完成，结果已取回
-				return;
+				break;
 			case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 			case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 				try{
@@ -56,57 +66,69 @@ namespace jw{
 #ifdef JWebTopLog
 						writeLog(L"发送JS到render进程失败，taskId="); writeLog(taskId); writeLog(L"\r\n");
 #endif
-						sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
-//					}
-//					else{
-//						wstring  flagResult = flagTask->wait(FLAG_TASK_TIMER);// 等待FLAG_TASK_TIMER毫秒
-//						if (L"1" != flagResult){// 此任务没有被正常处理，正常情况下FLAG_TASK_TIMER毫秒足够render进程接收任务了
-//#ifdef JWebTopLog
-//							writeLog(L"发送到render进程的JS未正常处理，taskId="); writeLog(taskId); writeLog(L"\r\n");
-//#endif
-//							sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
-//						}
+						wstring empty;
+						sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, empty, taskId); // 发送结果到远程进程
+						//					}
+						//					else{
+						//						wstring  flagResult = flagTask->wait(FLAG_TASK_TIMER);// 等待FLAG_TASK_TIMER毫秒
+						//						if (L"1" != flagResult){// 此任务没有被正常处理，正常情况下FLAG_TASK_TIMER毫秒足够render进程接收任务了
+						//#ifdef JWebTopLog
+						//							writeLog(L"发送到render进程的JS未正常处理，taskId="); writeLog(taskId); writeLog(L"\r\n");
+						//#endif
+						//							sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
+						//						}
 					}
 				}
 				catch (...){
 #ifdef JWebTopLog
 					writeLog(L"执行JS出现异常，taskId="); writeLog(taskId); writeLog(L"\r\n");
 #endif
-					sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, wstring(), taskId); // 发送结果到远程进程
+					wstring empty;
+					sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, empty, taskId); // 发送结果到远程进程
 				}
-				return;
+				break;
 			case JWM_JSON_EXECUTE_RETURN:{
 											 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 											 data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
 											 bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-											 return; }
+											 break; }
 			case JWM_JS_EXECUTE_RETURN:{
 										   BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
 										   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-										   return;
+										   break;
 			}
 			case JWM_CLOSEBROWSER:
 				jb::close((HWND)userValue);
-				return;
+				break;
 			case JWM_CREATEBROWSER_JSON:
 				createNewBrowser(JWebTopConfigs::loadAsJSON(data), taskId);
-				return;
+				break;
 			case JWM_CREATEBROWSER_FILE:
 				createNewBrowser(JWebTopConfigs::loadConfigs(data), taskId);
-				return;
+				break;
 			case JWM_CFGJWEBTOP_FILE:
 				jw::ctx::startJWebTopByFile(data);
-				return;
+				break;
 			case JWM_SET_ERR_URL:
 				JWebTopConfigs::setErrorURL(data);
-				return;
+				break;
 			case JWM_SET_TASK_WAIT_TIME:
 				jw::task::setDefaultTaskWiatTime(userValue);
-				return;
+				break;
 			case JWM_CEF_ExitAPP:
 				closeWebTopEx();
-				return;
+				break;
 			}
+#ifdef JWebTopLog
+			wss.str(L"");
+			wss << L"end__onRead "
+				<< L" userMsgType=" << userMsgType
+				<< L" userValue=" << userValue
+				<< L" userShortStr=" << taskId
+				<< L" pBuff=" << data
+				<< L"||\r\n";
+			writeLog(wss.str());
+#endif
 		}
 
 		class EXEReadListener :public fastipc::RebuildedBlockListener{
@@ -181,7 +203,7 @@ namespace jw{
 			client.write(JWM_BROWSER_CREATED, browserHWnd, LPSTR(jw::w2s(taskId).c_str()), NULL, 0);
 		}
 
-		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring msg, wstring taskId){
+		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring& msg, wstring& taskId){
 #ifdef JWebTopLog
 			std::wstringstream wss;
 			wss << L"Writed "
@@ -248,8 +270,8 @@ namespace jw{
 		}
 
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json){
-			wstring newjson = json.ToWString();
-			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, wstring()); // 发送任务到远程进程
+			wstring newjson = json.ToWString(), empty;
+			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, empty); // 发送任务到远程进程
 		}
 	}
 }
