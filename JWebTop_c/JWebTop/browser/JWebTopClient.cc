@@ -147,6 +147,10 @@ bool isReference(const wstring &appendFile){
 }
 
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode){
+#ifdef JWebTopLog
+	writeLog(L"OnLoadEnd URL===="); writeLog(frame->GetURL().ToWString()); writeLog(L"\r\n");
+#endif	
+	if (!frame->IsMain())return;// 只在主窗口上附加js
 	CefRefPtr<CefBrowserHost> host = browser->GetHost();
 	HWND hWnd = host->GetWindowHandle();
 	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
