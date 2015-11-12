@@ -326,7 +326,7 @@ public class JWebTopContext implements FastIPCReadListener {
 				bos.write(data);
 				if (msgType == FastIPCNative.MSG_TYPE_END) {
 					FastIPCReceivedCaches.remove(packId);
-					new InnerThread(userMsgType, userValue, userShortStr, new String(bos.toByteArray(), "utf-8"));
+					new InnerThread(userMsgType, userValue, userShortStr, new String(bos.toByteArray(), "utf-8")).start();
 				}
 			}
 		} catch (Throwable e) {
