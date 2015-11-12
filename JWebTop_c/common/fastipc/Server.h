@@ -62,6 +62,13 @@ namespace fastipc{
 						tmpBlock = new MemBlock();
 						tmpBlock->msgType = MSG_TYPE_NORMAL;
 						tmpBlock->dataLen = 0;
+						tmpBlock->userMsgType = readed->userMsgType;
+						tmpBlock->userValue = readed->userValue;
+						int len = lstrlenA(readed->userShortStr);
+						ZeroMemory(tmpBlock->userShortStr, PACK_ID_LEN);
+						if (len > 0){
+							memcpy(tmpBlock->userShortStr, readed->userShortStr, len);
+						}
 						rebuildBlocks.insert(std::pair<std::string, MemBlock*>(packId, tmpBlock));
 					}
 					int len = readed->dataLen;
