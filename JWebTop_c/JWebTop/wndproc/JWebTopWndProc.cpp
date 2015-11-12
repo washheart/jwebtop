@@ -46,14 +46,18 @@ namespace jb{
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
 		if (bw != NULL)bw->browser->ReloadIgnoreCache();
 	}
-	//showDev(handler);//打开开发者工具
-	void showDev(HWND hWnd){
+	void __showDev(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
 		if (bw != NULL){
 			CefWindowInfo windowInfo;
 			windowInfo.SetAsPopup(NULL, "cef_debug");
 			bw->browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), CefPoint());
 		}
+	}
+	//showDev(handler);//打开开发者工具
+	void showDev(HWND hWnd){
+		thread t(__showDev, hWnd);
+		t.detach();// 开启新线程启动开发者工具，避免和JS线程锁在一起
 	}
 
 	void ExecJS(HWND hWnd, string js){
@@ -219,7 +223,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_KEYUP:
 		switch (wParam)
 		{
-		case VK_F1:
+		case VK_F12:
 			jb::showDev(hWnd);
 			break;
 		}

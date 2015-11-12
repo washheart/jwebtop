@@ -118,6 +118,9 @@ namespace jw{
 			case JWM_CEF_ExitAPP:
 				closeWebTopEx();
 				break;
+			default:
+				MessageBox(NULL,L"用户定义消息值不对！",L"错误",0);
+				break;
 			}
 #ifdef JWebTopLog
 			wss.str(L"");
