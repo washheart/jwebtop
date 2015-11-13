@@ -150,71 +150,75 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 #ifdef JWebTopLog
 	writeLog(L"OnLoadEnd URL===="); writeLog(frame->GetURL().ToWString()); writeLog(L"\r\n");
 #endif	
-	if (!frame->IsMain())return;// 只在主窗口上附加js
-	CefRefPtr<CefBrowserHost> host = browser->GetHost();
-	HWND hWnd = host->GetWindowHandle();
-	// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
-	stringstream extensionCode;
-	extensionCode << "if(!JWebTop)JWebTop={};";
-	extensionCode << "(function() {";// 将OnLoad后，JWebTop动态添加的JS脚本包起来，避免和其他用户JS文件的冲突
-	extensionCode << "JWebTop.handler=" << (LONG)hWnd << ";" << endl;
-	extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
-	if (!settings.single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
-		// close(handler);// 关闭窗口
-		extensionCode << "JWebTop.close=function(handler){JWebTop.cefQuery({m:'close',handler:(handler?handler:JWebTop.handler)})};" << endl;
-		//loadUrl(url, handler);//加载网页，url为网页路径
-		extensionCode << "JWebTop.loadUrl=function(url,handler){JWebTop.cefQuery({m:'loadUrl',url:url,handler:(handler?handler:JWebTop.handler)})};" << endl;
-		//reload(handler);//重新加载当前页面
-		extensionCode << "JWebTop.reload=function(handler){JWebTop.cefQuery({m:'reload',handler:(handler?handler:JWebTop.handler)})};" << endl;
-		//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
-		extensionCode << "JWebTop.reloadIgnoreCache=function(handler){JWebTop.cefQuery({m:'reloadIgnoreCache',handler:(handler?handler:JWebTop.handler)})};" << endl;
-		//showDev(handler);//打开开发者工具
-		extensionCode << "JWebTop.showDev=function(handler){JWebTop.cefQuery({m:'showDev',handler:(handler?handler:JWebTop.handler)})};" << endl;
+	if (frame->IsMain()){// 只在主窗口上附加JWebTop JS对象
+		CefRefPtr<CefBrowserHost> host = browser->GetHost();
+		HWND hWnd = host->GetWindowHandle();
+		// 添加JWebTop对象的handler属性和close方法（放到OnAfterCreated中，页面重新加载后函数和变量会丢失）
+		stringstream extensionCode;
+		extensionCode << "if(!JWebTop)JWebTop={};";
+		extensionCode << "(function() {";// 将OnLoad后，JWebTop动态添加的JS脚本包起来，避免和其他用户JS文件的冲突
+		extensionCode << "JWebTop.handler=" << (LONG)hWnd << ";" << endl;
+		extensionCode << "JWebTop.cefQuery = function(ajson){ window.cefQuery({ request:JSON.stringify(ajson) }) }; " << endl;// 包装下window.cefQuery参数
+		if (!settings.single_process){	// 多进程模式下，需要按发送消息的方式注册需要根据HWND获取Borwser的函数到JWebTop对象
+			// close(handler);// 关闭窗口
+			extensionCode << "JWebTop.close=function(handler){JWebTop.cefQuery({m:'close',handler:(handler?handler:JWebTop.handler)})};" << endl;
+			//loadUrl(url, handler);//加载网页，url为网页路径
+			extensionCode << "JWebTop.loadUrl=function(url,handler){JWebTop.cefQuery({m:'loadUrl',url:url,handler:(handler?handler:JWebTop.handler)})};" << endl;
+			//reload(handler);//重新加载当前页面
+			extensionCode << "JWebTop.reload=function(handler){JWebTop.cefQuery({m:'reload',handler:(handler?handler:JWebTop.handler)})};" << endl;
+			//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
+			extensionCode << "JWebTop.reloadIgnoreCache=function(handler){JWebTop.cefQuery({m:'reloadIgnoreCache',handler:(handler?handler:JWebTop.handler)})};" << endl;
+			//showDev(handler);//打开开发者工具
+			extensionCode << "JWebTop.showDev=function(handler){JWebTop.cefQuery({m:'showDev',handler:(handler?handler:JWebTop.handler)})};" << endl;
 
-		// enableDrag(true|false);// 允许进行拖动
-		extensionCode << "JWebTop.enableDrag=function(enable){JWebTop.cefQuery({m:'enableDrag',enable:enable,handler:JWebTop.handler})};" << endl;
-		// startDrag();// 开始进行拖动
-		extensionCode << "JWebTop.startDrag=function(){JWebTop.cefQuery({m:'startDrag',handler:JWebTop.handler})};" << endl;
-		// stopDrag();// 停止拖动
-		extensionCode << "JWebTop.stopDrag=function(){JWebTop.cefQuery({m:'stopDrag',handler:JWebTop.handler})};" << endl;
-	}
-	// runApp(appName,handler);//运行一个app，appName为.app文件路径。
-	extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
-	extensionCode << "JWebTop.runAppMore=function(app,parentWin,url,name,icon,x,y,w,h,handler){" \
-		"var morejson={m:'runAppMore',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)};" \
-		"if(url!=null)morejson.url=url;" \
-		"if(name!=null)morejson.name=name;" \
-		"if(icon!=null)morejson.icon=icon;" \
-		"if(x!=null)morejson.x=x;" \
-		"if(y!=null)morejson.y=y;" \
-		"if(w!=null)morejson.w=w;" \
-		"if(h!=null)morejson.h=h;" \
-		"JWebTop.cefQuery(morejson)};";
-	if (!configs->appendJs.empty()){// 需要附加一个js文件
-		wstring appendFile = configs->appendJs.ToWString();
-		//下面这种方式会有跨域问题，所以采用读入文件的方式
-		if (isReference(ref(appendFile))){// 通过docuemnt.wirte的方式来写
-			appendFile = jw::replace_allW(ref(appendFile), L"\\", L"/");// 替换文件中的换行符号	
-			extensionCode
-				<< "\r\n var scriptLet = document.createElement('SCRIPT');"
-				<< "\r\n scriptLet.type = 'text/javascript';"
-				<< "\r\n scriptLet.src = '" << jw::w2s(appendFile) << "';"
-				<< "\r\n addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
-				<< "\r\n";
+			// enableDrag(true|false);// 允许进行拖动
+			extensionCode << "JWebTop.enableDrag=function(enable){JWebTop.cefQuery({m:'enableDrag',enable:enable,handler:JWebTop.handler})};" << endl;
+			// startDrag();// 开始进行拖动
+			extensionCode << "JWebTop.startDrag=function(){JWebTop.cefQuery({m:'startDrag',handler:JWebTop.handler})};" << endl;
+			// stopDrag();// 停止拖动
+			extensionCode << "JWebTop.stopDrag=function(){JWebTop.cefQuery({m:'stopDrag',handler:JWebTop.handler})};" << endl;
 		}
-		else{
-			appendFile = configs->getAbsolutePath(appendFile);
-			string appendJS;
-			if (jw::readfile(appendFile, ref(appendJS))){
-				extensionCode << "\r\n" << appendJS << "\r\n";
+		// runApp(appName,handler);//运行一个app，appName为.app文件路径。
+		extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;
+		extensionCode << "JWebTop.runAppMore=function(app,parentWin,url,name,icon,x,y,w,h,handler){" \
+			"var morejson={m:'runAppMore',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)};" \
+			"if(url!=null)morejson.url=url;" \
+			"if(name!=null)morejson.name=name;" \
+			"if(icon!=null)morejson.icon=icon;" \
+			"if(x!=null)morejson.x=x;" \
+			"if(y!=null)morejson.y=y;" \
+			"if(w!=null)morejson.w=w;" \
+			"if(h!=null)morejson.h=h;" \
+			"JWebTop.cefQuery(morejson)};";
+		if (!configs->appendJs.empty()){// 需要附加一个js文件
+			wstring appendFile = configs->appendJs.ToWString();
+			//下面这种方式会有跨域问题，所以采用读入文件的方式
+			if (isReference(ref(appendFile))){// 通过docuemnt.wirte的方式来写
+				appendFile = jw::replace_allW(ref(appendFile), L"\\", L"/");// 替换文件中的换行符号	
+				extensionCode
+					<< "\r\n var scriptLet = document.createElement('SCRIPT');"
+					<< "\r\n scriptLet.type = 'text/javascript';"
+					<< "\r\n scriptLet.src = '" << jw::w2s(appendFile) << "';"
+					<< "\r\n addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
+					<< "\r\n";
+			}
+			else{
+				appendFile = configs->getAbsolutePath(appendFile);
+				string appendJS;
+				if (jw::readfile(appendFile, ref(appendJS))){
+					extensionCode << "\r\n" << appendJS << "\r\n";
+				}
 			}
 		}
-	}
-	extensionCode << "})()\r\n";// 结束对脚本的包围
+		extensionCode << "})()\r\n";// 结束对脚本的包围
 #ifdef JWebTopLog
-	writeLog(extensionCode.str());
+		writeLog(extensionCode.str());
 #endif
-	browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
-	jw::js::events::sendReadey(browser->GetMainFrame());
-	if (configs->enableResize)jb::checkAndSetResizeAblity(hWnd);
+		browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
+		jw::js::events::sendReadey(browser->GetMainFrame());
+		if (configs->enableResize)jb::checkAndSetResizeAblity(hWnd);
+	}else{
+		jw::js::events::sendIFrameReady(browser->GetMainFrame());
+		jw::js::events::sendIFrameReady(frame);
+	}
 }

@@ -84,6 +84,11 @@ namespace jw{
 				CefString js_event(L"var e = new CustomEvent('JWebTopReady');dispatchEvent(e);");
 				frame->ExecuteJavaScript(js_event, "", 0);
 			}
+			// 页面内的子页面（iframe）准备好事件：new CustomEvent('JWebTopIFrameReady')
+			void sendIFrameReady(const CefRefPtr<CefFrame> frame){
+				CefString js_event(L"var e = new CustomEvent('JWebTopIFrameReady');dispatchEvent(e);");
+				frame->ExecuteJavaScript(js_event, "", 0);
+			}
 
 			// 发送窗口大小改变事件:new CustomEvent('JWebTopResize',{detail:{w:宽度数值,h:高度数值}})
 			void sendSize(const CefRefPtr<CefFrame> frame, const int w, const int h){

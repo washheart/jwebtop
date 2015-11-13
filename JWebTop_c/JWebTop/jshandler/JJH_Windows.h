@@ -329,6 +329,9 @@ namespace jw{
 			// 发送页面准备好事件：new CustomEvent('JWebTopReady')
 			void sendReadey(const CefRefPtr<CefFrame> frame);
 
+			// 页面内的子页面（iframe）准备好事件：new CustomEvent('JWebTopIFrameReady')
+			void sendIFrameReady(const CefRefPtr<CefFrame> frame);
+
 			// 发送窗口大小改变事件:new CustomEvent('JWebTopResize',{detail:{w:宽度数值,h:高度数值}})
 			void sendSize(const CefRefPtr<CefFrame> frame, const int w, const int h);
 
