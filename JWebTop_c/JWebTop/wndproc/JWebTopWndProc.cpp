@@ -275,12 +275,14 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		if (hIcon)SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
 	}
+	bool showMax = false;
 	if (configs.max){// 需要按最大化的方式来显示
-		jw::maxWin(hWnd);
+		jw::maxWin(hWnd); 
+		showMax = true;
 	}
 	else{// 检查坐标和宽高是否与设定相同，如果不同则重新设
 		RECT rc = winInfo.rcWindow;
-		if ((p_configs->x != -1 && p_configs->x != rc.left)					
+	if ((p_configs->x != -1 && p_configs->x != rc.left)					
 			|| (p_configs->y != -1 && p_configs->y != rc.top)				
 			|| (p_configs->w != -1 && p_configs->w != (rc.right - rc.left))	
 			|| (p_configs->h != -1 && p_configs->h != (rc.bottom- rc.top))
@@ -317,6 +319,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		<< L"           parentWin  =" << configs.parentWin << L"\r\n";
 	writeLog(wss.str());
 #endif 
+	if (!showMax)ShowWindow(hWnd, SW_NORMAL);
 }
 namespace jb{
 
