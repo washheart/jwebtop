@@ -40,6 +40,9 @@ public class JWebTopContext implements FastIPCReadListener {
 			JWM_BROWSER_CREATED = __JWM + 403, // CEF浏览器已初始完成
 			JWM_CLOSEBROWSER = __JWM + 404, // 关闭浏览器的消息 （异步发送）
 
+			JWM_M_SETURL = __JWM + 501, // 设置浏览器的URL（通过JS方式设置时，可能会有JS正在阻塞的问题）
+			JWM_M_APPEND_JS = __JWM + 502, // 为浏览器附加一些JS代码，附加的代码在页面的生命周期内有效
+
 			JWM_JS_EXECUTE_WAIT = __JWM + 201, // DLL调用CEF端：需要执行并等待的JS任务
 			JWM_JS_EXECUTE_RETURN = __JWM + 202, //
 			JWM_JSON_EXECUTE_WAIT = __JWM + 211, // DLL调用CEF端：需要执行并等待的JSON任务
@@ -114,7 +117,11 @@ public class JWebTopContext implements FastIPCReadListener {
 				+ " \"" + cfgFile + "\"" // 配置文件的路径
 				// + " " + JWebTopContext.WIN_HWND//
 		;
-		JWebTopNative.createSubProcess(processPath, cmds);
+		long handle = JWebTopNative.createSubProcess(processPath, cmds);
+		if (0 > handle) {
+			server.close();
+			throw new JWebTopException("无法启动程序（" + processPath + "）！");
+		}
 		// String[] cmds = {//
 		// processPath// 要启动的程序的路径
 		// , ":"// “:”作为特殊符号告诉JWebTop主程序，还有其他参数要解析。因为“:”不可能出现在文件路径的开通
@@ -418,6 +425,14 @@ public class JWebTopContext implements FastIPCReadListener {
 	 */
 	public void executeJS_NoWait(long browserHWnd, String script) {
 		client.write(JWM_JS_EXECUTE_RETURN, browserHWnd, null, script);
+	}
+
+	public void setUrl(long browserHWnd, String url) {
+		client.write(JWM_M_SETURL, browserHWnd, null, url);
+	}
+
+	public void setAppendJS(long browserHWnd, String js) {
+		client.write(JWM_M_APPEND_JS, browserHWnd, null, js);
 	}
 
 	public boolean isStable() {
