@@ -19,6 +19,7 @@ import org.jwebtop.JWebTopBrowser;
 import org.jwebtop.JWebTopConfigs;
 import org.jwebtop.JWebTopContext;
 import org.jwebtop.JWebTopNative;
+import org.jwebtop.JWebtopJSONDispater;
 import org.jwebtop.WindowStyle;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
@@ -204,9 +205,40 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		return buffer.toString();
 	}
 
+	static void 测试没有浏览器窗口打开的情况下_关闭EC时无法关闭浏览器进程的缺陷() {
+		final JWebTopContext ctx = new JWebTopContext();
+		ctx.setJsonHandler(new JWebtopJSONDispater() {
+			@Override
+			public void resetThreadClassLoader() {}
+
+			@Override
+			public void jWebTopContextInited() {
+				JWebTopConfigs configs = new JWebTopConfigs();
+				configs.setUrl("http://www.baidu.com");
+				long style = WS_EX_TOOLWINDOW | WS_VISIBLE;
+				configs.setDwStyle(style);
+				configs.setMax(0);
+				configs.setW(400);
+				configs.setH(400);
+				ctx.createBrowser(configs);
+			}
+
+			@Override
+			public void jWebTopBrowserCreated(String browserUuid, long browserHWnd) {}
+
+			@Override
+			public String dispatcher(long browserHWnd, String json) {
+				return null;
+			}
+		});
+		String path = "JWebTop.exe";
+		ctx.createJWebTopByCfgFile(path, null);
+	}
+
 	public static void main(String[] args) {
 		try {
 			initDll(args);
+			// 测试没有浏览器窗口打开的情况下_关闭EC时无法关闭浏览器进程的缺陷();
 			new WithinSwing();
 		} catch (Throwable e) {
 			e.printStackTrace();
