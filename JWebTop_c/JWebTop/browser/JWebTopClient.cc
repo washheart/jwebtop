@@ -22,7 +22,7 @@ namespace jw{
 	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 }
 JWebTopClient::JWebTopClient()
-: dialog_handler_(new JSDialogHandler()){
+: isClosed(false), dialog_handler_(new JSDialogHandler()){
 }
 
 JWebTopClient::~JWebTopClient() {}
@@ -50,11 +50,42 @@ bool JWebTopClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	CefRefPtr<CefRequest> request,
 	bool is_redirect) {
+#ifdef JWebTopLog
+	writeLog(L"■■■■■■■■■■■■CefRequestHandler---OnBeforeBrowse---\r\n");
+#endif 
 	CEF_REQUIRE_UI_THREAD();
 	message_router_->OnBeforeBrowse(browser, frame);
 	return false;
 }
 
+void JWebTopClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+	TerminationStatus status) {
+#ifdef JWebTopLog
+	writeLog(L"■■■■■■■■■■■■CefRequestHandler---OnRenderProcessTerminated---\r\n");
+#endif 
+	CEF_REQUIRE_UI_THREAD();
+	message_router_->OnRenderProcessTerminated(browser);
+}
+
+bool JWebTopClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	bool isProxy,
+	const CefString& host,
+	int port,
+	const CefString& realm,
+	const CefString& scheme,
+	CefRefPtr<CefAuthCallback> callback) {
+#ifdef JWebTopLog
+	writeLog(L"■■■■■■■■■■■■CefRequestHandler---GetAuthCredentials---\r\n");
+#endif 
+	CEF_REQUIRE_IO_THREAD();
+	if (isProxy) {// 对于代理，如果需要认证，提供用户名和密码
+		//if(frame->GetURL...)// 注意这里没有区分哪个代理，哪个url
+		callback->Continue(jw::g_configs->proxyAuthUser, jw::g_configs->proxyAuthPwd);
+		return true;
+	}
+	return false;
+}
 bool JWebTopClient::OnProcessMessageReceived(
 	CefRefPtr<CefBrowser> browser,
 	CefProcessId source_process,
@@ -76,28 +107,6 @@ bool JWebTopClient::OnProcessMessageReceived(
 	//}
 	return false;
 }
-void JWebTopClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
-	TerminationStatus status) {
-	CEF_REQUIRE_UI_THREAD();
-	message_router_->OnRenderProcessTerminated(browser);
-}
-
-bool JWebTopClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
-	CefRefPtr<CefFrame> frame,
-	bool isProxy,
-	const CefString& host,
-	int port,
-	const CefString& realm,
-	const CefString& scheme,
-	CefRefPtr<CefAuthCallback> callback) {
-	CEF_REQUIRE_IO_THREAD();
-	if (isProxy) {// 对于代理，如果需要认证，提供用户名和密码
-		//if(frame->GetURL...)// 注意这里没有区分哪个代理，哪个url
-		callback->Continue(jw::g_configs->proxyAuthUser, jw::g_configs->proxyAuthPwd);
-		return true;
-	}
-	return false;
-}
 bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	HWND hWnd = browser->GetHost()->GetWindowHandle();
@@ -110,11 +119,14 @@ bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 }
 
 void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
+	if (isClosed)return;
 	CEF_REQUIRE_UI_THREAD();
 	jw::ctx::removeBrowser(browser);
 	if (jw::dllex::ex()) {
-		jw::dllex::invokeRemote_NoWait(browser->GetHost()->GetWindowHandle(),"{\"method\":\"browserClosed\"}");
+		jw::dllex::removeBrowserSetting(browser->GetHost()->GetWindowHandle());
+		jw::dllex::invokeRemote_NoWait(browser->GetHost()->GetWindowHandle(), "{\"method\":\"browserClosed\"}");
 	}
+	isClosed = true;
 }
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -148,7 +160,12 @@ bool isReference(const wstring &appendFile){
 
 void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode){
 #ifdef JWebTopLog
-	writeLog(L"OnLoadEnd URL===="); writeLog(frame->GetURL().ToWString()); writeLog(L"\r\n");
+	if (frame->IsMain()){
+		writeLog(L"MAIN  ====");
+	}
+	else{
+		writeLog(L"FRAME ====");
+	} writeLog(L"OnLoadEnd URL===="); writeLog(frame->GetURL().ToWString()); writeLog(L"\r\n");
 #endif	
 	if (frame->IsMain()){// 只在主窗口上附加JWebTop JS对象
 		CefRefPtr<CefBrowserHost> host = browser->GetHost();
@@ -214,11 +231,13 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 #ifdef JWebTopLog
 		writeLog(extensionCode.str());
 #endif
-		browser->GetMainFrame()->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);
-		jw::js::events::sendReadey(browser->GetMainFrame());
+		frame->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);// 附加JWebTop对象
+		jw::dllex::appendBrowserJS(hWnd, frame); // 每次主页面重新加载之后，重新执行需要附加的JS
+		jw::js::events::sendReadey(frame);		 // 发送页面已准备好事件
 		if (configs->enableResize)jb::checkAndSetResizeAblity(hWnd);
-	}else{
-		jw::js::events::sendIFrameReady(browser->GetMainFrame());
-		jw::js::events::sendIFrameReady(frame);
+	}
+	else{
+		jw::js::events::sendIFrameReady(browser->GetMainFrame());// 在【主    】页面发送iframe页面已准备好事件
+		jw::js::events::sendIFrameReady(frame);					 // 在【iframe】页面送iframe页面已准备好事件
 	}
 }

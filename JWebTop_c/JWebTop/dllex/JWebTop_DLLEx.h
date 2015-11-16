@@ -24,6 +24,12 @@ namespace jw{
 
 		// dll按同步方式调用js，并将js的执行结果通过消息方式发送到dll端
 		void syncExecuteJS(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message);
+	
+		// 每次页面OnLoad后附加一些JS
+		void appendBrowserJS(HWND browserHwndconst ,const CefRefPtr<CefFrame> frame);
+
+		// 浏览器关闭时清除所有等待的锁，此方法会先调用unlockBrowserLocks解锁然后再清除
+		void removeBrowserSetting(HWND browserHwnd);
 	}
 }
 #endif
