@@ -282,10 +282,10 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	}
 	else{// 检查坐标和宽高是否与设定相同，如果不同则重新设
 		RECT rc = winInfo.rcWindow;
-	if ((p_configs->x != -1 && p_configs->x != rc.left)					
-			|| (p_configs->y != -1 && p_configs->y != rc.top)				
-			|| (p_configs->w != -1 && p_configs->w != (rc.right - rc.left))	
-			|| (p_configs->h != -1 && p_configs->h != (rc.bottom- rc.top))
+		if ((p_configs->x != -1 && p_configs->x != rc.left)
+			|| (p_configs->y != -1 && p_configs->y != rc.top)
+			|| (p_configs->w != -1 && p_configs->w != (rc.right - rc.left))
+			|| (p_configs->h != -1 && p_configs->h != (rc.bottom - rc.top))
 			){
 			jw::setBound(hWnd
 				, (p_configs->x != -1 ? p_configs->x : rc.left)
@@ -312,11 +312,14 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 	}
 #ifdef JWebTopLog
+	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息
+	RECT rc = winInfo.rcWindow;
 	wstringstream wss;
 	wss << L"窗口句柄信息 windowWnd  =" << hWnd << L"\r\n"
 		<< L"           browserWnd =" << bWnd << L"\r\n"
 		<< L"           renderWnd  =" << GetNextWindow(bWnd, GW_CHILD) << L"\r\n"  //
-		<< L"           parentWin  =" << configs.parentWin << L"\r\n";
+		<< L"           parentWin  =" << configs.parentWin << L"\r\n"
+		<< L"           winRect    =" << L"x:" << rc.left << L",y:" << rc.top << L",w:" << (rc.right - rc.left) << L",h:" << (rc.bottom - rc.top) << L"\r\n";
 	writeLog(wss.str());
 #endif 
 	if (!showMax)ShowWindow(hWnd, SW_NORMAL);
