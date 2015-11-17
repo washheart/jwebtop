@@ -1,5 +1,6 @@
 #include "JWebTopContext.h"
 
+#include <Windows.h>
 #include <sstream>
 #include <string>
 #include "include/cef_app.h"
@@ -14,9 +15,11 @@
 #include "common/task/Task.h"
 
 using namespace std;
-extern CefSettings settings;              // CEF全局设置
+extern CefSettings settings;        // CEF全局设置
 namespace jw{
-	JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
+
+	DWORD			 mainThreadId;	// 记录下主线程的id，以便最后发送退出消息
+	JWebTopConfigs * g_configs;		// 应用启动时的第一个配置变量
 	
 	namespace ctx{
 		BrowserList browser_list_;
@@ -57,7 +60,6 @@ namespace jw{
 			}
 		}
 
-
 		void CloseAllBrowsers(bool force_close) {
 #ifdef JWebTopLog
 			wstringstream log;
@@ -65,15 +67,19 @@ namespace jw{
 			writeLog(log.str());
 #endif
 			if (browser_list_.empty()){
-				CefQuitMessageLoop();
+				if (!jw::dllex::ex()){
+					//PostQuitMessage(0);						// 发送此消息不管用
+					PostAppMessage(mainThreadId, WM_QUIT, 0, 0);// 可以退出
+					CefQuitMessageLoop();
+				}
 				return;
 			}
 			BrowserList::const_iterator it = browser_list_.begin();
 			for (; it != browser_list_.end(); ++it)
 				(*it)->GetHost()->CloseBrowser(force_close);
 		}
-
 		void startJWebTopByCfg(JWebTopConfigs * tmpConfigs){
+			mainThreadId=GetCurrentThreadId();
 			jw::ctx::setDefaultConfigs(tmpConfigs);
 			// 对CEF进行一些设置
 			settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
@@ -126,6 +132,9 @@ namespace jw{
 			startJWebTopByCfg(JWebTopConfigs::loadConfigs(JWebTopConfigs::getAppDefFile(LPTSTR(cfgFile.c_str()))));
 		}
 		void closeJWebtopContext(){
+#ifdef JWebTopLog 
+			writeLog(L"已退出消息循环，执行最后的清理操作\r\n");
+#endif
 			jw::task::unlockAndClearAll();
 			CefShutdown();      // 关闭CEF
 		}

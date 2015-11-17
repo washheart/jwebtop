@@ -75,6 +75,9 @@
     <ClCompile Include="..\common\task\Task.cpp">
       <Filter>common\task</Filter>
     </ClCompile>
+    <ClCompile Include="dllex\DLLExState.cpp">
+      <Filter>jwebtop\dllex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -118,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="..\common\JWebTopMsg.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="dllex\DLLExState.h">
+      <Filter>jwebtop\dllex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

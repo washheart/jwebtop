@@ -16,6 +16,7 @@
 #endif
 #include "JWebTopContext.h"
 #include "JWebTopCommons.h"
+#include "JWebTop/dllex/DLLExState.h"
 
 using namespace std;
 namespace jw{
@@ -123,7 +124,7 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	jw::ctx::removeBrowser(browser);
 	if (jw::dllex::ex()) {
-		jw::dllex::removeBrowserSetting(browser->GetHost()->GetWindowHandle());
+		jw::dllex::DLLExState::removeBrowserSetting(browser->GetHost()->GetWindowHandle());
 		jw::dllex::invokeRemote_NoWait(browser->GetHost()->GetWindowHandle(), "{\"action\":\"window\",\"method\":\"browserClosed\"}");
 	}
 	isClosed = true;
@@ -232,8 +233,8 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		writeLog(extensionCode.str());
 #endif
 		frame->ExecuteJavaScript(CefString(extensionCode.str()), "", 0);// 附加JWebTop对象
-		jw::dllex::appendBrowserJS(hWnd, frame); // 每次主页面重新加载之后，重新执行需要附加的JS
-		jw::js::events::sendReadey(frame);		 // 发送页面已准备好事件
+		jw::dllex::DLLExState::appendBrowserJS(hWnd, frame);			// 每次主页面重新加载之后，重新执行需要附加的JS
+		jw::js::events::sendReadey(frame);								// 发送页面已准备好事件
 		if (configs->enableResize)jb::checkAndSetResizeAblity(hWnd);
 	}
 	else{

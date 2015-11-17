@@ -1,7 +1,7 @@
 #ifndef CEF_JWEBTOP_EXE_DLLEX_H_
 #define CEF_JWEBTOP_EXE_DLLEX_H_
 #include <string>
-#include "include/wrapper/cef_message_router.h"
+#include "include/cef_browser.h"
 using namespace std;
 namespace jw{
 	namespace dllex{// 和DLL进行交互的相关扩展方法
@@ -24,12 +24,6 @@ namespace jw{
 
 		// dll按同步方式调用js，并将js的执行结果通过消息方式发送到dll端
 		void syncExecuteJS(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message);
-	
-		// 每次页面OnLoad后附加一些JS
-		void appendBrowserJS(HWND browserHwndconst ,const CefRefPtr<CefFrame> frame);
-
-		// 浏览器关闭时清除所有等待的锁，此方法会先调用unlockBrowserLocks解锁然后再清除
-		void removeBrowserSetting(HWND browserHwnd);
 	}
 }
 #endif

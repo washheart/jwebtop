@@ -13,7 +13,7 @@
 #include "common/fastipc/Server.h"
 #include "common/fastipc/Client.h"
 #include "include/cef_app.h"
-
+#include "DLLExState.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
@@ -22,72 +22,6 @@
 using namespace std;
 namespace jw{
 	namespace dllex{
-		// 
-		typedef list<jw::task::ProcessMsgLock *> DefLockedTaskList;// 定义一个存储ProcessMsgLock的List
-		typedef map<HWND, DefLockedTaskList * > DefLockedTaskMap;  // map<key,value>,key=浏览器句柄，value=浏览器页面周期内的任务锁
-		typedef map<HWND, wstring> DefBrowserAppendJSMap;		   // map<key,value>,key=浏览器句柄，value=浏览器页面周期内的每次OnLoad后需要附加的JS
-		DefLockedTaskMap browserLockedTasks;
-		DefBrowserAppendJSMap browserAppendJS;
-		DefLockedTaskList * getTaskList(HWND taskId){
-			DefLockedTaskList * rtn = NULL;
-			DefLockedTaskMap::iterator it = browserLockedTasks.find(taskId);
-			if (browserLockedTasks.end() != it) {
-				rtn = it->second;
-			}
-			return rtn;
-		}
-		// 记录下所有的任务锁
-		void addLockedTask(HWND browserHwnd, jw::task::ProcessMsgLock * lock){
-			DefLockedTaskList *  taskList = getTaskList(browserHwnd);
-			if (taskList == NULL){
-				taskList = new DefLockedTaskList();
-				pair<DefLockedTaskMap::iterator, bool> v = browserLockedTasks.insert(pair<HWND, DefLockedTaskList* >(browserHwnd, taskList));// 记录下浏览器句柄与锁列表的关联
-			}
-			taskList->push_back(lock);
-		}
-		wstring getAppendJS(HWND taskId){
-			DefBrowserAppendJSMap::iterator it = browserAppendJS.find(taskId);
-			if (browserAppendJS.end() != it)return it->second;
-			return wstring();
-		}
-		void addAppendJS(HWND browserHwnd, wstring js){
-			browserAppendJS.insert(pair<HWND, wstring>(browserHwnd, js));// 记录下浏览器句柄与附加JS的关联			
-		}
-		void appendBrowserJS(HWND browserHwnd, const CefRefPtr<CefFrame> frame){
-			wstring js=getAppendJS(browserHwnd);
-#ifdef JWebTopLog
-			writeLog(L"附加的JS====="); writeLog(js); writeLog(L"\r\n");
-#endif
-			if(!js.empty())frame->ExecuteJavaScript(js, "", 0);
-		}
-		void unlockBrowserLocks(HWND browserHwnd){
-			DefLockedTaskList *  taskList = getTaskList(browserHwnd);
-			if (taskList == NULL)return;
-			DefLockedTaskList tmpTasks(taskList->begin(), taskList->end());
-			taskList->clear();
-			DefLockedTaskList::iterator it = tmpTasks.begin();
-			for (; it != tmpTasks.end(); it++){
-				(*it)->notify(L"");
-			}
-		}
-		void removeBrowserSetting(HWND browserHwnd){
-			browserAppendJS.erase(browserHwnd);
-			DefLockedTaskList *  taskList = getTaskList(browserHwnd);
-			if (taskList == NULL)return;
-			unlockBrowserLocks(browserHwnd);
-			browserLockedTasks.erase(browserHwnd);
-		}
-
-		// 添加任务
-		void removeLockedTask(HWND browserHwnd, jw::task::ProcessMsgLock * lock){
-			DefLockedTaskList *  taskList = getTaskList(browserHwnd);
-			if (taskList == NULL)return;
-			DefLockedTaskList::iterator it = find(taskList->begin(), taskList->end(), lock);
-			if (it != taskList->end()){
-				taskList->erase(it);
-				// if(taskList->empty())browserLockedTasks.erase(browserHwnd);// 因为要重复利用，所以除非浏览器关闭，否则不清除
-			}
-		}
 
 		bool isEx = false;
 
@@ -165,14 +99,14 @@ namespace jw{
 										   break;
 			}
 			case JWM_M_APPEND_JS:
-				addAppendJS((HWND)userValue, data);// 将JS保存下来，每次OnLoadEnd后执行
+				DLLExState::findOrCreateExState((HWND)userValue)->setAppendJS(data);// 将JS保存下来，每次OnLoadEnd后执行
 				break;
 			case JWM_M_SETURL:{
-				jw::dllex::unlockBrowserLocks((HWND)userValue);// 每次主页面重新加载之后，都解锁之前页面绑定的JS任务
-					BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-					bwInfo->browser->GetMainFrame()->LoadURL(data);
-					break;
-				}
+								  DLLExState::unlockBrowserLocks((HWND)userValue);// 每次主页面重新加载之后，都解锁之前页面绑定的JS任务
+								  BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
+								  bwInfo->browser->GetMainFrame()->LoadURL(data);
+								  break;
+			}
 			case JWM_CLOSEBROWSER:
 				jb::close((HWND)userValue);
 				break;
@@ -195,7 +129,7 @@ namespace jw{
 				closeWebTopEx();
 				break;
 			default:
-				MessageBox(NULL,L"用户定义消息值不对！",L"错误",0);
+				MessageBox(NULL, L"用户定义消息值不对！", L"错误", 0);
 				break;
 			}
 #ifdef JWebTopLog
@@ -341,9 +275,9 @@ namespace jw{
 			wstring newjson = json.ToWString();
 			jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池		
 			if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, taskId)){ // 发送任务到远程进程
-				addLockedTask(browserHWnd, lock);							// 记录当前浏览器已经创建的锁
+				DLLExState::findOrCreateExState(browserHWnd)->addLockedTask(lock);							// 记录当前浏览器已经创建的锁
 				wstring result = lock->wait();   	 						// 等待任务完成并取回执行结果
-				removeLockedTask(browserHWnd, lock);						// 移除当前浏览器已经解开的锁
+				DLLExState::findOrCreateExState(browserHWnd)->removeLockedTask(lock);						// 移除当前浏览器已经解开的锁
 				delete lock;
 				return CefString(result);									// 返回数据
 			}
