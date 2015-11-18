@@ -268,18 +268,29 @@ private:
 	IMPLEMENT_REFCOUNTING(JJH_ShowDev);
 };
 
-//JJH_InvokeRemote_Wait(jsonstring,[handler]);// 从JS调用远程进程代码
-class JJH_InvokeRemote_Wait : public CefV8Handler {
+////JJH_InvokeRemote_Wait(jsonstring,[handler]);// 从JS调用远程进程代码
+//class JJH_InvokeRemote_Wait : public CefV8Handler {
+//public:
+//	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+//		if (arguments.size() < 1)return false;
+//		retval = CefV8Value::CreateString(jw::dllex::invokeRemote_Wait(getHWND(object, arguments, 1), arguments[0]->GetStringValue()));
+//		return true;
+//	}
+//private:
+//	IMPLEMENT_REFCOUNTING(JJH_InvokeRemote_Wait);
+//};
+
+//invokeRemote_CallBack(jsonstring,callback,[handler]);// 从JS调用远程进程代码
+class JJH_InvokeRemote_CallBack : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		if (arguments.size() < 1)return false;
-		retval = CefV8Value::CreateString(jw::dllex::invokeRemote_Wait(getHWND(object, arguments, 1), arguments[0]->GetStringValue()));
+		if (arguments.size() < 2)return false;
+		jw::dllex::invokeRemote_CallBack(getHWND(object, arguments, 2), arguments[0]->GetStringValue(), arguments[1]->GetStringValue());
 		return true;
 	}
 private:
-	IMPLEMENT_REFCOUNTING(JJH_InvokeRemote_Wait);
+	IMPLEMENT_REFCOUNTING(JJH_InvokeRemote_CallBack);
 };
-
 //JJH_InvokeRemote_NoWait(jsonstring,[handler]);// 从JS调用远程进程代码
 class JJH_InvokeRemote_NoWait : public CefV8Handler {
 public:
@@ -323,6 +334,24 @@ public:
 private:
 	IMPLEMENT_REFCOUNTING(JJH_stopDrag);
 };
+
+
+////invokeReflect(function(v){});// 测试回调js的function
+//class JJH_invokeReflect : public CefV8Handler {
+//public:
+//	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+//		CefV8ValueList args;
+//		std::string jsons = "{\"a\":\"a\",\"b\":1234}";
+//		CefRefPtr<CefV8Value> v = CefV8Value::CreateString(jsons);
+//		args.push_back(v);
+//		CefRefPtr<CefV8Value> fun = arguments[0];
+//		fun->ExecuteFunction(object, args);
+//		return true;
+//	}
+//private:
+//	IMPLEMENT_REFCOUNTING(JJH_invokeReflect);
+//};
+
 namespace jw{
 	namespace js{
 		namespace events{

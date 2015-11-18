@@ -119,9 +119,11 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "setWindowStyle", new JJH_SetWindowStyle());	//setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
 	regist(jWebTop, "setWindowExStyle", new JJH_SetWindowExStyle());
 
-	regist(jWebTop, "invokeRemote_Wait", new JJH_InvokeRemote_Wait());
+	regist(jWebTop, "invokeRemote_CallBack", new JJH_InvokeRemote_CallBack());// 容易阻塞render进程，屏蔽
+	//regist(jWebTop, "invokeRemote_Wait", new JJH_InvokeRemote_Wait());// 容易阻塞render进程，屏蔽
 	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());
 
+	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//测试JS回调
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
 	// 多进程模式要通过消息传递数据，参见JWebTopClient#OnLoadEnd（具体实现是JWebTopCommons#renderBrowserWindow）
 	if (settings.single_process){

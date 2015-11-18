@@ -17,8 +17,11 @@ namespace jw{
 		// 发送浏览器已创建消息到客户端
 		void sendBrowserCreatedMessage(wstring taskId,long browserHWnd);
 		
-		// js调用dll的方法，并等待返回结果
-		CefString invokeRemote_Wait(HWND browserHWnd, CefString json);
+		// js调用dll的方法，结果返回后，会执行响应的callback
+		void invokeRemote_CallBack(HWND browserHWnd, CefString json, CefString callBackFunName);
+
+		// 多进程时lock会阻塞整个render的前进，所以屏蔽
+		//CefString invokeRemote_Wait(HWND browserHWnd, CefString json);
 		
 		// js调用dll的方法，但不等待返回结果
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json);

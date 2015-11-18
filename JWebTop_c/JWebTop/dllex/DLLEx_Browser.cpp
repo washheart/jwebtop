@@ -4,7 +4,6 @@
 #include "JWebTop_DLLEx.h"
 #include "common/util/StrUtil.h"
 #include "common/JWebTopMsg.h"
-#include "common/task/Task.h"
 #include "JWebTop/config/JWebTopConfigs.h"
 #include "JWebTop/browser/JWebTopClient.h"
 #include "JWebTop/browser/JWebTopCommons.h"
@@ -35,6 +34,7 @@ namespace jw{
 
 		void closeWebTopEx();
 		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring& msg, wstring& taskId);
+		void executeJSCallBack(CefRefPtr<CefFrame> frame, wstring callback, wstring result);
 
 		bool setMsgToRender(HWND browserHWnd, CefRefPtr<CefProcessMessage> cefMsg){
 			BrowserWindowInfo * bw = getBrowserWindowInfo((HWND)browserHWnd);
@@ -42,7 +42,7 @@ namespace jw{
 			return bw->browser->SendProcessMessage(PID_RENDERER, cefMsg);
 		}
 		void sendIPCServerInfo(HWND browserHWnd){
-			if (client != NULL)return;// 没有开启独立的render进程
+			if (settings.single_process)return;// 没有开启独立的render进程
 			CefRefPtr<CefProcessMessage> tmp = CefProcessMessage::Create(B2R_MSG_NAME);
 			CefRefPtr<CefListValue> args = tmp->GetArgumentList();
 			args->SetInt(0, JWM_B2R_SERVERINFO);
@@ -66,17 +66,19 @@ namespace jw{
 #endif
 			switch (userMsgType){
 			case JWM_RESULT_RETURN:{
-									   jw::task::ProcessMsgLock * task = jw::task::getTask(taskId);
-									   if (task == NULL){
+									   wstring callBack = DLLExState::findAndRemoveCallBack((HWND)userValue, taskId);
+									   if (callBack.empty()){
 										   CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
 										   CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
 										   args->SetInt(0, JWM_B2R_TASKRESULT);
 										   args->SetString(1, taskId);
 										   args->SetString(2, data);
+										   args->SetInt(3, userValue);
 										   setMsgToRender((HWND)userValue, cefMsg);
 									   }
 									   else{
-										   jw::task::putTaskResult(taskId, data); // 通知等待线程，远程任务已完成，结果已取回
+										   BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
+										   executeJSCallBack(bwInfo->browser->GetMainFrame(), callBack, data);
 									   }
 									   break;
 			}
@@ -138,9 +140,9 @@ namespace jw{
 			case JWM_SET_ERR_URL:
 				JWebTopConfigs::setErrorURL(data);
 				break;
-			case JWM_SET_TASK_WAIT_TIME:
-				jw::task::setDefaultTaskWiatTime(userValue);
-				break;
+			//case JWM_SET_TASK_WAIT_TIME:
+			//	jw::task::setDefaultTaskWiatTime(userValue);
+			//	break;
 			case JWM_CEF_ExitAPP:
 				closeWebTopEx();
 				break;
@@ -234,5 +236,19 @@ namespace jw{
 		void OnContextInitialized(){
 			client->write(JWM_CEF_APP_INITED, 0, NULL, NULL, 0); // CEF浏览器已初始完成
 		}
+
+		void sendBrowserCreatedMessage(wstring taskId, long browserHWnd){
+#ifdef JWebTopLog
+			std::wstringstream wss;
+			wss << L"Writed "
+				<< L" sendBrowserCreatedMessage"
+				<< L" taskId=" << taskId
+				<< L" browserHWnd=" << browserHWnd
+				<< L"||\r\n";
+			writeLog(wss.str());
+#endif
+			client->write(JWM_BROWSER_CREATED, browserHWnd, LPSTR(jw::w2s(taskId).c_str()), NULL, 0);
+		}
+
 	}// End dllex namespace
 }// End jw namespac
