@@ -98,6 +98,7 @@ public:
 	//virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame) {
 	//	writeLog(L"¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡öCefLoadHandler---OnLoadStart---\r\n");
 	//}
+
 	// CefRequestHandler-------------------------------------------------------------------------------
 	bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool is_redirect) OVERRIDE;
 	void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser, TerminationStatus status) OVERRIDE;
@@ -113,6 +114,9 @@ public:
 	//	writeLog(L"¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡öCefRequestHandler---OnResourceResponse---\r\n");
 	//	return false;
 	//}
+	void OnRenderViewReady(CefRefPtr<CefBrowser> browser)OVERRIDE;
+
+
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
 	//virtual bool OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
 	// const CefKeyEvent& event,

@@ -32,10 +32,10 @@ extern CefSettings settings;              // CEF全局设置
 
 void JWebTopClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	jw::ctx::addBrowser(browser);// 记录下已经创建的窗口来
+	renderBrowserWindow(browser, this->configs);
 	if (jw::dllex::ex()) {
 		jw::dllex::sendBrowserCreatedMessage(this->taskId, (LONG)browser->GetHost()->GetWindowHandle());
 	}
-	renderBrowserWindow(browser, this->configs);
 	if (!message_router_) {
 		CefMessageRouterConfig config;
 		message_router_ = CefMessageRouterBrowserSide::Create(config);
@@ -86,6 +86,9 @@ bool JWebTopClient::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
 		return true;
 	}
 	return false;
+}
+void JWebTopClient::OnRenderViewReady(CefRefPtr<CefBrowser> browser){
+	jw::dllex::sendIPCServerInfo(browser->GetHost()->GetWindowHandle());// 发送消息构建render进程的ipc客户端
 }
 bool JWebTopClient::OnProcessMessageReceived(
 	CefRefPtr<CefBrowser> browser,
@@ -152,9 +155,6 @@ bool isReference(const wstring &appendFile){
 	wstring start = appendFile.substr(0, 10);
 	int len = start.length();
 	if (len < 7/*7=="http://".length()*/ || start.find(L":") == -1)return 0;
-	//for (int i = 0; i < len; i++){
-	//	start[i] = tolower(start[i]);
-	//}
 	transform(start.begin(), start.end(), start.begin(), ::tolower);
 	return start.find(L"http://") != -1 || start.find(L"https://") != -1 || start.find(L"jwebtop://") != -1;
 }

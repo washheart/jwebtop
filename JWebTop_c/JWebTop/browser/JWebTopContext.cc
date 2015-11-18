@@ -20,7 +20,7 @@ namespace jw{
 
 	DWORD			 mainThreadId;	// 记录下主线程的id，以便最后发送退出消息
 	JWebTopConfigs * g_configs;		// 应用启动时的第一个配置变量
-	
+
 	namespace ctx{
 		BrowserList browser_list_;
 
@@ -79,7 +79,7 @@ namespace jw{
 				(*it)->GetHost()->CloseBrowser(force_close);
 		}
 		void startJWebTopByCfg(JWebTopConfigs * tmpConfigs){
-			mainThreadId=GetCurrentThreadId();
+			mainThreadId = GetCurrentThreadId();
 			jw::ctx::setDefaultConfigs(tmpConfigs);
 			// 对CEF进行一些设置
 			settings.single_process = tmpConfigs->single_process;                      // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式

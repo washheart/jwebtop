@@ -29,4 +29,8 @@
 #define JWM_M_SETURL			(__JWM+501)  // 设置浏览器的URL（通过JS方式设置时，可能会有JS正在阻塞的问题）
 #define JWM_M_APPEND_JS			(__JWM+502)  // 为浏览器附加一些JS代码，附加的代码在页面的生命周期内有效
 
+// B2R=Browser to Renderer
+#define JWM_B2R_SERVERINFO		(__JWM+601)  // 给render进程发送FastIPC服务端参数
+#define JWM_B2R_TASKRESULT		(__JWM+602)  // 给render进程发送远程任务执行结果
+
 #endif

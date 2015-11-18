@@ -2,6 +2,7 @@
 #define CEF_JWEBTOP_EXE_DLLEX_H_
 #include <string>
 #include "include/cef_browser.h"
+#define B2R_MSG_NAME L"jwebtop_b2r"
 using namespace std;
 namespace jw{
 	namespace dllex{// 和DLL进行交互的相关扩展方法
@@ -22,8 +23,11 @@ namespace jw{
 		// js调用dll的方法，但不等待返回结果
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json);
 
-		// dll按同步方式调用js，并将js的执行结果通过消息方式发送到dll端
-		void syncExecuteJS(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message);
+		// 在render端按同步方式调用js，并将js的执行结果通过消息方式发送到dll端
+		void render_processMsg(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message);
+
+		// 当多进程模式时发送FastIPCServerInfo到render进程，以便创建render端的IPCClient
+		void sendIPCServerInfo(HWND browserHWnd);
 	}
 }
 #endif

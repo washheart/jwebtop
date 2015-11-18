@@ -38,6 +38,9 @@ namespace jw{
 		// 添加一个等待任务到任务列表
 		ProcessMsgLock * addTask(wstring taskId);
 
+		// 获取某个任务
+		ProcessMsgLock * getTask(wstring taskId);
+
 		// 移除已完成的任务
 		void removeTask(wstring taskId);
 

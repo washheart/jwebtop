@@ -63,13 +63,12 @@ namespace renderer {
 				CefRefPtr<CefBrowser> browser,
 				CefProcessId source_process,
 				CefRefPtr<CefProcessMessage> message) OVERRIDE{
-				wstring name=message->GetName().ToWString();
-					if (L"waitjs" == name){
-						jw::dllex::syncExecuteJS(browser, source_process, message);
-						return 1;
-					}
-				return message_router_->OnProcessMessageReceived(
-				browser, source_process, message);
+				wstring name = message->GetName().ToWString();
+				if (B2R_MSG_NAME == name){
+					jw::dllex::render_processMsg(browser, source_process, message);
+					return 1;
+				}
+				return message_router_->OnProcessMessageReceived(browser, source_process, message);
 			}
 
 		private:
