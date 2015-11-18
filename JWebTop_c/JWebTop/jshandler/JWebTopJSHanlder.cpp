@@ -2,6 +2,73 @@
 #include "include/cef_app.h"
 #include "JJH_Windows.h"
 
+namespace jw{
+	namespace js{
+		namespace events{
+			// 发送页面准备好事件：new CustomEvent('JWebTopReady')
+			void sendReadey(const CefRefPtr<CefFrame> frame){
+				CefString js_event(L"var e = new CustomEvent('JWebTopReady');dispatchEvent(e);");
+				frame->ExecuteJavaScript(js_event, "", 0);
+			}
+			// 页面内的子页面（iframe）准备好事件：new CustomEvent('JWebTopIFrameReady')
+			void sendIFrameReady(const CefRefPtr<CefFrame> frame){
+				CefString js_event(L"var e = new CustomEvent('JWebTopIFrameReady');dispatchEvent(e);");
+				frame->ExecuteJavaScript(js_event, "", 0);
+			}
+
+			// 发送窗口大小改变事件:new CustomEvent('JWebTopResize',{detail:{w:宽度数值,h:高度数值}})
+			void sendSize(const CefRefPtr<CefFrame> frame, const int w, const int h){
+				stringstream js_event;
+				js_event << "var e = new CustomEvent('JWebTopResize',{"
+					<< "	detail:{"
+					<< "		width:" << w << ","
+					<< "		height:" << h
+					<< "	}"
+					<< "});"
+					<< "dispatchEvent(e);";
+				frame->ExecuteJavaScript(js_event.str(), "", 0);
+			}
+
+			// 发送窗口位置改变事件:new CustomEvent('JWebTopMove',{detail:{x:X坐标值,y:Y坐标值}})
+			void sendMove(const CefRefPtr<CefFrame> frame, const int x, const int y){
+				stringstream js_event;
+				js_event << "var e = new CustomEvent('JWebTopMove',{"
+					<< "	detail:{"
+					<< "		x:" << x << ","
+					<< "		y:" << y
+					<< "	}"
+					<< "});"
+					<< "dispatchEvent(e);";
+				frame->ExecuteJavaScript(js_event.str(), "", 0);
+			}
+
+			// 发送窗口被激活事件:new CustomEvent('JWebTopWindowActive',{detail:{handler:被激活的窗口的句柄}})
+			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler){
+				stringstream js_event;
+				js_event << "var e = new CustomEvent('JWebTopWindowActive',{"
+					<< "	detail:{"
+					<< "		handler:" << handler
+					<< "	}"
+					<< "});"
+					<< "dispatchEvent(e);";
+				frame->ExecuteJavaScript(js_event.str(), "", 0);
+			}
+
+			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:触发此消息的窗口的句柄}})
+			void sendAppActive(const CefRefPtr<CefFrame> frame, const long handler){
+				stringstream js_event;
+				js_event << "var e = new CustomEvent('JWebTopAppActive',{"
+					<< "	detail:{"
+					<< "		handler:" << handler
+					<< "	}"
+					<< "});"
+					<< "dispatchEvent(e);";
+				frame->ExecuteJavaScript(js_event.str(), "", 0);
+			}
+		}// End ns-events
+	}// End ns-js
+}// End ns-jw
+
 // 获取函数对应的窗口句柄：默认从最后一个参数获取，如果没有知道最后一个参数，从object的handler中取
 HWND getHWND(CefRefPtr<CefV8Value> object/*JS对象*/, const CefV8ValueList& arguments/*函数参数列表*/
 	, CefV8ValueList::size_type lastIdx/*最后一个参数的地址*/){
