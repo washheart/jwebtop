@@ -20,7 +20,7 @@ namespace jw{
 		}		
 
 		// 静态变量与方法
-		DLLExState::DefBrowserSateMap DLLExState::browserStateMap;					// 保存浏览器扩展状态（静态变量）
+		DLLExState::DefBrowserSateMap DLLExState::browserStateMap;			// 保存浏览器扩展状态（静态变量）
 
 		DLLExState * DLLExState::findWithoutCreate(HWND browserHWnd){
 			DLLExState * rtn = NULL;

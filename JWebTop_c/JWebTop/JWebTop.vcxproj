@@ -230,7 +230,6 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\task\Task.cpp" />
     <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp" />
     <ClCompile Include="browser\JWebTopApp.cpp" />
     <ClCompile Include="browser\JWebTopCommons.cpp" />
@@ -240,7 +239,8 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
     <ClCompile Include="browser\JWebTopScheme.cpp" />
     <ClCompile Include="config\JWebTopConfigs.cpp" />
     <ClCompile Include="dllex\DLLExState.cpp" />
-    <ClCompile Include="dllex\JWebTop_DLLEx.cpp" />
+    <ClCompile Include="dllex\DLLEx_Browser.cpp" />
+    <ClCompile Include="dllex\DLLEx_Renderer.cpp" />
     <ClCompile Include="jshandler\JSDialogHandler.cc" />
     <ClCompile Include="jshandler\JWebTopJSHanlder.cpp" />
     <ClCompile Include="JWebTop_main.cpp" />
@@ -248,7 +248,6 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).exe  $(SolutionDir)..\demos\JW
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\JWebTopMsg.h" />
-    <ClInclude Include="..\common\task\Task.h" />
     <ClInclude Include="..\common\ui\dlgs\InputDialog.h" />
     <ClInclude Include="browser\JWebTopApp.h" />
     <ClInclude Include="browser\JWebTopCommons.h" />

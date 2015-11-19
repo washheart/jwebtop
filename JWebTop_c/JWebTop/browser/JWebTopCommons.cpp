@@ -10,7 +10,6 @@
 #include "JWebTopContext.h"
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
-#include "common/task/Task.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif

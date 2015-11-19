@@ -9,7 +9,6 @@
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
-#include "common/task/Task.h"
 #include "common/util/StrUtil.h"
 #include "browser/JWebTopContext.h"
 #include "browser/JWebTopCommons.h"

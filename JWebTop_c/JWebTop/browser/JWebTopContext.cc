@@ -12,7 +12,6 @@
 #include "JWebTopApp.h"
 #include "JWebTopCommons.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
-#include "common/task/Task.h"
 
 using namespace std;
 extern CefSettings settings;        // CEF全局设置
@@ -94,9 +93,8 @@ namespace jw{
 			CefString(&settings.locales_dir_path) = tmpConfigs->locales_dir_path;      // 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
 			settings.ignore_certificate_errors = tmpConfigs->ignore_certificate_errors;// 是否忽略SSL证书错误
 			settings.remote_debugging_port = tmpConfigs->remote_debugging_port;        // 远程调试端口，取值范围[1024-65535]
-
 #ifdef JWebTopLog
-			settings.single_process = 1;// 测试时，采用单进程
+			// settings.single_process = 1;// 测试时，采用单进程
 			settings.log_severity = LOGSEVERITY_VERBOSE;
 #endif
 			void* sandbox_info = NULL;
@@ -122,7 +120,12 @@ namespace jw{
 			log << "CefExecuteProcess exit_code ==" << exit_code << "\r\n";
 			writeLog(log.str());
 #endif
-			if (exit_code >= 0) return;	// 子进程在这里完成，并返回							
+			if (exit_code >= 0){
+#ifdef JWebTopLog 
+				if (settings.single_process != 1)setLogFileName(L"jwebtop_render.log");
+#endif
+				return;	// 子进程在这里完成，并返回							
+			}
 			CefRunMessageLoop();// 运行CEF消息监听，直到CefQuitMessageLoop()方法被调用
 			closeJWebtopContext();
 		}
@@ -135,7 +138,6 @@ namespace jw{
 #ifdef JWebTopLog 
 			writeLog(L"已退出消息循环，执行最后的清理操作\r\n");
 #endif
-			jw::task::unlockAndClearAll();
 			CefShutdown();      // 关闭CEF
 		}
 	}// End ctx namespace

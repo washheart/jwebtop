@@ -28,9 +28,6 @@
     <Filter Include="common\ui\dlgs">
       <UniqueIdentifier>{f3ddc2ec-b80b-4f5d-b664-70edf456deaf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common\task">
-      <UniqueIdentifier>{ad4d16c3-df52-490e-93da-8014dd4f855c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JWebTop_main.cpp">
@@ -57,9 +54,6 @@
     <ClCompile Include="wndproc\JWebTopWndProc.cpp">
       <Filter>jwebtop\wndproc</Filter>
     </ClCompile>
-    <ClCompile Include="dllex\JWebTop_DLLEx.cpp">
-      <Filter>jwebtop\dllex</Filter>
-    </ClCompile>
     <ClCompile Include="browser\JWebTopContext.cc">
       <Filter>jwebtop\browser</Filter>
     </ClCompile>
@@ -72,10 +66,13 @@
     <ClCompile Include="..\common\ui\dlgs\InputDialog.cpp">
       <Filter>common\ui\dlgs</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\task\Task.cpp">
-      <Filter>common\task</Filter>
-    </ClCompile>
     <ClCompile Include="dllex\DLLExState.cpp">
+      <Filter>jwebtop\dllex</Filter>
+    </ClCompile>
+    <ClCompile Include="dllex\DLLEx_Renderer.cpp">
+      <Filter>jwebtop\dllex</Filter>
+    </ClCompile>
+    <ClCompile Include="dllex\DLLEx_Browser.cpp">
       <Filter>jwebtop\dllex</Filter>
     </ClCompile>
   </ItemGroup>
@@ -115,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="..\common\ui\dlgs\InputDialog.h">
       <Filter>common\ui\dlgs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\task\Task.h">
-      <Filter>common\task</Filter>
     </ClInclude>
     <ClInclude Include="..\common\JWebTopMsg.h">
       <Filter>common</Filter>

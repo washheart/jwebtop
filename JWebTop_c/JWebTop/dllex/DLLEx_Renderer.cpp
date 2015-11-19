@@ -17,7 +17,6 @@
 #include "common/tests/TestUtil.h"
 #endif
 
-//#define FLAG_TASK_TIMER 100
 using namespace std;
 
 namespace jw{
@@ -62,7 +61,6 @@ namespace jw{
 			if (userMsgType == JWM_B2R_TASKRESULT){
 				wstring taskId = args->GetString(1).ToWString();
 				wstring result = args->GetString(2).ToWString();
-				//jw::task::putTaskResult(taskId, result);
 				wstring callBack = DLLExState::findAndRemoveCallBack((HWND)args->GetInt(3), taskId);
 				if (callBack.empty()){// 出错了？？？
 				} else{
@@ -107,44 +105,15 @@ namespace jw{
 			}
 		}
 		void invokeRemote_CallBack(HWND browserHWnd, CefString json, CefString callBackFunName){
-			//wstring taskId = jw::task::createTaskId();			         // 生成任务id
-			wstring taskId = jw::GenerateGuidW();
+			wstring taskId = jw::GenerateGuidW();	
 			wstring newjson = json.ToWString();
 			DLLExState::findOrCreateExState(browserHWnd)->addCallBack(taskId, callBackFunName);
 			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, taskId);
-			//jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池		
-			//if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, taskId)){ // 发送任务到远程进程
-			//	DLLExState::findOrCreateExState(browserHWnd)->addLockedTask(lock);							// 记录当前浏览器已经创建的锁
-			//	wstring result = lock->wait();   	 						// 等待任务完成并取回执行结果
-			//	DLLExState::findOrCreateExState(browserHWnd)->removeLockedTask(lock);						// 移除当前浏览器已经解开的锁
-			//	delete lock;
-			//	return CefString(result);									// 返回数据
-			//} else{
-			//	jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
-			//	return CefString();											// 返回数据：注意这里是空字符串
-			//}
 		}
 
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json){
 			wstring newjson = json.ToWString(), empty;
 			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_RETURN, newjson, empty); // 发送任务到远程进程
 		}
-		// 多进程时lock会阻塞整个render的前进
-		//CefString invokeRemote_Wait(HWND browserHWnd, CefString json){
-		//	wstring taskId = jw::task::createTaskId();			         // 生成任务id
-		//	wstring newjson = json.ToWString();
-		//	jw::task::ProcessMsgLock * lock = jw::task::addTask(taskId); // 放置任务到任务池		
-		//	if (sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, taskId)){ // 发送任务到远程进程
-		//		DLLExState::findOrCreateExState(browserHWnd)->addLockedTask(lock);							// 记录当前浏览器已经创建的锁
-		//		wstring result = lock->wait();   	 						// 等待任务完成并取回执行结果
-		//		DLLExState::findOrCreateExState(browserHWnd)->removeLockedTask(lock);						// 移除当前浏览器已经解开的锁
-		//		delete lock;
-		//		return CefString(result);									// 返回数据
-		//	}
-		//	else{
-		//		jw::task::removeTask(taskId);								// 消息发送失败移除现有消息
-		//		return CefString();											// 返回数据：注意这里是空字符串
-		//	}
-		//}
 	}// End dllex namespace
 }// End jw namespace

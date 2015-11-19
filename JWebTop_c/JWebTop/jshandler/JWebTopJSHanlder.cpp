@@ -120,7 +120,6 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "setWindowExStyle", new JJH_SetWindowExStyle());
 
 	regist(jWebTop, "invokeRemote_CallBack", new JJH_InvokeRemote_CallBack());// 容易阻塞render进程，屏蔽
-	//regist(jWebTop, "invokeRemote_Wait", new JJH_InvokeRemote_Wait());// 容易阻塞render进程，屏蔽
 	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());
 
 	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//测试JS回调

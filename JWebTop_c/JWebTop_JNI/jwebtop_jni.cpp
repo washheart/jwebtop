@@ -1,6 +1,5 @@
 // JNI主体实现
 #include "jni_jdk1_6_24\jni.h"
-#include "common/task/Task.h"
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 
