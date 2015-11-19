@@ -101,8 +101,13 @@ namespace fastipc{
 			catch (...){
 				delete rtn;// 清理环境
 			}
-			InterlockedExchange(&memBuf->state, MEM_CAN_WRITE);// 数据读取之后，设置为可写
-			SetEvent(evtReaded);
+			if (memBuf){
+				InterlockedExchange(&memBuf->state, MEM_CAN_WRITE);// 数据读取之后，设置为可写
+				SetEvent(evtReaded);
+			} else{
+				SetEvent(evtReaded);
+				return;// 
+			}
 		}
 	};
 }
