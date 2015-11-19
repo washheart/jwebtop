@@ -83,11 +83,13 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 			// JWebTopNative.executeJs(listHandler, rtn.toJSONString());
 			return rtn.toJSONString();
 		} else if ("getDetailAppFile".equals(method)) {
-			return getDetailAppFile();
+			JSONObject rtn = new JSONObject();
+			rtn.put("value", getDetailAppFile());
+			return rtn.toJSONString();
 		} else if ("setDetailHandler".equals(method)) {
 			this.detailHandler = jo.getLong("value");
 			this.withinSwingCtrlHelper.detailCreated(this.detailHandler);
-			showDetail(null);
+			showDetail(names.size() == 0 ? null : names.get(0));
 		} else if ("showDetail".equals(method)) {
 			String name = jo.getString("value");
 			this.currentNote = name;
@@ -95,7 +97,7 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		} else if ("saveNote".equals(method)) {
 			saveNote(jo.getString("note"), jo.getString("value"));
 		} else if ("javaWindowHwnd".equals(method)) {
-			return Long.toString(WithinSwing.frameHwnd);
+			return "{\"value\":" + WithinSwing.frameHwnd + "}";
 		} else if ("getDetailRect".equals(method)) {
 			int[] rect = withinSwingCtrlHelper.getDetailRect();
 			StringBuilder sb = new StringBuilder();

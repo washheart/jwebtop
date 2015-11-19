@@ -35,7 +35,7 @@ import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
 public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, WindowStyle {
 	protected static long RootBrowserHwnd = 0;
 
-	private static void initDll(String[] args) {
+	private static File initDll(String[] args) {
 		String dll = "JWebTop.dll";
 		File tmp = null;
 		args = new String[] { "" };
@@ -51,6 +51,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		}
 		if (tmp.isFile()) tmp = tmp.getParentFile();
 		JWebTopContext.initDLL(tmp.getAbsolutePath());
+		return tmp;
 	}
 
 	// 一般情况下一个独立的应用中有一个JWebTopContext即可，一个JWebTopContext可以创建多个Browser
@@ -122,7 +123,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		this.setVisible(true);
 		// 创建浏览器
 		try {
-			JOptionPane.showMessageDialog(this, "wait");
+			// JOptionPane.showMessageDialog(this, "wait");
 			WithinSwing.frameHwnd = JWebTopNative.getWindowHWND(this);
 			// JWebTopContext.WIN_HWND = WithinSwing.frameHwnd;
 
@@ -237,7 +238,25 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 
 	public static void main(String[] args) {
 		try {
-			initDll(args);
+			File dir = initDll(args);
+			System.out.println("dir = " + dir.getCanonicalPath());
+			// D:\c\jwebtop\JWebTop_c\JWebTop_JNI\Release
+			// D:\c\jwebtop\demos\WithinSwing_Java_Demo
+			File from = new File(dir.getCanonicalPath() + "../../../../demos/WithinSwing_Java_Demo/res");
+			// try {// 改为xcopy方式来拷贝文件，加快测试时的启动速度
+			String cmd = "xcopy \"" + from.getCanonicalPath() + "\" \"" + dir.getCanonicalPath() + "\\res" + "\" /S /D /Y";
+			System.out.println("复制资源：" + cmd);
+
+			Process process = Runtime.getRuntime().exec(cmd);
+			if (process.waitFor() != 0) {
+				System.err.println("复制资源出错了。。。。。。。。。。");
+				return;
+			}
+			// } catch (Throwable e) {
+			// if (Constants.rootLog.isErrorEnabled()) Constants.rootLog.error("开发环境设置HTML页面路径出错了", e);
+			// }
+			System.out.println("dir = " + dir);
+
 			// 测试没有浏览器窗口打开的情况下_关闭EC时无法关闭浏览器进程的缺陷();
 			new WithinSwing();
 		} catch (Throwable e) {
