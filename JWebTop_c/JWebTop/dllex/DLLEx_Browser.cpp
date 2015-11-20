@@ -42,7 +42,8 @@ namespace jw{
 			return bw->browser->SendProcessMessage(PID_RENDERER, cefMsg);
 		}
 		void sendIPCServerInfo(HWND browserHWnd){
-			if (settings.single_process)return;// 没有开启独立的render进程
+			if (settings.single_process)return;	// 没有开启独立的render进程
+			if (!ex())return;					// 不是从主进程调用
 			CefRefPtr<CefProcessMessage> tmp = CefProcessMessage::Create(B2R_MSG_NAME);
 			CefRefPtr<CefListValue> args = tmp->GetArgumentList();
 			args->SetInt(0, JWM_B2R_SERVERINFO);

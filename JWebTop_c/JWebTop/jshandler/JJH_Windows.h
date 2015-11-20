@@ -272,8 +272,25 @@ private:
 class JJH_InvokeRemote_CallBack : public CefV8Handler {
 public:
 	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		if (arguments.size() < 2)return false;
-		jw::dllex::invokeRemote_CallBack(getHWND(object, arguments, 2), arguments[0]->GetStringValue(), arguments[1]->GetStringValue());
+		if (arguments.size() < 2){
+			exception = (L"invokeRemote_CallBack(jsonstring,callback,[handler])需要至少两个参数");
+			return true;
+		}
+		if (!arguments[1]->IsString()){
+			exception = (L"第二个参数必须是字符串");
+			return true;
+		}
+		string callback = arguments[1]->GetStringValue().ToString();
+		int size = callback.size();
+		if (size == 0){
+			exception = (L"第二个参数不能是空字符串");
+			return true;
+		}
+		if (size > 100){
+			exception = (L"第二个参数长度不能超过100");
+			return true;
+		}
+		jw::dllex::invokeRemote_CallBack(getHWND(object, arguments, 2), arguments[0]->GetStringValue(), callback);
 		return true;
 	}
 private:
