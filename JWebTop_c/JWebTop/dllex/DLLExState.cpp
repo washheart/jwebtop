@@ -6,12 +6,6 @@
 
 namespace jw{
 	namespace dllex{// 和DLL进行交互的相关扩展方法
-		void DLLExState::addCallBack(wstring taskId, wstring callBack){
-			callBacks.insert(pair<wstring, wstring>(taskId, callBack));// 记录下浏览器句柄与扩展状态的关联
-		}
-		void DLLExState::removeCallBack(wstring taskId){
-			callBacks.erase(taskId);
-		}
 		wstring DLLExState::getAppendJS(){
 			return this->appendJS;
 		}
@@ -30,18 +24,7 @@ namespace jw{
 			}
 			return rtn;
 		}
-		wstring DLLExState::findAndRemoveCallBack(HWND browserHwnd, wstring taskId){
-			wstring rtn;
-			DLLExState * exState = findWithoutCreate(browserHwnd);
-			if (exState != NULL){
-				DefBrowserCallBackMap::iterator it = exState->callBacks.find(taskId);
-				if (exState->callBacks.end() != it) {
-					rtn = it->second;
-					exState->callBacks.erase(taskId);
-				}
-			}
-			return rtn;
-		}
+
 		DLLExState * DLLExState::findOrCreateExState(HWND browserHWnd){
 			DLLExState * rtn = NULL;
 			DefBrowserSateMap::iterator it = browserStateMap.find(browserHWnd);
@@ -58,7 +41,6 @@ namespace jw{
 		void DLLExState::unlockBrowserLocks(HWND browserHwnd){
 			DLLExState *  exState = findWithoutCreate(browserHwnd);
 			if (exState == NULL)return;
-			exState->callBacks.clear();
 		}
 		void DLLExState::removeBrowserSetting(HWND browserHwnd){
 			DLLExState *  exState = findWithoutCreate(browserHwnd);

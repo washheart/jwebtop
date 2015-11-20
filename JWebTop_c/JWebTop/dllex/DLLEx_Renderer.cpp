@@ -52,16 +52,16 @@ namespace jw{
 		}
 
 		void executeJSCallBack(CefRefPtr<CefFrame> frame, wstring callback, wstring result){
-			wstring code = callback + L"(" + result + L")";
+			//wstring code = L"try{" + callback + L"(" + result + L")" + L"}catch(e){alert(e)}";
+			wstring code = callback + L"(" + result + L");";
 			frame->ExecuteJavaScript(code, "", 0);
 		}
 		void render_processMsg(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message){
 			CefRefPtr<CefListValue> args = message->GetArgumentList();
 			DWORD userMsgType = args->GetInt(0);
 			if (userMsgType == JWM_B2R_TASKRESULT){
-				wstring taskId = args->GetString(1).ToWString();
+				wstring callBack = args->GetString(1).ToWString();
 				wstring result = args->GetString(2).ToWString();
-				wstring callBack = DLLExState::findAndRemoveCallBack((HWND)args->GetInt(3), taskId);
 				if (callBack.empty()){// ³ö´íÁË£¿£¿£¿
 				} else{
 					executeJSCallBack(browser->GetMainFrame(), callBack, result);
@@ -105,10 +105,9 @@ namespace jw{
 			}
 		}
 		void invokeRemote_CallBack(HWND browserHWnd, CefString json, CefString callBackFunName){
-			wstring taskId = jw::GenerateGuidW();	
 			wstring newjson = json.ToWString();
-			DLLExState::findOrCreateExState(browserHWnd)->addCallBack(taskId, callBackFunName);
-			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, taskId);
+			wstring callBack = callBackFunName.ToWString();
+			sendJWebTopProcessMsg(browserHWnd, JWM_DLL_EXECUTE_WAIT, newjson, callBack);
 		}
 
 		void invokeRemote_NoWait(HWND browserHWnd, CefString json){

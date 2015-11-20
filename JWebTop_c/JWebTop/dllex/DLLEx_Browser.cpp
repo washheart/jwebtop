@@ -66,23 +66,20 @@ namespace jw{
 			writeLog(wss.str());
 #endif
 			switch (userMsgType){
-			case JWM_RESULT_RETURN:{
-									   wstring callBack = DLLExState::findAndRemoveCallBack((HWND)userValue, taskId);
-									   if (callBack.empty()){
-										   CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
-										   CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
-										   args->SetInt(0, JWM_B2R_TASKRESULT);
-										   args->SetString(1, taskId);
-										   args->SetString(2, data);
-										   args->SetInt(3, userValue);
-										   setMsgToRender((HWND)userValue, cefMsg);
-									   }
-									   else{
-										   BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-										   executeJSCallBack(bwInfo->browser->GetMainFrame(), callBack, data);
-									   }
-									   break;
-			}
+			case JWM_RESULT_RETURN:
+				if (settings.single_process){// 单进程模式下直接执行callback即可
+					BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
+					executeJSCallBack(bwInfo->browser->GetMainFrame(), taskId, data);
+				} else{
+					CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
+					CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
+					args->SetInt(0, JWM_B2R_TASKRESULT);
+					args->SetString(1, taskId);
+					args->SetString(2, data);
+					args->SetInt(3, userValue);
+					setMsgToRender((HWND)userValue, cefMsg);
+				}
+				break;
 			case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 			case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
 				try{
