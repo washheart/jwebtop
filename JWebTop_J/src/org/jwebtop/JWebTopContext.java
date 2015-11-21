@@ -93,7 +93,7 @@ public class JWebTopContext implements FastIPCReadListener {
 			processPath = file.getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
 			if (cfgFile != null && cfgFile.trim().length() > 0) {
 				file = new File(cfgFile);
-				if (!file.exists()) throw new JWebTopException("找不到可执行文件：" + processPath);
+				if (!file.exists()) throw new JWebTopException("找不到配置文件：" + processPath);
 				cfgFile = file.getCanonicalPath();
 			}
 		} catch (IOException e) {

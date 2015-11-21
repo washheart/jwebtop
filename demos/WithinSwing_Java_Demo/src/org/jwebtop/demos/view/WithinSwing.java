@@ -206,7 +206,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		return buffer.toString();
 	}
 
-	static void 测试没有浏览器窗口打开的情况下_关闭EC时无法关闭浏览器进程的缺陷() {
+	static void 测试没有浏览器窗口打开的情况下_关闭主进程时无法关闭浏览器进程的缺陷() {
 		final JWebTopContext ctx = new JWebTopContext();
 		ctx.setJsonHandler(new JWebtopJSONDispater() {
 			@Override
@@ -257,7 +257,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 			// }
 			System.out.println("dir = " + dir);
 
-			// 测试没有浏览器窗口打开的情况下_关闭EC时无法关闭浏览器进程的缺陷();
+			// 测试没有浏览器窗口打开的情况下_关闭主进程时无法关闭浏览器进程的缺陷();
 			new WithinSwing();
 		} catch (Throwable e) {
 			e.printStackTrace();
