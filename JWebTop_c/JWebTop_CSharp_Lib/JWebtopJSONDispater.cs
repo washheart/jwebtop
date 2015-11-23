@@ -4,6 +4,21 @@ using System.Linq;
 using System.Text;
 
 namespace JWebTop {
+    //public interface JWebTopIPCStarted {
+    //    void onIPCStarted();
+    //}
+    public interface JWebTopAppInited {
+        void onJWebTopAppInited();
+    }
+    public interface JWebTopBrowserCreated {
+        void onJWebTopBrowserCreated(long browserHWnd);
+    }
+    public interface JWebTopJSReturn {
+        void onJWebTopJSReturn(String jsonString);
+    }
+    public interface JWebTopJSONCallBack {
+        void onJWebTopJSONCallBack();
+    }
     public interface JWebtopJSONDispater {
         /**
 	     * 处理浏览器发来的json内容，并返回结果

@@ -58,10 +58,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="fastipc\FastIPCClient.cs" />
+    <Compile Include="fastipc\FastIPCException.cs" />
+    <Compile Include="fastipc\FastIPCNative.cs" />
+    <Compile Include="fastipc\FastIPCReadListener.cs" />
+    <Compile Include="fastipc\FastIPCServer.cs" />
     <Compile Include="JWebTopBrowser.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="JWebTopConfigs.cs" />
+    <Compile Include="JWebTopContext.cs" />
     <Compile Include="JWebTopException.cs" />
     <Compile Include="JWebtopJSONDispater.cs" />
     <Compile Include="JWebTopNative.cs" />
