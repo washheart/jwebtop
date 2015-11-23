@@ -66,6 +66,9 @@ public class JWebTopContext implements FastIPCReadListener {
 	private ClassLoader commonlassLoader;
 	private JWebTopAppInited appInitListner;
 
+	private Map<String, JWebTopBrowserCreated> browserCreateListeners = new HashMap<String, JWebTopBrowserCreated>();
+	private Map<String, JWebTopJSReturn> jsReturnListners = new HashMap<String, JWebTopJSReturn>();
+
 	public static void initDLL(String dllDir) {
 		File dllFile = new File(dllDir, "JWebTopCommon.dll");
 		if (!dllFile.exists()) {
@@ -159,9 +162,6 @@ public class JWebTopContext implements FastIPCReadListener {
 		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
 		createBrowserByJSON(jo.toString(), createListener);
 	}
-
-	private Map<String, JWebTopBrowserCreated> browserCreateListeners = new HashMap<String, JWebTopBrowserCreated>();
-	private Map<String, JWebTopJSReturn> jsReturnListners = new HashMap<String, JWebTopJSReturn>();
 
 	/**
 	 * 根据JSON配置字符串创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
@@ -276,11 +276,11 @@ public class JWebTopContext implements FastIPCReadListener {
 				client.write(JWM_RESULT_RETURN, userValue, userShortStr, result); // 发送结果到远程进程
 				break;
 			case JWM_RESULT_RETURN:
-				JWebTopJSReturn tmp1 = jsReturnListners.get(userShortStr);
+				JWebTopJSReturn tmp1 = jsReturnListners.remove(userShortStr);
 				if (tmp1 != null) tmp1.onJWebTopJSReturn(userShortStr, data);
 				break;
 			case JWM_BROWSER_CREATED:
-				JWebTopBrowserCreated tmp2 = browserCreateListeners.get(userShortStr);
+				JWebTopBrowserCreated tmp2 = browserCreateListeners.remove(userShortStr);
 				if (tmp2 != null) tmp2.onJWebTopBrowserCreated(userValue);
 				break;
 			case JWM_IPC_CLIENT_OK:
@@ -363,11 +363,16 @@ public class JWebTopContext implements FastIPCReadListener {
 	 * 这里发送是包装的JSON数据，其调用JS脚本中的invokeByDLL(jsonvalue)方法
 	 * 
 	 * @param browserHWnd
+	 *            在哪个浏览器执行
 	 * @param jsonstring
+	 *            待执行的JSON数据
 	 * @param jsReturn
+	 *            JS执行结果的侦听器
+	 * @param uuid
+	 *            执行js时用于获取返回结果，如果jsReturn是共用的，那么可以根据此uuid来区分不同的调用
 	 */
-	public void executeJSON_Wait(long browserHWnd, String jsonstring, JWebTopJSReturn jsReturn) {
-		String taskId = createTaskId();
+	public void executeJSON_Wait(long browserHWnd, String jsonstring, JWebTopJSReturn jsReturn, String uuid) {
+		String taskId = (uuid == null || uuid.trim().length() == 0) ? createTaskId() : uuid;
 		jsReturnListners.put(taskId, jsReturn);
 		client.write(JWM_JSON_EXECUTE_WAIT, browserHWnd, taskId, jsonstring);
 	}
@@ -387,11 +392,16 @@ public class JWebTopContext implements FastIPCReadListener {
 	 * 推荐使用executeJSON_Wait方法，以减少字符串转换的问题
 	 * 
 	 * @param browserHWnd
+	 *            在哪个浏览器执行
 	 * @param script
+	 *            待执行的JS脚本
 	 * @param jsReturn
+	 *            JS执行结果的侦听器
+	 * @param uuid
+	 *            执行js时用于获取返回结果，如果jsReturn是共用的，那么可以根据此uuid来区分不同的调用
 	 */
-	public void executeJS_Wait(long browserHWnd, String script, JWebTopJSReturn jsReturn) {
-		String taskId = createTaskId();
+	public void executeJS_Wait(long browserHWnd, String script, JWebTopJSReturn jsReturn, String uuid) {
+		String taskId = (uuid == null || uuid.trim().length() == 0) ? createTaskId() : uuid;
 		jsReturnListners.put(taskId, jsReturn);
 		client.write(JWM_JS_EXECUTE_WAIT, browserHWnd, taskId, script);
 	}
