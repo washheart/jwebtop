@@ -19,10 +19,12 @@ import org.jwebtop.JWebTopBrowser;
 import org.jwebtop.JWebTopConfigs;
 import org.jwebtop.JWebTopContext;
 import org.jwebtop.JWebTopNative;
-import org.jwebtop.JWebtopJSONDispater;
 import org.jwebtop.WindowStyle;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
+import org.jwebtop.listener.JWebTopAppInited;
+import org.jwebtop.listener.JWebTopBrowserCreated;
+import org.jwebtop.listener.JWebtopJSONDispater;
 
 /**
  * 测试嵌入浏览器到Swing窗口的例子<br/>
@@ -71,7 +73,12 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		configs.setMax(0);
 		configs.setW(400);
 		configs.setH(400);
-		this.modalBrowserDlgHWnd = ctx.createBrowser(configs);
+		ctx.createBrowser(configs, new JWebTopBrowserCreated() {
+			@Override
+			public void onJWebTopBrowserCreated(long browserHWnd) {
+				modalBrowserDlgHWnd = browserHWnd;
+			}
+		});
 		f.setEnabled(false);// 将主窗口设置为不可用：相当于对话框是模态的
 	}
 
@@ -132,7 +139,12 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 			System.out.println("\tpath = " + path);
 			this.appFile = ctrl.getListAppFile();
 			System.out.println("\tappFile = " + appFile);
-			ctx.createJWebTopByCfgFile(path, appFile);
+			ctx.createJWebTopByCfgFile(path, appFile, new JWebTopAppInited() {
+				@Override
+				public void onJWebTopAppInited() {
+					jwebtopContextInited();
+				}
+			});
 			// JWebTopNative.createJWebTop(path, appFile);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -183,9 +195,13 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 	}
 
 	public void jwebtopContextInited() {
-		RootBrowserHwnd = listWebtopView.createInernalBrowser(ctx, appFile, null, "列表页", null);
-		System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
-		ctrl.setListHandler(RootBrowserHwnd);
+		listWebtopView.createInernalBrowser(ctx, appFile, null, "列表页", null, new JWebTopBrowserCreated() {
+			@Override
+			public void onJWebTopBrowserCreated(long browserHWnd) {
+				System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
+				ctrl.setListHandler(RootBrowserHwnd);
+			}
+		});
 	}
 
 	public static String arrayToString(byte[] array) {
@@ -213,7 +229,14 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 			public void resetThreadClassLoader() {}
 
 			@Override
-			public void jWebTopContextInited() {
+			public String dispatcher(long browserHWnd, String json) {
+				return null;
+			}
+		});
+		String path = "JWebTop.exe";
+		ctx.createJWebTopByCfgFile(path, null, new JWebTopAppInited() {
+			@Override
+			public void onJWebTopAppInited() {
 				JWebTopConfigs configs = new JWebTopConfigs();
 				configs.setUrl("http://www.baidu.com");
 				long style = WS_EX_TOOLWINDOW | WS_VISIBLE;
@@ -221,19 +244,14 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 				configs.setMax(0);
 				configs.setW(400);
 				configs.setH(400);
-				ctx.createBrowser(configs);
-			}
-
-			@Override
-			public void jWebTopBrowserCreated(String browserUuid, long browserHWnd) {}
-
-			@Override
-			public String dispatcher(long browserHWnd, String json) {
-				return null;
+				ctx.createBrowser(configs, new JWebTopBrowserCreated() {
+					@Override
+					public void onJWebTopBrowserCreated(long browserHWnd) {
+						System.out.println("browserHWnd = " + browserHWnd);
+					}
+				});
 			}
 		});
-		String path = "JWebTop.exe";
-		ctx.createJWebTopByCfgFile(path, null);
 	}
 
 	public static void main(String[] args) {

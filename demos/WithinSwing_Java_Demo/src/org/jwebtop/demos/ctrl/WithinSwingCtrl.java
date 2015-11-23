@@ -10,8 +10,8 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jwebtop.JWebtopJSONDispater;
 import org.jwebtop.demos.view.WithinSwing;
+import org.jwebtop.listener.JWebtopJSONDispater;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -294,16 +294,5 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		rtn.put("value", names);
 		// JWebTopNative.executeJs(listHandler, rtn.toJSONString());
 		System.out.println("rtn.toJSONString() = " + rtn.toJSONString());
-	}
-
-	@Override
-	public void jWebTopBrowserCreated(String userShortStr, long userValue) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void jWebTopContextInited() {
-		frame.jwebtopContextInited();
 	}
 }
