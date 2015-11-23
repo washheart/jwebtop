@@ -10,5 +10,5 @@ disableRefresh=1
 disableDevelop=0
 enableDrag=0
 [CEF]
-single_process=1
+single_process=0
 log_severity=0
