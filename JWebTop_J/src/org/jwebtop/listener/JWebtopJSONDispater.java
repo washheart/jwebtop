@@ -1,4 +1,4 @@
-package org.jwebtop;
+package org.jwebtop.listener;
 
 /**
  * 用来响应浏览器的JSON调用<br>
@@ -8,6 +8,7 @@ package org.jwebtop;
  * @author washheart@163.com
  */
 public interface JWebtopJSONDispater {
+
 	/**
 	 * 处理浏览器发来的json内容，并返回结果
 	 * 
@@ -36,19 +37,4 @@ public interface JWebtopJSONDispater {
 	 * </pre>
 	 */
 	void resetThreadClassLoader();
-
-	/**
-	 * 当指定浏览器被创建后调用
-	 * 
-	 * @param browserUuid
-	 *            创建浏览器时传递的uuid，根据此uuid分发可以得知某浏览器是否已创建完成
-	 * @param browserHWnd
-	 *            成功创建的浏览器的窗口句柄
-	 */
-	void jWebTopBrowserCreated(String browserUuid, long browserHWnd);
-
-	/**
-	 * 当JWebTop进程成功启动后调用，只有在此时间点之后，才可以构建浏览器
-	 */
-	void jWebTopContextInited();
 }

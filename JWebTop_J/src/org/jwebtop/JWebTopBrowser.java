@@ -10,6 +10,8 @@ import java.awt.event.ComponentListener;
 
 import javax.swing.JComponent;
 
+import org.jwebtop.listener.JWebTopBrowserCreated;
+
 /**
  * 与实际浏览器控件对应的Java控件<br>
  * 通过监听Java控件的移动、最小化等相关事件，然后将这些事件分发给实际的浏览器控件<br>
@@ -94,16 +96,16 @@ public class JWebTopBrowser extends JComponent {
 		return locOnDesktop;
 	}
 
-	public long createInernalBrowser(JWebTopContext ctx, String appFile, String url, String title, String icon) {
+	public void createInernalBrowser(JWebTopContext ctx, String appFile, String url, String title, String icon, JWebTopBrowserCreated listener) {
 		JWebTopConfigs config = new JWebTopConfigs();
 		config.setAppDefFile(appFile);
 		config.setUrl(url);
 		config.setName(title);
 		config.setIcon(icon);
-		return createInernalBrowser(ctx, config);
+		createInernalBrowser(ctx, config, listener);
 	}
 
-	public long createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config) {
+	public void createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config, JWebTopBrowserCreated listener) {
 		Dimension size = this.getSize();
 		Point p = this.calcBrowserLocation();
 		long parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
@@ -112,8 +114,7 @@ public class JWebTopBrowser extends JComponent {
 		config.setY(p.y);//
 		config.setW(size.width);
 		config.setH(size.height);
-		this.hWnd = ctx.createBrowser(config);
-		return this.hWnd;
+		ctx.createBrowser(config, listener);
 	}
 
 	private ComponentListener topWindowComponentListener = null;

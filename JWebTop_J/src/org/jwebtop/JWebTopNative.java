@@ -51,8 +51,6 @@ public final class JWebTopNative {
 
 	private static native void nSetTopMost(long browserHWnd);
 
-	private static JWebtopJSONDispater jsonHandler = null;
-
 	private JWebTopNative() {}
 
 	// 创建一个新进程，返回的数据为进程中主线程的id
