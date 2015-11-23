@@ -18,8 +18,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	JNIEXPORT jobjectArray JNICALL Java_org_fastipc_FastIPCNative_data
-		(JNIEnv * env, jclass);
 
 	/*
 	* 对应org.fastipc.FastIPCNative类的nCreateServer方法
