@@ -28,7 +28,13 @@ namespace jb{
 	//close(handler);// 关闭窗口
 	void close(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
-		if (bw != NULL)bw->browser->GetHost()->CloseBrowser(true);
+		if (bw != NULL){
+			if (bw->isWsChild){
+				// DestroyWindow(hWnd);// 不能关闭浏览器进程
+				SetParent(hWnd, NULL); // 所以需要先把父窗口设置为NULL，然后再关闭
+			}
+			bw->browser->GetHost()->CloseBrowser(true);
+		}
 	}
 
 	//loadUrl(url, handler);//加载网页，url为网页路径
@@ -275,6 +281,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		if (hIcon)SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
 	}
+	
 	bool showMax = false;
 	if (configs.max){// 需要按最大化的方式来显示
 		jw::maxWin(hWnd); 
@@ -300,6 +307,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	if (preWndProc != (LONG)JWebTop_BrowerWndProc){
 		SetWindowLongPtr(bWnd, GWLP_WNDPROC, (LONG)JWebTop_BrowerWndProc);
 		BrowserWindowInfo * bwInfo = new BrowserWindowInfo();
+		bwInfo->isWsChild = (WS_CHILD&p_configs->dwStyle) !=0;
 		bwInfo->hWnd = hWnd;
 		bwInfo->bWnd = bWnd;
 		bwInfo->oldBrowserProc = preWndProc;

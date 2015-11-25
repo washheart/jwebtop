@@ -13,6 +13,7 @@ public:
 	HWND hWnd = NULL;					// CEF浏览器的外部窗口
 	HWND bWnd = NULL;					// CEF内部浏览器窗口
 	HWND rWnd = NULL;					// CEF内部绘制器窗口
+	bool isWsChild = false;				// 是否有WS_CHILD风格
 
 	LONG oldMainProc;                   // 浏览器所在主窗口之前的消息处理函数
 	LONG oldBrowserProc;                // 浏览器窗口之前的消息处理函数
