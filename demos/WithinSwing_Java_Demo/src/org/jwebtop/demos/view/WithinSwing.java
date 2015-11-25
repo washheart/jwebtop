@@ -24,7 +24,6 @@ import org.jwebtop.demos.ctrl.WithinSwingCtrl;
 import org.jwebtop.demos.ctrl.WithinSwingCtrl.WithinSwingCtrlHelper;
 import org.jwebtop.listener.JWebTopAppInited;
 import org.jwebtop.listener.JWebTopBrowserCreated;
-import org.jwebtop.listener.JWebtopJSONDispater;
 
 /**
  * 测试嵌入浏览器到Swing窗口的例子<br/>
@@ -222,38 +221,6 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		return buffer.toString();
 	}
 
-	static void 测试没有浏览器窗口打开的情况下_关闭主进程时无法关闭浏览器进程的缺陷() {
-		final JWebTopContext ctx = new JWebTopContext();
-		ctx.setJsonHandler(new JWebtopJSONDispater() {
-			@Override
-			public void resetThreadClassLoader() {}
-
-			@Override
-			public String dispatcher(long browserHWnd, String json) {
-				return null;
-			}
-		});
-		String path = "JWebTop.exe";
-		ctx.createJWebTopByCfgFile(path, null, new JWebTopAppInited() {
-			@Override
-			public void onJWebTopAppInited() {
-				JWebTopConfigs configs = new JWebTopConfigs();
-				configs.setUrl("http://www.baidu.com");
-				long style = WS_EX_TOOLWINDOW | WS_VISIBLE;
-				configs.setDwStyle(style);
-				configs.setMax(0);
-				configs.setW(400);
-				configs.setH(400);
-				ctx.createBrowser(configs, new JWebTopBrowserCreated() {
-					@Override
-					public void onJWebTopBrowserCreated(long browserHWnd) {
-						System.out.println("browserHWnd = " + browserHWnd);
-					}
-				});
-			}
-		});
-	}
-
 	public static void main(String[] args) {
 		try {
 			File dir = initDll(args);
@@ -275,8 +242,9 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 			// }
 			System.out.println("dir = " + dir);
 
-			// 测试没有浏览器窗口打开的情况下_关闭主进程时无法关闭浏览器进程的缺陷();
-			new WithinSwing();
+			// 测试没有浏览器窗口打开的情况下_关闭主进程时无法关闭浏览器进程的缺陷.test();
+			测试嵌入到TabPane中.test();
+			// new WithinSwing();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

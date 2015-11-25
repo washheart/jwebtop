@@ -26,16 +26,9 @@ public class JWebTopBrowser extends JComponent {
 		if (!aFlag) JWebTopNative.setSize(getBrowserHwnd(), 0, 0);
 	}
 
-	private long getBrowserHwnd() {
-		System.out.println("this.hWnd = " + this.hWnd);
-		return this.hWnd;
-	}
-
-	public void setBrowserHwnd(long hWnd) {
-		this.hWnd = hWnd;
-	}
-
 	protected Window topWindow;
+	protected long hWnd;
+
 	private ComponentListener swtPanelComponentListener = new ComponentAdapter() {
 		@Override
 		public void componentMoved(ComponentEvent e) {
@@ -69,13 +62,12 @@ public class JWebTopBrowser extends JComponent {
 			}
 		}
 	};
-	private long hWnd;
 
 	public JWebTopBrowser() {
 		this.setOpaque(false);
 	}
 
-	protected void moveWebTopBrowser() {
+	public void moveWebTopBrowser() {
 		if (!this.isShowing()) return;
 		long browserHwnd = getBrowserHwnd();
 		if (browserHwnd == 0) return;
@@ -105,16 +97,31 @@ public class JWebTopBrowser extends JComponent {
 		createInernalBrowser(ctx, config, listener);
 	}
 
-	public void createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config, JWebTopBrowserCreated listener) {
-		Dimension size = this.getSize();
-		Point p = this.calcBrowserLocation();
+	public void createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config, final JWebTopBrowserCreated listener) {
 		long parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
 		config.setParentWin(parentHWnd);
-		config.setX(p.x);
-		config.setY(p.y);//
-		config.setW(size.width);
-		config.setH(size.height);
-		ctx.createBrowser(config, listener);
+		config.setDwStyle(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE);
+		if (isShowing()) {
+			Point p = this.calcBrowserLocation();
+			config.setX(p.x);
+			config.setY(p.y);//
+			Dimension size = this.getSize();
+			config.setW(size.width);
+			config.setH(size.height);
+		} else {
+			config.setX(0);
+			config.setY(0);//
+			config.setW(0);
+			config.setH(0);
+		}
+		config.setMax(0);
+		ctx.createBrowser(config, new JWebTopBrowserCreated() {
+			@Override
+			public void onJWebTopBrowserCreated(long browserHWnd) {
+				hWnd = browserHWnd;
+				listener.onJWebTopBrowserCreated(browserHWnd);
+			}
+		});
 	}
 
 	private ComponentListener topWindowComponentListener = null;
@@ -138,8 +145,6 @@ public class JWebTopBrowser extends JComponent {
 		if (this.isShowing()) moveWebTopBrowser();
 	}
 
-	public void createTopWindowComponentListener(final Window topWindow) {}
-
 	@Override
 	public void setVisible(boolean aFlag) {
 		super.setVisible(aFlag);
@@ -149,5 +154,17 @@ public class JWebTopBrowser extends JComponent {
 		}
 	}
 
-	protected void innerSwtHasGainedFocus() {}
+	public void dispose(JWebTopContext ctx) {
+		JWebTopNative.setWindowStyle(hWnd, WindowStyle.WS_POPUP);
+		ctx.closeBrowser(hWnd);
+		hWnd = 0;
+	}
+
+	private long getBrowserHwnd() {
+		return this.hWnd;
+	}
+
+	public void setBrowserHwnd(long hWnd) {
+		this.hWnd = hWnd;
+	}
 }
