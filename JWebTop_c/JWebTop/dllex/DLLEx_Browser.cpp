@@ -36,11 +36,7 @@ namespace jw{
 		bool sendJWebTopProcessMsg(HWND browserHWnd, DWORD msgId, wstring& msg, wstring& taskId);
 		void executeJSCallBack(CefRefPtr<CefFrame> frame, wstring callback, wstring result);
 
-		bool setMsgToRender(HWND browserHWnd, CefRefPtr<CefProcessMessage> cefMsg){
-			BrowserWindowInfo * bw = getBrowserWindowInfo((HWND)browserHWnd);
-			if (bw == NULL)return false;
-			return bw->browser->SendProcessMessage(PID_RENDERER, cefMsg);
-		}
+
 		void sendIPCServerInfo(HWND browserHWnd){
 			if (settings.single_process)return;	// 没有开启独立的render进程
 			if (!ex())return;					// 不是从主进程调用
@@ -52,6 +48,7 @@ namespace jw{
 			BrowserWindowInfo * bw = getBrowserWindowInfo((HWND)browserHWnd);
 			bw->browser->SendProcessMessage(PID_RENDERER, tmp);
 		}
+
 		void __onRead(LONG userMsgType, LONG userValue, std::string& taskIds, std::string& datas){
 			std::wstring taskId = jw::s2w(taskIds);
 			std::wstring data = jw::s2w(datas);
@@ -65,88 +62,91 @@ namespace jw{
 				<< L"||\r\n";
 			writeLog(wss.str());
 #endif
-			switch (userMsgType){
-			case JWM_RESULT_RETURN:
-				if (settings.single_process){// 单进程模式下直接执行callback即可
-					BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-					executeJSCallBack(bwInfo->browser->GetMainFrame(), taskId, data);
-				} else{
-					CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
-					CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
-					args->SetInt(0, JWM_B2R_TASKRESULT);
-					args->SetString(1, taskId);
-					args->SetString(2, data);
-					args->SetInt(3, userValue);
-					setMsgToRender((HWND)userValue, cefMsg);
-				}
-				break;
-			case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-			case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
-				try{
-					CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
-					CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
-					args->SetInt(0, userMsgType);
-					args->SetString(1, data);
-					args->SetString(2, taskId);
-					if (!setMsgToRender((HWND)userValue, cefMsg)){// 直接发送到render进程去执行
+			if (userValue != 0){// 基本都是操作浏览器页面、执行或调用JS的
+				BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
+				if (bwInfo != NULL){
+					switch (userMsgType){
+					case JWM_RESULT_RETURN:
+						if (settings.single_process){// 单进程模式下直接执行callback即可
+							executeJSCallBack(bwInfo->browser->GetMainFrame(), taskId, data);
+						} else{
+							CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
+							CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
+							args->SetInt(0, JWM_B2R_TASKRESULT);
+							args->SetString(1, taskId);
+							args->SetString(2, data);
+							//args->SetInt(3, userValue);
+							bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg);
+						}
+						break;
+					case JWM_JSON_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+					case JWM_JS_EXECUTE_WAIT:// 远程进程发来一个任务，并且远程进程正在等待，任务完成后需要发送JWEBTOP_MSG_RESULT_RETURN消息给远程进程
+						try{
+							CefRefPtr<CefProcessMessage> cefMsg = CefProcessMessage::Create(B2R_MSG_NAME);
+							CefRefPtr<CefListValue> args = cefMsg->GetArgumentList();
+							args->SetInt(0, userMsgType);
+							args->SetString(1, data);
+							args->SetString(2, taskId);
+							if (!bwInfo->browser->SendProcessMessage(PID_RENDERER, cefMsg)){// 直接发送到render进程去执行
 #ifdef JWebTopLog
-						writeLog(L"发送JS到render进程失败，taskId="); writeLog(taskId); writeLog(L"\r\n");
+								writeLog(L"发送JS到render进程失败，taskId="); writeLog(taskId); writeLog(L"\r\n");
 #endif
-						wstring empty;
-						sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, empty, taskId); // 发送结果到远程进程
+								wstring empty;
+								sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, empty, taskId); // 发送结果到远程进程
+							}
+						} catch (...){
+#ifdef JWebTopLog
+							writeLog(L"执行JS出现异常，taskId="); writeLog(taskId); writeLog(L"\r\n");
+#endif
+							wstring empty;
+							sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, empty, taskId); // 发送结果到远程进程
+						}
+						break;
+					case JWM_JSON_EXECUTE_RETURN:
+						data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
+						bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
+						break;
+					case JWM_JS_EXECUTE_RETURN:
+						bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
+						break;
+					case JWM_M_APPEND_JS:
+						DLLExState::findOrCreateExState((HWND)userValue)->setAppendJS(data);// 将JS保存下来，每次OnLoadEnd后执行
+						break;
+					case JWM_M_SETURL:
+						DLLExState::unlockBrowserLocks((HWND)userValue);// 每次主页面重新加载之后，都解锁之前页面绑定的JS任务
+						bwInfo->browser->GetMainFrame()->LoadURL(data);
+						break;
+					case JWM_CLOSEBROWSER:
+						jb::close((HWND)userValue);
+						break;
+					default:
+						MessageBox(NULL, L"用户浏览器消息值不对！", L"错误", 0);
+						break;
 					}
+				} else{
+					MessageBox(NULL, L"用户浏览器句柄不对！", L"错误", 0);
 				}
-				catch (...){
-#ifdef JWebTopLog
-					writeLog(L"执行JS出现异常，taskId="); writeLog(taskId); writeLog(L"\r\n");
-#endif
-					wstring empty;
-					sendJWebTopProcessMsg((HWND)userValue, JWM_RESULT_RETURN, empty, taskId); // 发送结果到远程进程
+			} else{
+				switch (userMsgType){
+				case JWM_CREATEBROWSER_JSON:
+					createNewBrowser(JWebTopConfigs::loadAsJSON(data), taskId);
+					break;
+				case JWM_CREATEBROWSER_FILE:
+					createNewBrowser(JWebTopConfigs::loadConfigs(data), taskId);
+					break;
+				case JWM_CFGJWEBTOP_FILE:
+					jw::ctx::startJWebTopByFile(data);
+					break;
+				case JWM_SET_ERR_URL:
+					JWebTopConfigs::setErrorURL(data);
+					break;
+				case JWM_CEF_ExitAPP:
+					closeWebTopEx();
+					break;
+				default:
+					MessageBox(NULL, L"用户定义消息值不对！", L"错误", 0);
+					break;
 				}
-				break;
-			case JWM_JSON_EXECUTE_RETURN:{
-											 BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-											 data = L"invokeByDLL(" + data + L")";// 包装json为js调用 
-											 bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-											 break; }
-			case JWM_JS_EXECUTE_RETURN:{
-										   BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-										   bwInfo->browser->GetMainFrame()->ExecuteJavaScript(data, "", 0);
-										   break;
-			}
-			case JWM_M_APPEND_JS:
-				DLLExState::findOrCreateExState((HWND)userValue)->setAppendJS(data);// 将JS保存下来，每次OnLoadEnd后执行
-				break;
-			case JWM_M_SETURL:{
-								  DLLExState::unlockBrowserLocks((HWND)userValue);// 每次主页面重新加载之后，都解锁之前页面绑定的JS任务
-								  BrowserWindowInfo * bwInfo = getBrowserWindowInfo((HWND)userValue);
-								  bwInfo->browser->GetMainFrame()->LoadURL(data);
-								  break;
-			}
-			case JWM_CLOSEBROWSER:
-				jb::close((HWND)userValue);
-				break;
-			case JWM_CREATEBROWSER_JSON:
-				createNewBrowser(JWebTopConfigs::loadAsJSON(data), taskId);
-				break;
-			case JWM_CREATEBROWSER_FILE:
-				createNewBrowser(JWebTopConfigs::loadConfigs(data), taskId);
-				break;
-			case JWM_CFGJWEBTOP_FILE:
-				jw::ctx::startJWebTopByFile(data);
-				break;
-			case JWM_SET_ERR_URL:
-				JWebTopConfigs::setErrorURL(data);
-				break;
-			//case JWM_SET_TASK_WAIT_TIME:
-			//	jw::task::setDefaultTaskWiatTime(userValue);
-			//	break;
-			case JWM_CEF_ExitAPP:
-				closeWebTopEx();
-				break;
-			default:
-				MessageBox(NULL, L"用户定义消息值不对！", L"错误", 0);
-				break;
 			}
 #ifdef JWebTopLog
 			wss.str(L"");
@@ -186,8 +186,7 @@ namespace jw{
 				HANDLE hHandle = OpenProcess(SYNCHRONIZE, false, processId);// 降低权限，否则有些情况下OpendProcess失败（比如xp）
 				WaitForSingleObject(hHandle, INFINITE);// 等待远程进程结束
 				closeWebTopEx();
-			}
-			catch (...){
+			} catch (...){
 #ifdef JWebTopLog
 				writeLog("等待远程进程结束出错。。。。。\r\n");
 #endif

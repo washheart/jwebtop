@@ -5,11 +5,10 @@
 
 #define JWM_IPC_CLIENT_OK		(__JWM+101)  // IPC对应的客户端已成功创建
 #define JWM_SET_ERR_URL			(__JWM+102)  // 设置错误页面
-#define JWM_SET_TASK_WAIT_TIME	(__JWM+103)  // 执行等待任务时的最大等待时间（毫秒）
 
 #define JWM_STARTJWEBTOP		(__JWM+301)  // 启动JWebTop进程
 #define JWM_CFGJWEBTOP_FILE		(__JWM+302)  // 
-#define JWM_CFGJWEBTOP_JSON		(__JWM+303)  // 
+//#define JWM_CFGJWEBTOP_JSON		(__JWM+303)  // 
 #define JWM_CEF_APP_INITED		(__JWM+304)  // CEF浏览器已初始完成
 #define JWM_CEF_ExitAPP			(__JWM+305)  // 关闭CEF浏览器进程
 
