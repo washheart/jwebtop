@@ -99,6 +99,7 @@ public class JWebTopBrowser extends JComponent {
 
 	public void createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config, final JWebTopBrowserCreated listener) {
 		long parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
+		if (parentHWnd == 0) throw new JWebTopException("使用JWebTopBrowser时，其所在父窗口必须已显示");
 		config.setParentWin(parentHWnd);
 		config.setDwStyle(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE);
 		if (isShowing()) {
