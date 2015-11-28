@@ -1,5 +1,6 @@
 package org.jwebtop;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -98,8 +99,19 @@ public class JWebTopBrowser extends JComponent {
 	}
 
 	public void createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config, final JWebTopBrowserCreated listener) {
-		long parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
-		if (parentHWnd == 0) throw new JWebTopException("使用JWebTopBrowser时，其所在父窗口必须已显示");
+		long parentHWnd = 0;
+		if (this.topWindow == null) {
+			Component tmp = this, pre = this;
+			while (tmp != null) {
+				pre = tmp;
+				tmp = tmp.getParent();
+			}
+			parentHWnd = JWebTopNative.getWindowHWND(pre);
+			if (parentHWnd == 0) throw new JWebTopException("使用JWebTopBrowser时，其所在父窗口必须已显示");
+		} else {
+			parentHWnd = JWebTopNative.getWindowHWND(this.topWindow);
+			if (parentHWnd == 0) throw new JWebTopException("使用JWebTopBrowser时，其所在父窗口必须已显示");
+		}
 		config.setParentWin(parentHWnd);
 		config.setDwStyle(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE);
 		if (isShowing()) {
@@ -128,6 +140,7 @@ public class JWebTopBrowser extends JComponent {
 	private ComponentListener topWindowComponentListener = null;
 
 	public void setTopWindow(Window w) {
+		if (w == this.topWindow) return;
 		if (w == null) throw new JWebTopException("必须设置容器所在窗口，否则不能创建组件！");
 		if (topWindowComponentListener == null) {
 			topWindowComponentListener = new ComponentAdapter() {
