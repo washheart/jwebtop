@@ -11,7 +11,7 @@ import java.awt.peer.ComponentPeer;
  * @author washheart@163.com
  */
 public final class JWebTopNative {
-	private static native long nCreateSubProcess(String subProcess, String szCmdLine);
+	private static native long nCreateSubProcess(String subProcess, String szCmdLine, boolean waitFor);
 
 	private static native long nGetProcessID();
 
@@ -53,9 +53,19 @@ public final class JWebTopNative {
 
 	private JWebTopNative() {}
 
-	// 创建一个新进程，返回的数据为进程中主线程的id
-	public static long createSubProcess(String subProcess, String szCmdLine) {
-		return nCreateSubProcess(subProcess, szCmdLine);
+	/**
+	 * 创建一个新进程
+	 * 
+	 * @param subProcess
+	 *            新进程执行的可执行文件
+	 * @param szCmdLine
+	 *            命令行参数
+	 * @param waitFor
+	 *            是否等待进程结束再返回
+	 * @return waitFor=true时返回0，否则返回的数据为进程中主线程的id
+	 */
+	public static long createSubProcess(String subProcess, String szCmdLine, boolean waitFor) {
+		return nCreateSubProcess(subProcess, szCmdLine, waitFor);
 	}
 
 	public static long getProcessID() {

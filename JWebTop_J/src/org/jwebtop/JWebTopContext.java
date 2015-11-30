@@ -110,18 +110,26 @@ public class JWebTopContext implements FastIPCReadListener {
 				server.startRead();
 			}
 		}.start();
-		String cmds = " :"// “:”作为特殊符号告诉JWebTop主程序，还有其他参数要解析。因为“:”不可能出现在文件路径的开通
+		final String cmds = " :"// “:”作为特殊符号告诉JWebTop主程序，还有其他参数要解析。因为“:”不可能出现在文件路径的开通
 				+ " " + String.valueOf(JWebTopNative.getProcessID())// 将当前进程id传递过去，以便当前进程结束后，JWebTop主程序自己退出
 				+ " " + Integer.toString(blockSize)// 通过FastIPC进行通信时，缓存区的大小
 				+ " " + serverName // 通过FastIPC进行通信时，双方的交互标记
 				+ " \"" + cfgFile + "\"" // 配置文件的路径
 				// + " " + JWebTopContext.WIN_HWND//
 		;
-		long handle = JWebTopNative.createSubProcess(processPath, cmds);
-		if (0 > handle) {
-			server.close();
-			throw new JWebTopException("无法启动程序（" + processPath + "）！");
-		}
+		final String _processPath = processPath;
+		new Thread() {
+			@Override
+			public void run() {
+				JWebTopNative.createSubProcess(_processPath, cmds, true);
+				if (client != null) client.close();
+			}
+		}.start();
+		// long handle = JWebTopNative.createSubProcess(processPath, cmds, true);
+		// if (0 > handle) {
+		// server.close();
+		// throw new JWebTopException("无法启动程序（" + processPath + "）！");
+		// }
 		// String[] cmds = {//
 		// processPath// 要启动的程序的路径
 		// , ":"// “:”作为特殊符号告诉JWebTop主程序，还有其他参数要解析。因为“:”不可能出现在文件路径的开通
