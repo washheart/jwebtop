@@ -121,13 +121,13 @@ namespace jw{
 						break;
 					default:
 #ifdef JWebTopLog
-						WriteLog(L"【错误】__OnRead 找到了浏览器，但无法处理对应消息值。\r\n");
+						writeLog(L"【错误】__OnRead 找到了浏览器，但无法处理对应消息值。\r\n");
 #endif
 						break;
 					}
 				} else{
 #ifdef JWebTopLog
-					WriteLog(L"【错误】__OnRead 无法根据指定的浏览器句柄找到对应的浏览器。\r\n");
+					writeLog(L"【错误】__OnRead 无法根据指定的浏览器句柄找到对应的浏览器。\r\n");
 #endif
 				}
 			} else{
@@ -149,7 +149,7 @@ namespace jw{
 					break;
 				default:
 #ifdef JWebTopLog
-					WriteLog(L"【错误】__OnRead 用户定义消息值不对。\r\n");
+					writeLog(L"【错误】__OnRead 用户定义消息值不对。\r\n");
 #endif
 					break;
 				}
