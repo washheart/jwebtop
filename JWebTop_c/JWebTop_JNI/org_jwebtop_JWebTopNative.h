@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 	// 创建一个新进程，返回的数据为进程中主线程的id
-	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine);
+	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine,jboolean waitFor);
 	
 	/*
 	* 获取当前进程id

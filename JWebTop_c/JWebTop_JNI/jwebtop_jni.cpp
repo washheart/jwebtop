@@ -12,13 +12,20 @@
 //typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 using namespace std;
 // 创建一个新进程，返回的数据为进程中主线程的id
-JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine){
+JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine, jboolean waitFor){
 #ifdef JWebTopLog
 	setLogFileName(L"jwebtop_dll.log");
 	writeLog(L"JNI开始启动新进程\r\n");
 #endif
 	wstring exe = jstring2wstring(env, subProcess), cmd = jstring2wstring(env, szCmdLine);
-	return jw::os::process::createSubProcess(LPTSTR(exe.c_str()), LPTSTR(cmd.c_str()));
+	DWORD processId = jw::os::process::createSubProcess(LPTSTR(exe.c_str()), LPTSTR(cmd.c_str()));
+	if (waitFor){		
+		HANDLE hHandle = OpenThread(SYNCHRONIZE, false, processId);// 降低权限，否则有些情况下OpendProcess失败（比如xp）
+		WaitForSingleObject(hHandle, INFINITE);// 等待远程进程结束
+		return 0;
+	} else{
+		return processId;
+	}
 }
 
 /*
