@@ -11,6 +11,9 @@
 #endif
 //typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 using namespace std;
+JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nShowWindow(JNIEnv * env, jclass, jlong hWnd, jint nCmdShow){
+	jw::showWindow((HWND)hWnd, nCmdShow);
+}
 // 创建一个新进程，返回的数据为进程中主线程的id
 JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine, jboolean waitFor){
 #ifdef JWebTopLog
@@ -109,26 +112,6 @@ JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nBringToTop
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nFocus
 (JNIEnv *, jclass, jlong browserHWnd){
 	jw::focus((HWND)browserHWnd);
-}
-//隐藏窗口
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nHide
-(JNIEnv *, jclass, jlong browserHWnd){
-	jw::hide((HWND)browserHWnd);
-}
-//最大化窗口
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMax
-(JNIEnv *, jclass, jlong browserHWnd){
-	jw::maxWin((HWND)browserHWnd);
-}
-//最小化窗口
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMini
-(JNIEnv *, jclass, jlong browserHWnd){
-	jw::mini((HWND)browserHWnd);
-}
-//还原窗口，对应于hide函数
-JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nRestore
-(JNIEnv *, jclass, jlong browserHWnd){
-	jw::restore((HWND)browserHWnd);
 }
 
 // 窗口是否显示

@@ -42,7 +42,7 @@ namespace jw{
 	}
 	// setSize(x, y, handler);//设置窗口大小
 	void setSize(HWND hWnd, int w, int h){
-		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER);// 只改变窗口大小，不改变窗口坐标和窗口所在层次
+		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);// 只改变窗口大小，不改变窗口坐标和窗口所在层次
 	}
 	// getSize(handler);//获得窗口大小，返回值为一object，格式如下{width:130,height:54}
 	POINT getSize(HWND hWnd){
@@ -61,7 +61,7 @@ namespace jw{
 	}
 	// move(x, y, handler);//移动窗口
 	void move(HWND hWnd, int x, int y){
-		::SetWindowPos(hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING);// 移动窗口，但不改变窗口大小和窗口所在层次
+		::SetWindowPos(hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING);// 移动窗口，但不改变窗口大小和窗口所在层次
 	}
 	// setBound(x, y,w ,h, handler);// 同时设置窗口的坐标和大小
 	void setBound(HWND hWnd, int x, int y, int w, int h){
@@ -90,6 +90,9 @@ namespace jw{
 	// focus(handler);//使窗口获得焦点
 	void focus(HWND hWnd){
 		SetFocus(hWnd);
+	}
+	void showWindow(HWND hWnd,int style){
+		ShowWindow(hWnd, style);
 	}
 	// hide(handler);//隐藏窗口
 	void hide(HWND hWnd){

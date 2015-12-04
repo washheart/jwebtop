@@ -9,6 +9,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	/*
+	 * 按指定风格显示窗口
+	 */
+	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nShowWindow(JNIEnv * env, jclass, jlong, jint);
+
 	// 创建一个新进程，返回的数据为进程中主线程的id
 	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nCreateSubProcess(JNIEnv * env, jclass, jstring subProcess, jstring szCmdLine,jboolean waitFor);
 	
@@ -44,14 +49,6 @@ extern "C" {
 		(JNIEnv *, jclass, jlong browserHWnd);//窗口移到最顶层
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nFocus
 		(JNIEnv *, jclass, jlong browserHWnd);//使窗口获得焦点
-	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nHide
-		(JNIEnv *, jclass, jlong browserHWnd);//隐藏窗口
-	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMax
-		(JNIEnv *, jclass, jlong browserHWnd);//最大化窗口
-	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nMini
-		(JNIEnv *, jclass, jlong browserHWnd);//最小化窗口
-	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nRestore
-		(JNIEnv *, jclass, jlong browserHWnd);//还原窗口，对应于hide函数
 	JNIEXPORT jboolean JNICALL Java_org_jwebtop_JWebTopNative_nIsVisible
 		(JNIEnv *, jclass, jlong browserHWnd);// 窗口是否显示
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nSetTopMost

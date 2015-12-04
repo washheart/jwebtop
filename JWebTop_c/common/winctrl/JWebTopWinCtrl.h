@@ -17,14 +17,15 @@ namespace jw{
 	_declspec(dllexport) void  setTitle(HWND hWnd, std::wstring title);          // setTitle(title, handler);// 设置窗口名称
 	_declspec(dllexport) std::wstring getTitle(HWND hWnd);                       // getTitle(handler);// 获取窗口名称，返回值为一字符串
 
-	_declspec(dllexport) void bringToTop(HWND hWnd);	// bringToTop(handler);//窗口移到最顶层
-	_declspec(dllexport) void focus(HWND hWnd);	    // focus(handler);//使窗口获得焦点
-	_declspec(dllexport) void hide(HWND hWnd);	    // hide(handler);//隐藏窗口
-	_declspec(dllexport) void maxWin(HWND hWnd);	    // max(handler);//最大化窗口
-	_declspec(dllexport) void mini(HWND hWnd);	    // mini(hander);//最小化窗口
-	_declspec(dllexport) void restore(HWND hWnd);	// restore(handler);//还原窗口，对应于hide函数
-	_declspec(dllexport) BOOL isVisible(HWND hWnd);  // 窗口是否在显示
-	_declspec(dllexport) void setTopMost(HWND hWnd);	// setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
+	_declspec(dllexport) void bringToTop(HWND hWnd);		// bringToTop(handler);//窗口移到最顶层
+	_declspec(dllexport) void focus(HWND hWnd);				// focus(handler);//使窗口获得焦点
+	_declspec(dllexport) void showWindow(HWND hWnd, int);	// 设置窗口显示状态
+	_declspec(dllexport) void hide(HWND hWnd);				// hide(handler);//隐藏窗口
+	_declspec(dllexport) void maxWin(HWND hWnd);		    // max(handler);//最大化窗口
+	_declspec(dllexport) void mini(HWND hWnd);				// mini(hander);//最小化窗口
+	_declspec(dllexport) void restore(HWND hWnd);			// restore(handler);//还原窗口，对应于hide函数
+	_declspec(dllexport) BOOL isVisible(HWND hWnd);			// 窗口是否在显示
+	_declspec(dllexport) void setTopMost(HWND hWnd);		// setTopMost(handler);//窗口置顶，此函数跟bringToTop的区别在于此函数会使窗口永远置顶，除非有另外一个窗口调用了置顶函数
 
 	_declspec(dllexport) void setWindowStyle(HWND hWnd, int style);	// setWindowStyle(exStyle, handler);//高级函数，设置窗口额外属性，诸如置顶之类。
 	_declspec(dllexport) void setWindowExStyle(HWND hWnd, int exStyle);  // setWindowExStyle(exStyle, handler)
