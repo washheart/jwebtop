@@ -11,7 +11,6 @@
 		<textarea id="detail"
 			style="width: 100%; min-height: 400px; height: 100%">请使用“添加日记”按钮新建日记</textarea>
 	</div>
-<script type="text/javascript" src="../AlloyDesktop.js"></script> 
 	<script>
 		var curNote = null;
 		// 保存当前日记
@@ -23,14 +22,13 @@
 				};
 				toJava['note'] = curNote;
 				toJava['value'] = content.value;
-				AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，保存日记
+				JWebTop.invokeRemote_NoWait(JSON.stringify(toJava));// 调用java，保存日记
 			}
 		}
 
 		//被java回调的js函数
 		function invokeByJava(jsonv) {
 			if (!jsonv || !jsonv.method) return;
-			// alert(jsonv.method);
 			if (jsonv.method == 'showDetail') {// 节点已添加，需要更新
 				saveNote();// 切换之前保存当前日记
 				var content = document.getElementById("detail");
@@ -38,18 +36,25 @@
 				content.value = jsonv.value;
 			} else if (jsonv.method == 'willClose') {
 				saveNote();// 关闭之前保存当前日记
-				AlloyDesktop.close();
+				JWebTop.close();
 			}
 		}
-
+    
+	// 被远程进程调用
+	function invokeByDLL(jsonValue){
+		invokeByJava(jsonValue);
+		return jsonValue.value;
+	}
 	function afterBrowserInit(){
+		// JWebTop.showDev();
 		// 注册日记细节浏览器到java端
 		toJava = {
-			method : "showDetail"
+			method : "setDetailHandler",
+			value : JWebTop.handler
 		}
-		AlloyDesktop.invokeJava(JSON.stringify(toJava));// 调用java，为其设置内容浏览器的句柄
+		JWebTop.invokeRemote_NoWait(JSON.stringify(toJava));// 调用java，为其设置内容浏览器的句柄
 	}
-	addEventListener("AlloyDesktopReady", afterBrowserInit);
+	addEventListener("JWebTopReady", afterBrowserInit);
 	</script>
 </body>
 </html>
