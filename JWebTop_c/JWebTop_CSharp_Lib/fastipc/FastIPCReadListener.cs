@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace org {
          * 
          * @author washheart@163.com
          */
-        interface FastIPCReadListener {
+        public interface FastIPCReadListener {
             /**
 	         * 当FastIPC服务端成功接收客户端写入的数据后，会回调此方法
 	         * 
@@ -30,7 +31,43 @@ namespace org {
 	         * @param data
 	         *            传递的消息具体内容，注意消息可能是分段的，此时需要根据packId进行组装
 	         */
-            void OnRead(int msgType, String packId, int userMsgType, long userValue, String userShortStr, byte[] data);
-        }
-    }
-}
+            void OnRead(int msgType, IntPtr packId
+                , int userMsgType, long userValue, IntPtr userShortStr
+                , IntPtr data, int dataLen);
+        }// End FastIPCReadListener class
+
+        // 提供一个完成了分段数据组装的抽象类，对不是太大的数据免除自己用流组织数据的麻烦
+        public abstract class RebuildedBlockListener : org.fastipc.FastIPCReadListener {
+            private Dictionary<String, Stream> caches = new Dictionary<String, Stream>();
+
+            public abstract void OnRead(int userMsgType, long userValue, String userShortStr, String data);
+
+            public void OnRead(int msgType, IntPtr _packId
+                , int userMsgType, long userValue, IntPtr _userShortStr
+                , IntPtr data, int dataLen) {
+                string packId = FastIPCNative.ptr2string(_packId);
+                string userShortStr = FastIPCNative.ptr2string(_userShortStr);
+                if (msgType == FastIPCNative.MSG_TYPE_NORMAL) {
+                    OnRead(userMsgType, userValue, userShortStr, FastIPCNative.ptr2string(data, dataLen));
+                } else {
+                    Stream bos = null;
+                    if (caches.ContainsKey(packId)) {
+                        bos = caches[packId];
+                    } else {
+                        bos = new MemoryStream();
+                        caches.Add(packId, bos);
+                    }
+                    FastIPCNative.readPtr(bos, data, dataLen);
+                    if (msgType == FastIPCNative.MSG_TYPE_END) {
+                        caches.Remove(packId);
+                        byte[] bytes = new byte[bos.Length];
+                        bos.Position = 0; // 设置当前流的位置为流的开始
+                        bos.Read(bytes, 0, bytes.Length);
+                        string rtn = Encoding.UTF8.GetString(bytes);
+                        OnRead(userMsgType, userValue, userShortStr, rtn);
+                    }
+                }
+            }
+        }// End RebuildedBlockListener class
+    }// End fastipc namespace
+}// End org namespace

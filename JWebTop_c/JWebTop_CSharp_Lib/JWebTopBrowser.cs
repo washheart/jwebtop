@@ -5,12 +5,14 @@ using System.Drawing;
 using System.Text;
 
 namespace JWebTop {
-    public class JWebTopBrowser : System.Windows.Forms.Panel {
+    public class JWebTopBrowser : System.Windows.Forms.Panel,JWebTopBrowserCreated {
         public JWebTopBrowser() {
             this.Resize += new System.EventHandler(this.sizeChanged);
         }
-        private int hWnd = 0;
-        private int getBorwserHWnd() {
+        private long hWnd = 0;
+        private JWebTopBrowserCreated jWebTopBrowserCreated;
+
+        private long getBorwserHWnd() {
             return this.hWnd;
         }
         private void sizeChanged(object sender, EventArgs e) {
@@ -18,26 +20,31 @@ namespace JWebTop {
             JWebTopNative.setSize(getBorwserHWnd(), size.Width, size.Height);
         }
 
-        public int createInernalBrowser(string appFile, string url, string title, string icon) {
+        public void createInernalBrowser(JWebTopContext ctx, string appFile, string url, string title, string icon, JWebTopBrowserCreated listener) {
             JWebTopConfigs config = new JWebTopConfigs();
             config.appDefFile = appFile;
             config.url = url;
             config.name = title;
             config.icon = icon;
-            return createInernalBrowser(config);
+            createInernalBrowser(ctx, config, listener);
         }
-
-        public int createInernalBrowser(JWebTopConfigs config) {
+        public void createInernalBrowser(JWebTopContext ctx, JWebTopConfigs config,
+             JWebTopBrowserCreated listener) {
             Size size = this.Size;
             config.parentWin = this.getControlHandle();
             config.x = 0;
             config.y = 0;//
             config.w = size.Width;
             config.h = size.Height;
-            this.hWnd = JWebTopNative.createBrowser(config);
-            return this.hWnd;
+            config.max=0;
+            this.jWebTopBrowserCreated = listener;
+		    ctx.createBrowser(config, this);
         }
 
+        public void onJWebTopBrowserCreated(long browserHWnd) {
+            hWnd = browserHWnd;
+            jWebTopBrowserCreated.onJWebTopBrowserCreated(browserHWnd);
+        }
         private int GetHandle_direct() {
             return this.Handle.ToInt32();
         }
@@ -51,7 +58,7 @@ namespace JWebTop {
             }
         }
 
-        public int getBrowserHWnd() {
+        public long getBrowserHWnd() {
             return this.hWnd;
         }
     }

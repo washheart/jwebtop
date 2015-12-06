@@ -93,7 +93,7 @@
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
     <Link>
-      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;comctl32.lib;shlwapi.lib;rpcrt4.lib;opengl32.lib;glu32.lib;lib\$(Configuration)\libcef.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;comctl32.lib;rpcrt4.lib;opengl32.lib;glu32.lib;..\$(Configuration)\JWebTopCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../../third_party/directxsdk/files/Lib/x86;../../../third_party/platformsdk_win7/files/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/safeseh /dynamicbase /ignore:4199 /ignore:4221 /nxcompat %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>dbghelp.dll;dwmapi.dll;shell32.dll;uxtheme.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
@@ -207,7 +207,7 @@
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;dbghelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;dbghelp.lib;psapi.lib;..\$(Configuration)\JWebTopCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/safeseh /dynamicbase /ignore:4199 /ignore:4221 /nxcompat %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>
@@ -287,7 +287,7 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).dll  $(SolutionDir)..\demos\JW
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;..\Release\cef_sandbox.lib;dbghelp.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;dbghelp.lib;psapi.lib;..\$(Configuration)\JWebTopCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/safeseh /dynamicbase /ignore:4199 /ignore:4221 /nxcompat %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>
@@ -489,27 +489,18 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).dll  $(SolutionDir)..\demos\JW
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\JWebTopMsg.h" />
-    <ClInclude Include="..\common\process\MultiProcess.h" />
-    <ClInclude Include="..\common\task\Task.h" />
-    <ClInclude Include="..\common\tests\TestUtil.h" />
-    <ClInclude Include="..\common\util\StrUtil.h" />
-    <ClInclude Include="..\common\winctrl\JWebTopWinCtrl.h" />
-    <ClInclude Include="..\common_dll\jwebtop_dll.h" />
     <ClInclude Include="jwebtop_4csharp.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\JWebTopMsg.cpp" />
-    <ClCompile Include="..\common\process\MultiProcess.cpp" />
-    <ClCompile Include="..\common\task\Task.cpp" />
-    <ClCompile Include="..\common\tests\TestUtil.cpp" />
-    <ClCompile Include="..\common\util\StrUtil.cpp" />
-    <ClCompile Include="..\common\winctrl\JWebTopWinCtrl.cpp" />
-    <ClCompile Include="..\common_dll\jwebtop_dll.cpp" />
     <ClCompile Include="jwebtop_4csharp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\JWebTop_DLL\JWebTop_DLL.vcxproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JWebTopCommon\JWebTopCommon.vcxproj">
+      <Project>{6bd8e842-723a-47ba-83a4-fa357465dc13}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

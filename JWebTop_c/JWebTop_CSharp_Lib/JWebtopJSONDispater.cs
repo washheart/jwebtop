@@ -16,9 +16,7 @@ namespace JWebTop {
     public interface JWebTopJSReturn {
         void onJWebTopJSReturn(String jsonString);
     }
-    public interface JWebTopJSONCallBack {
-        void onJWebTopJSONCallBack();
-    }
+
     public interface JWebtopJSONDispater {
         /**
 	     * 处理浏览器发来的json内容，并返回结果
