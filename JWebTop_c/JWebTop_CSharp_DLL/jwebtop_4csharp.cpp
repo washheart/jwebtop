@@ -2,10 +2,23 @@
 #include "common/util/StrUtil.h"
 #include "common/fastipc/Server.h"
 #include "common/fastipc/Client.h"
+#include "common/os/OS.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
 using namespace std;
+
+// 创建一个新进程，返回的数据为进程中主线程的id
+EXPORT long WINAPI nCreateSubProcess(LPTSTR subProcess, LPTSTR szCmdLine, int waitFor){
+	DWORD processId = jw::os::process::createSubProcess(subProcess, szCmdLine);
+	if (waitFor == 1){
+		HANDLE hHandle = OpenThread(SYNCHRONIZE, false, processId);// 降低权限，否则有些情况下OpendProcess失败（比如xp）
+		WaitForSingleObject(hHandle, INFINITE);// 等待远程进程结束
+		return 0;
+	} else{
+		return processId;
+	}
+}
 
 // 把wstring转为char*返回给csharp端
 char* wstring2char(wstring ws){
@@ -108,11 +121,7 @@ EXPORT int WINAPI nCreateClient(LPTSTR serverName, int blockSize, int& result){
 * data			要写入的数据
 * return		成功写入的数据长度
 */
-EXPORT int WINAPI nWriteClient(int nativeClient
-	, int userMsgType
-	, int userValue
-	, LPTSTR userShortStr
-	, LPTSTR data){
+EXPORT int WINAPI nWriteClient(int nativeClient, int userMsgType, int userValue, LPTSTR userShortStr, LPTSTR data){
 	fastipc::Client * client = (fastipc::Client *) nativeClient;
 	char * shortStr = NULL;
 	char * str = NULL;

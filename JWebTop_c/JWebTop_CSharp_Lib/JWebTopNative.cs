@@ -27,18 +27,19 @@ namespace JWebTop {
         private static extern int SetWindowPos(IntPtr hwnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
         #endregion
 
-        // 创建一个新进程，返回的数据为进程中主线程的id
-        public static long createSubProcess(String subProcess, String szCmdLine) {
-            //return nCreateSubProcess(subProcess, szCmdLine);
-            ProcessStartInfo process = new ProcessStartInfo();
-            process.FileName = subProcess;
-            process.Arguments = " " + szCmdLine;
-            process.UseShellExecute = false;
-            process.CreateNoWindow = true;
-            process.RedirectStandardOutput = true;
-            Process p = Process.Start(process);
-            return p.Id;
-        }
+        // FastIPC.createSubProcess
+        //// 创建一个新进程，返回的数据为进程中主线程的id
+        //public static long createSubProcess(String subProcess, String szCmdLine) {
+        //    //return nCreateSubProcess(subProcess, szCmdLine);
+        //    ProcessStartInfo process = new ProcessStartInfo();
+        //    process.FileName = subProcess;
+        //    process.Arguments = " " + szCmdLine;
+        //    process.UseShellExecute = false;
+        //    process.CreateNoWindow = true;
+        //    process.RedirectStandardOutput = true;
+        //    Process p = Process.Start(process);
+        //    return p.Id;
+        //}
 
         public static long getProcessID() {
             return Process.GetCurrentProcess().Id;

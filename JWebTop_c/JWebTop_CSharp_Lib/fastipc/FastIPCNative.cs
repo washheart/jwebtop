@@ -35,6 +35,8 @@ namespace org {
                 // ERR_MappingMap = 303, // 服务器/客户端映射内存文件失败
                     ERR_ServerName = 1, // 客户端创建失败
                     ERR_NONE = 0;// 没有任何错误
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+            private extern static int nCreateSubProcess([MarshalAs(UnmanagedType.LPTStr)]string subProcess, [MarshalAs(UnmanagedType.LPTStr)]string szCmdLine, int waitFor);
 
             [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static int nCreateServer([MarshalAs(UnmanagedType.LPTStr)]string serverName, int blockSize, ref int result);
@@ -57,6 +59,10 @@ namespace org {
 
             [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static void nCloseClient(int nativeClient);
+
+            public static int CreateSubProcess(string subProcess, string szCmdLine, int waitFor = 1) {
+                return nCreateSubProcess(subProcess, szCmdLine, waitFor);
+            }
 
             // 创建服务器
             public static int createServer(String serverName, int blockSize) {

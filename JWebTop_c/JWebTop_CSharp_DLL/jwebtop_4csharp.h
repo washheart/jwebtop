@@ -6,6 +6,10 @@
 #define EXPORT __declspec(dllexport)
 
 extern "C" {
+	// 创建一个新进程，返回的数据为进程中主线程的id
+	// 创建一个新进程，返回的数据为进程中主线程的id
+	EXPORT long WINAPI nCreateSubProcess(LPTSTR subProcess, LPTSTR szCmdLine, int waitFor);
+
 	/*
 	* 该方法用于创建一个fastipc服务端
 	* serverName	服务端名称
@@ -48,11 +52,7 @@ extern "C" {
 	* data			要写入的数据
 	* return		成功写入的数据长度
 	*/
-	EXPORT int WINAPI nWriteClient(int nativeClient
-		, int userMsgType
-		, int userValue
-		, LPTSTR userShortStr
-		, LPTSTR data);
+	EXPORT int WINAPI nWriteClient(int nativeClient, int userMsgType, int userValue, LPTSTR userShortStr, LPTSTR data);
 
 	/*
 	* 该方法用于关闭fastipcnWriteClient

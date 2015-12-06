@@ -46,27 +46,13 @@ namespace JWebTop {
             return this.Handle.ToInt32();
         }
         private delegate int GetHandle_delegate(); //定义委托变量
-        private int getControlHandle() {
+        public int getControlHandle() {
             if (this.InvokeRequired) {
                 GetHandle_delegate d = new GetHandle_delegate(GetHandle_direct);
                 return (int)this.Invoke(d);
             } else {
                 return GetHandle_direct();
             }
-        }
-
-        public long getBrowserHWnd() {
-            return this.hWnd;
-        }
-
-        public Point calcBrowserLocation() {
-            Point locOnDesktop = this.Location;
-            //if (this.topWindow != null) {
-            //    int[] rc = JWebTopNative.getWindowClient(JWebTopNative.getWindowHWND(this.topWindow));
-            //    locOnDesktop.x -= rc[0];
-            //    locOnDesktop.y -= rc[1];
-            //}
-            return locOnDesktop;
         }
 
         public int getBorwserHWnd() {

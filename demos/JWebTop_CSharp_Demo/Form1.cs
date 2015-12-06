@@ -49,8 +49,6 @@ namespace JWebTop_CSharp_Demo {
             private DemoBrowserCtrl ctrl = null;
             public ListBrowserCreated(DemoBrowserCtrl ctrl) { this.ctrl = ctrl; }
             public void onJWebTopBrowserCreated(int browserHWnd) {
-                //appfile = ctrl.getDetailAppFile();
-                //detailBrowser.createInernalBrowser(appfile, null, null, null);
                 ctrl.setListHandler(browserHWnd);
             }
         }
@@ -66,21 +64,20 @@ namespace JWebTop_CSharp_Demo {
         }
         public JWebTopContext getCtx() {
             return this.ctx;
-        }
-        public int getMainHWnd() {
-            return this.Handle.ToInt32();
-        }
+        }       
         private void btnDelNote_Click(object sender, EventArgs e) {
             string note = ctrl.getCurrentNote();
             if (note == null) return;
             if (MessageBox.Show(this, "是否删除【" + note + "】日记？") != DialogResult.OK) return;
             ctrl.delNote();
         }
-
+        // 这里和java不同，java中只有最顶层窗口才有句柄，C#中每个空间都有句柄，所以返回控件的即可 
+        public int getMainHWnd() {
+            return detailBrowser.getControlHandle();
+        }
         public int[] getDetailRect() {
-            Point p = detailBrowser.calcBrowserLocation();
             Size s = detailBrowser.Size;
-            return new int[] { p.X, p.Y, s.Width, s.Height };
+            return new int[] { 0, 0, s.Width, s.Height };
         }
         public void detailCreated(int browserHWnd) {
             detailBrowser.setBrowserHwnd(browserHWnd);
