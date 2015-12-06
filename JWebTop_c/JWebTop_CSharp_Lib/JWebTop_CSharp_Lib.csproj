@@ -74,6 +74,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\JWebTop_CSharp.dll /Q
+del $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\Newtonsoft.Json.dll /Q
+copy $(ProjectDir)bin\$(Configuration)\JWebTop_CSharp.dll  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\$(ProjectName).dll /Y
+copy $(ProjectDir)bin\$(Configuration)\Newtonsoft.Json.dll  $(SolutionDir)..\demos\JWebTop_CSharp_Demo\bin\$(Configuration)\Newtonsoft.Json.dll /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

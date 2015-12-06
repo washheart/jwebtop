@@ -32,7 +32,7 @@ namespace org {
 	         *            传递的消息具体内容，注意消息可能是分段的，此时需要根据packId进行组装
 	         */
             void OnRead(int msgType, IntPtr packId
-                , int userMsgType, long userValue, IntPtr userShortStr
+                , int userMsgType, int userValue, IntPtr userShortStr
                 , IntPtr data, int dataLen);
         }// End FastIPCReadListener class
 
@@ -40,10 +40,10 @@ namespace org {
         public abstract class RebuildedBlockListener : org.fastipc.FastIPCReadListener {
             private Dictionary<String, Stream> caches = new Dictionary<String, Stream>();
 
-            public abstract void OnRead(int userMsgType, long userValue, String userShortStr, String data);
+            public abstract void OnRead(int userMsgType, int userValue, String userShortStr, String data);
 
             public void OnRead(int msgType, IntPtr _packId
-                , int userMsgType, long userValue, IntPtr _userShortStr
+                , int userMsgType, int userValue, IntPtr _userShortStr
                 , IntPtr data, int dataLen) {
                 string packId = FastIPCNative.ptr2string(_packId);
                 string userShortStr = FastIPCNative.ptr2string(_userShortStr);

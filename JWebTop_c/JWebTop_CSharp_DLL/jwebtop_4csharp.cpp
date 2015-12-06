@@ -108,7 +108,11 @@ EXPORT int WINAPI nCreateClient(LPTSTR serverName, int blockSize, int& result){
 * data			要写入的数据
 * return		成功写入的数据长度
 */
-EXPORT int WINAPI nWriteClient(int nativeClient, int userMsgType, long userValue, LPTSTR userShortStr, LPTSTR data){
+EXPORT int WINAPI nWriteClient(int nativeClient
+	, int userMsgType
+	, int userValue
+	, LPTSTR userShortStr
+	, LPTSTR data){
 	fastipc::Client * client = (fastipc::Client *) nativeClient;
 	char * shortStr = NULL;
 	char * str = NULL;
@@ -134,7 +138,7 @@ EXPORT int WINAPI nWriteClient(int nativeClient, int userMsgType, long userValue
 	// 写到客户端，并清理当前申请的内存
 	client->write(userMsgType, userValue, shortStr, str, len);
 	delete[] str;
-	delete[] shortStr;
+	if (shortStr)delete[] shortStr;
 	return 0;
 }
 

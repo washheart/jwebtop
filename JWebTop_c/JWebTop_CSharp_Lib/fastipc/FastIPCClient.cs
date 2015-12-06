@@ -21,7 +21,7 @@ namespace org {
                 nativeClient = FastIPCNative.createClient(serverName, blockSize);
             }
 
-            public void write(int userMsgType, long userValue, String userShortStr, String data) {
+            public void write(int userMsgType, int userValue, String userShortStr, String data) {
                 // System.out.println("Writed msgId=" + userMsgType + " userValue=" + userValue + " taskId=" + userShortStr + " msg=" + data);
                 FastIPCNative.write(nativeClient, userMsgType, userValue, userShortStr, data);
             }

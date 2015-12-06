@@ -36,26 +36,26 @@ namespace org {
                     ERR_ServerName = 1, // 客户端创建失败
                     ERR_NONE = 0;// 没有任何错误
 
-            [DllImport("FastIPC_CSharp.dll", CharSet = CharSet.Unicode)]
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static int nCreateServer([MarshalAs(UnmanagedType.LPTStr)]string serverName, int blockSize, ref int result);
 
             // DLL回调CSharp回调函数原型   
             private delegate void CSharpCallBack(int msgType, IntPtr packId
-                , int userMsgType, long userValue, IntPtr userShortStr
+                , int userMsgType, int userValue, IntPtr userShortStr
                 , IntPtr data, int dataLen);
-            [DllImport("FastIPC_CSharp.dll", CharSet = CharSet.Unicode)]
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static void nStartRead(int nativeServer, CSharpCallBack listener);
 
-            [DllImport("FastIPC_CSharp.dll", CharSet = CharSet.Unicode)]
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static void nCloseServer(int nativeServer);
 
-            [DllImport("FastIPC_CSharp.dll", CharSet = CharSet.Unicode)]
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static int nCreateClient(String serverName, int blockSize, ref int result);
 
-            [DllImport("FastIPC_CSharp.dll", CharSet = CharSet.Unicode)]
-            private extern static int nWriteClient(int nativeClient, int userMsgType, long userValue, String userShortStr, String data);
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
+            private extern static int nWriteClient(int nativeClient, int userMsgType, int userValue, String userShortStr, String data);
 
-            [DllImport("FastIPC_CSharp.dll", CharSet = CharSet.Unicode)]
+            [DllImport("JWebTop_CSharp_DLL.dll", CharSet = CharSet.Unicode)]
             private extern static void nCloseClient(int nativeClient);
 
             // 创建服务器
@@ -91,7 +91,7 @@ namespace org {
             }
 
             // 写数据到服务端
-            public static void write(int nativeClient, int userMsgType, long userValue, String userShortStr, String data) {
+            public static void write(int nativeClient, int userMsgType, int userValue, String userShortStr, String data) {
                 nWriteClient(nativeClient, userMsgType, userValue, userShortStr, data);
             }
 

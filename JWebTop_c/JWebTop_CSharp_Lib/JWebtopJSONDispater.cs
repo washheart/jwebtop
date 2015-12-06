@@ -4,14 +4,11 @@ using System.Linq;
 using System.Text;
 
 namespace JWebTop {
-    //public interface JWebTopIPCStarted {
-    //    void onIPCStarted();
-    //}
     public interface JWebTopAppInited {
         void onJWebTopAppInited();
     }
     public interface JWebTopBrowserCreated {
-        void onJWebTopBrowserCreated(long browserHWnd);
+        void onJWebTopBrowserCreated(int browserHWnd);
     }
     public interface JWebTopJSReturn {
         void onJWebTopJSReturn(String jsonString);
@@ -27,7 +24,7 @@ namespace JWebTop {
 	     *            浏览器端发来的要执行内容
 	     * @return 本地处理后的结果
 	     */
-        string dispatcher(long browserHWnd, string json);
+        string dispatcher(int browserHWnd, string json);
 
         /**
          * Java中需要泽洋处理（c#是否有必要呢？）

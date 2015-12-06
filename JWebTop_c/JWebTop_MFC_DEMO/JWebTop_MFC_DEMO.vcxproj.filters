@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="wincomm.cpp" />
+    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="jwebtopex\jwebtopex.cpp">
+      <Filter>jwebtopex</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mfc_demo.h" />
+    <ClInclude Include="jwebtopex\JWebTopConfigs.h">
+      <Filter>jwebtopex</Filter>
+    </ClInclude>
+    <ClInclude Include="jwebtopex\jwebtopex.h">
+      <Filter>jwebtopex</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="jwebtopex">
+      <UniqueIdentifier>{2a8f0391-df16-46bc-a819-876873a0b992}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

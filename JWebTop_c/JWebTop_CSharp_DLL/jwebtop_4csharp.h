@@ -48,10 +48,14 @@ extern "C" {
 	* data			要写入的数据
 	* return		成功写入的数据长度
 	*/
-	EXPORT int WINAPI nWriteClient(int nativeClient, int userMsgType, long userValue, LPTSTR userShortStr, LPTSTR data);
+	EXPORT int WINAPI nWriteClient(int nativeClient
+		, int userMsgType
+		, int userValue
+		, LPTSTR userShortStr
+		, LPTSTR data);
 
 	/*
-	* 该方法用于关闭fastipc客户端
+	* 该方法用于关闭fastipcnWriteClient
 	* nativeClient	指向客户端实例的指针
 	*/
 	EXPORT void WINAPI nCloseClient(int nativeClient);

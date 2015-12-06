@@ -9,12 +9,9 @@ namespace JWebTop {
         public JWebTopBrowser() {
             this.Resize += new System.EventHandler(this.sizeChanged);
         }
-        private long hWnd = 0;
+        private int hWnd = 0;
         private JWebTopBrowserCreated jWebTopBrowserCreated;
 
-        private long getBorwserHWnd() {
-            return this.hWnd;
-        }
         private void sizeChanged(object sender, EventArgs e) {
             Size size = this.Size;
             JWebTopNative.setSize(getBorwserHWnd(), size.Width, size.Height);
@@ -41,7 +38,7 @@ namespace JWebTop {
 		    ctx.createBrowser(config, this);
         }
 
-        public void onJWebTopBrowserCreated(long browserHWnd) {
+        public void onJWebTopBrowserCreated(int browserHWnd) {
             hWnd = browserHWnd;
             jWebTopBrowserCreated.onJWebTopBrowserCreated(browserHWnd);
         }
@@ -60,6 +57,23 @@ namespace JWebTop {
 
         public long getBrowserHWnd() {
             return this.hWnd;
+        }
+
+        public Point calcBrowserLocation() {
+            Point locOnDesktop = this.Location;
+            //if (this.topWindow != null) {
+            //    int[] rc = JWebTopNative.getWindowClient(JWebTopNative.getWindowHWND(this.topWindow));
+            //    locOnDesktop.x -= rc[0];
+            //    locOnDesktop.y -= rc[1];
+            //}
+            return locOnDesktop;
+        }
+
+        public int getBorwserHWnd() {
+            return this.hWnd;
+        }
+        public void setBrowserHwnd(int browserHWnd) {
+            this.hWnd = browserHWnd;
         }
     }
 }
