@@ -196,6 +196,7 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 	browser_settings.web_security = cef_state_t::STATE_DISABLED;                      // 降低页面安全性设置，允许跨域加载资源
 	browser_settings.universal_access_from_file_urls = cef_state_t::STATE_ENABLED;
 	browser_settings.file_access_from_file_urls = cef_state_t::STATE_ENABLED;
+	browser_settings.application_cache = cef_state_t::STATE_DISABLED;// 禁止浏览器缓存
 	// 创建浏览器窗口
 	CefBrowserHost::CreateBrowser(
 		window_info, handler.get(), 

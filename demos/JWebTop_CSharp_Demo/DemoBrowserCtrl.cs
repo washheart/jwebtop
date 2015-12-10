@@ -142,12 +142,12 @@ namespace JWebTop_CSharp_Demo {
             string fn = ("res/list/index.app");
             if (File.Exists(fn)) return Path.GetFullPath(fn);
             // 开发环境下		
-            return Path.GetFullPath("../../" + fn);
+            return Path.GetFullPath("../../../" + fn);
         }
         public string getDetailAppFile() {
             string fn = ("res/detail/index.app"); if (File.Exists(fn)) return Path.GetFullPath(fn);
             // 开发环境下		
-            return Path.GetFullPath("../../" + fn);
+            return Path.GetFullPath("../../../" + fn);
         }
 
         public string getCurrentNote() {
