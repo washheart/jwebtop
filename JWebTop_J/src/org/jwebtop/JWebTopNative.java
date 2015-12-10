@@ -11,6 +11,9 @@ import java.awt.peer.ComponentPeer;
  * @author washheart@163.com
  */
 public final class JWebTopNative {
+
+	private static native long nSetActiveWindow(long hWnd);
+
 	private static native long nCreateSubProcess(String subProcess, String szCmdLine, boolean waitFor);
 
 	private static native long nGetProcessID();
@@ -52,6 +55,10 @@ public final class JWebTopNative {
 	private static native void nSetTopMost(long browserHWnd);
 
 	private JWebTopNative() {}
+
+	public static void setActiveWindow(long hWnd) {
+		nSetActiveWindow(hWnd);
+	}
 
 	/**
 	 * 创建一个新进程

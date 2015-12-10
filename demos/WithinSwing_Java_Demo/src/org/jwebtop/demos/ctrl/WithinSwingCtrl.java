@@ -171,14 +171,14 @@ public class WithinSwingCtrl implements JWebtopJSONDispater {
 		File f = new File("res/list/index.app");
 		if (f.exists()) return f.getAbsolutePath();
 		URL url = WithinSwingCtrl.class.getClassLoader().getResource("");
-		return url.getFile() + "../../demos/WithinSwing/res/list/index.app";
+		return url.getFile() + "../../res/list/index.app";
 	}
 
 	public String getDetailAppFile() {
 		File f = new File("res/detail/index.app");
 		if (f.exists()) return f.getAbsolutePath();
 		URL url = WithinSwingCtrl.class.getClassLoader().getResource("");
-		String fs = url.getFile() + "../../demos/WithinSwing/res/detail/index.app";
+		String fs = url.getFile() + "../../res/detail/index.app";
 		try {
 			return new File(fs).getCanonicalPath();
 		} catch (IOException e) {

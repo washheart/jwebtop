@@ -197,6 +197,7 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		listWebtopView.createInernalBrowser(ctx, appFile, null, "列表页", null, new JWebTopBrowserCreated() {
 			@Override
 			public void onJWebTopBrowserCreated(long browserHWnd) {
+				RootBrowserHwnd = browserHWnd;
 				System.out.println("浏览器窗口handler = " + RootBrowserHwnd + " hex=0x" + Long.toHexString(RootBrowserHwnd));
 				ctrl.setListHandler(RootBrowserHwnd);
 			}
@@ -225,26 +226,9 @@ public class WithinSwing extends JFrame implements WithinSwingCtrlHelper, Window
 		try {
 			File dir = initDll(args);
 			System.out.println("dir = " + dir.getCanonicalPath());
-			// D:\c\jwebtop\JWebTop_c\JWebTop_JNI\Release
-			// D:\c\jwebtop\demos\WithinSwing_Java_Demo
-			File from = new File(dir.getCanonicalPath() + "../../../../demos/WithinSwing_Java_Demo/res");
-			// try {// 改为xcopy方式来拷贝文件，加快测试时的启动速度
-			String cmd = "xcopy \"" + from.getCanonicalPath() + "\" \"" + dir.getCanonicalPath() + "\\res" + "\" /S /D /Y";
-			System.out.println("复制资源：" + cmd);
-
-			Process process = Runtime.getRuntime().exec(cmd);
-			if (process.waitFor() != 0) {
-				System.err.println("复制资源出错了。。。。。。。。。。");
-				return;
-			}
-			// } catch (Throwable e) {
-			// if (Constants.rootLog.isErrorEnabled()) Constants.rootLog.error("开发环境设置HTML页面路径出错了", e);
-			// }
-			System.out.println("dir = " + dir);
-
 			// 测试没有浏览器窗口打开的情况下_关闭主进程时无法关闭浏览器进程的缺陷.test();
-			测试嵌入到TabPane中.test();
-			// new WithinSwing();
+			// 测试嵌入到TabPane中.test();
+			new WithinSwing();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

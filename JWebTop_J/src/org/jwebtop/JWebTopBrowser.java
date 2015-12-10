@@ -82,9 +82,10 @@ public class JWebTopBrowser extends JComponent {
 		if (!isShowing()) return new Point(0, 0);
 		Point locOnDesktop = this.getLocationOnScreen();
 		if (this.topWindow != null) {
+			Point winLoc = topWindow.getLocationOnScreen();
 			int[] rc = JWebTopNative.getWindowClient(JWebTopNative.getWindowHWND(this.topWindow));
-			locOnDesktop.x -= rc[0];
-			locOnDesktop.y -= rc[1];
+			locOnDesktop.x = locOnDesktop.x - winLoc.x - rc[0];
+			locOnDesktop.y = locOnDesktop.y - winLoc.y - rc[1];
 		}
 		return locOnDesktop;
 	}

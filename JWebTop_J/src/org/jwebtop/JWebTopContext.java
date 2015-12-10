@@ -82,6 +82,13 @@ public class JWebTopContext implements FastIPCReadListener {
 		System.load(dllFile.getAbsolutePath());
 	}
 
+	/**
+	 * 创建JWebTop进程，成功后回调JWebTopAppInited侦听器
+	 * 
+	 * @param processPath
+	 * @param cfgFile
+	 * @param appInitListner
+	 */
 	public void createJWebTopByCfgFile(String processPath, String cfgFile, JWebTopAppInited appInitListner) {
 		if (server != null) return;
 		if (jsonHandler == null) throw new JWebTopException("必须设置jsonHandler。");
@@ -92,7 +99,7 @@ public class JWebTopContext implements FastIPCReadListener {
 			processPath = file.getCanonicalPath();// 如果不是绝对路径，浏览器无法显示出来
 			if (cfgFile != null && cfgFile.trim().length() > 0) {
 				file = new File(cfgFile);
-				if (!file.exists()) throw new JWebTopException("找不到配置文件：" + processPath);
+				if (!file.exists()) throw new JWebTopException("找不到配置文件：" + cfgFile);
 				cfgFile = file.getCanonicalPath();
 			}
 		} catch (IOException e) {
@@ -146,7 +153,7 @@ public class JWebTopContext implements FastIPCReadListener {
 	}
 
 	/**
-	 * 根据配置文件创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
+	 * 根据配置文件创建浏览器，成功后回调JWebTopBrowserCreated
 	 * 
 	 * @param browserCfgFile
 	 */
@@ -158,11 +165,10 @@ public class JWebTopContext implements FastIPCReadListener {
 	}
 
 	/**
-	 * 根据配置对象来创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
+	 * 根据配置对象来创建浏览器，成功后回调JWebTopBrowserCreated
 	 * 
 	 * @param configs
 	 *            配置浏览器的对象
-	 * @return 创建的浏览器的句柄
 	 */
 	public void createBrowser(JWebTopConfigs configs, JWebTopBrowserCreated createListener) {
 		if (client == null) throw new JWebTopException("尚未完成初始化");
@@ -172,57 +178,16 @@ public class JWebTopContext implements FastIPCReadListener {
 	}
 
 	/**
-	 * 根据JSON配置字符串创建浏览器，成功后返回创建的浏览器的句柄，此方法在浏览器构建过程中会一直阻塞当前线程
+	 * 根据JSON配置字符串创建浏览器，成功后回调JWebTopBrowserCreated
 	 * 
 	 * @param browerCfgJSON
 	 *            JSON配置字符串
-	 * @return 创建的浏览器的句柄
 	 */
 	public void createBrowserByJSON(String browerCfgJSON, JWebTopBrowserCreated createListener) {
 		if (client == null) throw new JWebTopException("尚未完成初始化");
 		String taskId = createTaskId();
 		browserCreateListeners.put(taskId, createListener);
 		_createBrowser(JWM_CREATEBROWSER_JSON, taskId, browerCfgJSON);
-	}
-
-	/**
-	 * 根据配置文件创建浏览器，此方法异步执行，浏览器成功创建后，会回调JWebtopJSONDispater的jWebTopBrowserCreated方法
-	 * 
-	 * @param broserUuid
-	 *            创建浏览器时指定一个uuid，以便回调方法中确认是否是自己的浏览器
-	 * @param browerCfgFile
-	 *            配置浏览器的文件
-	 */
-	public void createBrowserByFile_async(String broserUuid, String browerCfgFile) {
-		if (client == null) throw new JWebTopException("尚未完成初始化");
-		_createBrowser(JWM_CREATEBROWSER_FILE, broserUuid, browerCfgFile);
-	}
-
-	/**
-	 * 根据配置对象来创建浏览器，此方法异步执行，浏览器成功创建后，会回调JWebtopJSONDispater的jWebTopBrowserCreated方法
-	 * 
-	 * @param broserUuid
-	 *            创建浏览器时指定一个uuid，以便回调方法中确认是否是自己的浏览器
-	 * @param configs
-	 *            配置浏览器的对象
-	 */
-	public void createBrowser_async(String broserUuid, JWebTopConfigs configs) {
-		JSONObject jo = (JSONObject) JSONObject.toJSON(configs);
-		JWebTopConfigs.removeDefaults(jo);// 移除一些默认值属性
-		createBrowserByJSON_async(broserUuid, jo.toString());
-	}
-
-	/**
-	 * 根据JSON字符串来创建浏览器，此方法异步执行，浏览器成功创建后，会回调JWebtopJSONDispater的jWebTopBrowserCreated方法
-	 * 
-	 * @param broserUuid
-	 *            创建浏览器时指定一个uuid，以便回调方法中确认是否是自己的浏览器
-	 * @param browerCfgJSON
-	 *            配置浏览器的JSON字符串
-	 */
-	public void createBrowserByJSON_async(String broserUuid, String browerCfgJSON) {
-		if (client == null) throw new JWebTopException("尚未完成初始化");
-		_createBrowser(JWM_CREATEBROWSER_JSON, broserUuid, browerCfgJSON);
 	}
 
 	private void _createBrowser(int createType, String browserHWnd, String cfgData) {
@@ -239,6 +204,9 @@ public class JWebTopContext implements FastIPCReadListener {
 		client.write(JWM_CLOSEBROWSER, browserHWnd, null, null);
 	}
 
+	/**
+	 * 关闭当前Context持有的FastIPC服务端、客户端，以及浏览器进程
+	 */
 	public void closeContext() {
 		if (client == null) return;
 		client.write(JWM_CEF_ExitAPP, 0, null, null);

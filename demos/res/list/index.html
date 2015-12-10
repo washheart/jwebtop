@@ -26,7 +26,7 @@ html,body {
 	</div>
 	<script type="text/javascript">
 		// 被java回调的js函数
-		function invokeByJava(jo) {
+		function invokeByDLL(jo) {
 			if (!jo || !jo.method)return;
 			alert(jo.method)
 			if (jo.method == 'noteAdded') {// 节点已添加，需要更新
@@ -94,6 +94,7 @@ html,body {
 				var rect = JWebTop.invokeRemote_CallBack(JSON.stringify(toJava),"ListFuns.onGetDetailRect");// 调用java，获取细节区的坐标信息
 			},
 			onGetDetailRect : function(rect){
+				// alert(ListFuns.app+" javaWindowHwnd="+JWebTop.javaWindowHwnd+" rect=["+rect.x+","+rect.y+","+rect.w+","+rect.h+","+"]");
 				JWebTop.runAppMore(ListFuns.app, parseInt(JWebTop.javaWindowHwnd),null,null,null,rect.x,rect.y,rect.w,rect.h);	
 			}
 		}
@@ -116,7 +117,7 @@ html,body {
 			JWebTop.invokeRemote_CallBack(JSON.stringify(toJava),"ListFuns.onJavaWindowHwnd")
 		}
 		function afterBrowserInit() {// 直接的js代码会执行两次，所以这里需要通过
-			JWebTop.showDev();
+			// JWebTop.showDev();
 			var initListData = {
 				method : "initList"
 			}
