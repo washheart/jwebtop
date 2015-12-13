@@ -77,17 +77,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\$(Configuration)\JWebTopCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\$(Configuration)\JWebTopCommon.lib;..\$(Configuration)\libcef.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="jwebtopex\JWebTopConfigs.h" />
     <ClInclude Include="jwebtopex\jwebtopex.h" />
-    <ClInclude Include="mfc_demo.h" />
+    <ClInclude Include="Demo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Demo_ctrl.cpp" />
     <ClCompile Include="jwebtopex\jwebtopex.cpp" />
-    <ClCompile Include="wincomm.cpp" />
+    <ClCompile Include="Demo_view.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
