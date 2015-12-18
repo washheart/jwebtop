@@ -189,6 +189,40 @@ namespace jw{
 	//	delete[] buffer;
 	//	return buffer;
 	//}
+	
+
+	wstring URLEncode(const wstring &s){
+		int size = s.size();
+		wchar_t * to = NULL;
+		LPTSTR from = LPTSTR(s.c_str());
+		to = (wchar_t *)malloc(sizeof(wchar_t)*(size * 3 + 1));
+		int offset = 0;
+		int i = 0;
+		for (; i < size; i++){
+			if (from[i] == L'+'){			// 1. + URL 中 + 号表示空格 %2B
+				to[i + offset++] = L'%'; to[i + offset++] = L'2'; to[i + offset] = L'B';
+			} else if (from[i] == L' '){	// 2. 空格 URL中的空格可以用 + 号或者编码 %20
+				to[i + offset++] = L'%'; to[i + offset++] = L'2'; to[i + offset] = L'0';
+			} else if (from[i] == L'/'){	//	3. / 分隔目录和子目录 %2F
+				to[i + offset++] = L'%'; to[i + offset++] = L'2'; to[i + offset] = L'F';
+			} else if (from[i] == L'?'){	//	4. ? 分隔实际的 URL 和参数 %3F
+				to[i + offset++] = L'%'; to[i + offset++] = L'3'; to[i + offset] = L'F';
+			} else if (from[i] == L'%'){	//	5. % 指定特殊字符 %25
+				to[i + offset++] = L'%'; to[i + offset++] = L'2'; to[i + offset] = L'5';
+			} else if (from[i] == L'#'){	//	6. # 表示书签 %23
+				to[i + offset++] = L'%'; to[i + offset++] = L'2'; to[i + offset] = L'3';
+			} else if (from[i] == L'&'){	//	7. & URL 中指定的参数间的分隔符 %26
+				to[i + offset++] = L'%'; to[i + offset++] = L'2'; to[i + offset] = L'6';
+			} else if (from[i] == L'='){	//	8. = URL 中指定参数的值 %3D
+				to[i + offset++] = L'%'; to[i + offset++] = L'3'; to[i + offset] = L'D';
+			} else{
+				to[i + offset] = from[i];
+			}
+		}
+		to[i + offset] = L'\0';
+		wstring rtn = wstring(to);
+		return rtn;
+	}
 
 	char* GenerateGuid()
 	{

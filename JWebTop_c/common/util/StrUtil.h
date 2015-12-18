@@ -29,6 +29,8 @@ namespace jw{
 	_declspec(dllexport) string w2s(const wstring &ws);
 	_declspec(dllexport) wstring s2w(const string &s);
 
+	_declspec(dllexport) wstring URLEncode(const wstring &s);
+
 	// 生成唯一性字符串
 	_declspec(dllexport) char* GenerateGuid();
 	_declspec(dllexport) std::string GenerateGuidA();
