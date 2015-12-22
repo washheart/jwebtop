@@ -24,11 +24,14 @@ void JWebTopConfigs::setErrorURL(wstring url){
 // 根据相对路径获取绝对路径
 // 如果relativePath已经是绝对路径，则直接返回
 // 否则将返回appPath+relativePath
-CefString JWebTopConfigs::getAbsolutePath(std::wstring relativePath){
-	wstring _appPath=appPath.ToWString();
-	_appPath= jw::os::file::getAbsolutePath(relativePath, _appPath);
-	return jw::URLEncode(_appPath);
-}
+ CefString JWebTopConfigs::getAbsolutePath(std::wstring relativePath){
+	 wstring _appPath = appPath.ToWString();
+	 if (relativePath.find(L":") == -1){// 如果指定的路径是相对路径
+		 _appPath.append(relativePath);
+		 return jw::URLEncode(_appPath);
+	 }
+	 return relativePath;
+ }
 // 根据传入的参数获取配置文件路径(目前主要用于处理传入参数为NULL或空字符串的情况)
 std::wstring JWebTopConfigs::getAppDefFile(LPCTSTR lpCmdLine){
 	if (lpCmdLine == NULL || lstrlen(lpCmdLine) == 0){// 未指定启动文件，检查下是否通过启动参数指定了appDefFile
