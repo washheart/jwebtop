@@ -16,7 +16,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTopCommon", "JWebTopCom
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_CSharp_DLL", "JWebTop_CSharp_DLL\JWebTop_CSharp_DLL.vcxproj", "{FDE79515-195F-4C3F-98EB-FB9D47839D9D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_MFC_DEMO", "JWebTop_MFC_DEMO\JWebTop_MFC_DEMO.vcxproj", "{B7BB166E-50C9-4482-BAB6-B56541A068FF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_MFC_DEMO", "..\demos\JWebTop_MFC_DEMO\JWebTop_MFC_DEMO.vcxproj", "{B7BB166E-50C9-4482-BAB6-B56541A068FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

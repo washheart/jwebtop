@@ -86,6 +86,10 @@ namespace JWebTop_CSharp_Demo {
         public void browserClosed(int browserHWnd) { }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
+          
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e) {
             ctx.closeContext();
         }
     }

@@ -88,6 +88,7 @@
             this.Controls.Add(this.toolStrip1);
             this.Name = "MainForm";
             this.Text = "测试嵌入两个浏览器";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.toolStrip1.ResumeLayout(false);
