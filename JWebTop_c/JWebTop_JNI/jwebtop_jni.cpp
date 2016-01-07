@@ -11,6 +11,11 @@
 #endif
 //typedef jboolean(JNICALL *GETAWT)(JNIEnv*, JAWT*);
 using namespace std;
+
+JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nGetForegroundWindow(JNIEnv * env, jclass){
+	return (jlong)GetForegroundWindow();
+}
+
 JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nShowWindow(JNIEnv * env, jclass, jlong hWnd, jint nCmdShow){
 	jw::showWindow((HWND)hWnd, nCmdShow);
 }

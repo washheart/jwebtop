@@ -10,6 +10,11 @@
 extern "C" {
 #endif
 	/*
+	 * 获取最前端窗口
+	 */
+	JNIEXPORT jlong JNICALL Java_org_jwebtop_JWebTopNative_nGetForegroundWindow(JNIEnv * env, jclass);
+
+	/*
 	 * 按指定风格显示窗口
 	 */
 	JNIEXPORT void JNICALL Java_org_jwebtop_JWebTopNative_nShowWindow(JNIEnv * env, jclass, jlong, jint);
