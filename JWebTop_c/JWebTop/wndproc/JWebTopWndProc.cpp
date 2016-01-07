@@ -47,6 +47,11 @@ namespace jb{
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
 		if (bw != NULL)bw->browser->Reload();
 	}
+
+	// 为当前网页动态记载一个js文件(url, handler);//加载网页，url为网页路径
+	void appendJSFile(HWND hWnd, std::wstring jsfile){
+
+	}
 	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
 	void reloadIgnoreCache(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
@@ -202,7 +207,7 @@ LRESULT CALLBACK JWebTop_WindowWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 		jw::js::events::sendMove(bwInfo->browser->GetMainFrame(), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;// End case-WM_MOVE
 	case WM_ACTIVATE:
-		jw::js::events::sendWinowActive(bwInfo->browser->GetMainFrame(), (long)hWnd);
+		jw::js::events::sendWinowActive(bwInfo->browser->GetMainFrame(), (long)hWnd, LOWORD(wParam));
 		break;// End case-WM_ACTIVATE
 	case WM_ACTIVATEAPP:
 		jw::js::events::sendAppActive(bwInfo->browser->GetMainFrame(), (long)hWnd);

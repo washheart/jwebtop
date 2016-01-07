@@ -374,7 +374,7 @@ namespace jw{
 			void sendMove(const CefRefPtr<CefFrame> frame, const int x, const int y);
 	
 			// 发送窗口被激活事件:new CustomEvent('JWebTopWindowActive',{detail:{handler:被激活的窗口的句柄}})
-			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler);
+			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler, const DWORD state);
 
 			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:除非此消息的窗口的句柄}})
 			void sendAppActive(const CefRefPtr<CefFrame> frame, const long handler);

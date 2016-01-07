@@ -43,11 +43,12 @@ namespace jw{
 			}
 
 			// 发送窗口被激活事件:new CustomEvent('JWebTopWindowActive',{detail:{handler:被激活的窗口的句柄}})
-			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler){
+			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler, const DWORD state){
 				stringstream js_event;
 				js_event << "var e = new CustomEvent('JWebTopWindowActive',{"
 					<< "	detail:{"
-					<< "		handler:" << handler
+					<< "		handler:" << handler << ","
+					<< "		state:" << state
 					<< "	}"
 					<< "});"
 					<< "dispatchEvent(e);";
