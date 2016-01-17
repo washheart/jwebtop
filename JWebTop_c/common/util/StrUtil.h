@@ -5,6 +5,9 @@
 using namespace std;
 
 namespace jw{
+	_declspec(dllexport) string& trim(string &s);
+	_declspec(dllexport) wstring& trim(wstring &s);
+
 	_declspec(dllexport) wstring&   replace_allW(wstring& str, const wstring& old_value, const wstring& new_value);
 	_declspec(dllexport) string&    replace_all(string&  str, const string&  old_value, const string&  new_value);
 	//string&   replace_all_distinct(string&   str, const   string&   old_value, const   string&   new_value);

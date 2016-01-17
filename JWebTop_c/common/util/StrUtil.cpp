@@ -4,8 +4,35 @@
 #include <codecvt>
 #include <fstream>
 
+#define _jw_IS_SPACE(c) (0 <=c && c<=32)
 using namespace std;
 namespace jw{
+
+	template<class STR> inline STR& _trim(STR &s){	// 去除左右空白字符的函数
+		if (s.empty())return s;
+		STR::iterator it = s.begin();
+		for (; it != s.end();){						// 检查前面的空白字符
+			if (_jw_IS_SPACE(*it)){ it++; continue; }
+			break;
+		}
+		if (it == s.end()){
+			s.erase(s.begin(), s.end());			// 全部都是空白字符
+			return s;
+		} else{
+			s.erase(s.begin(), it);					// 擦除前面的空白字符
+		}
+		int len = s.size() - 1;
+		for (; len >= 0;){							// 检查后面的空白字符
+			if (_jw_IS_SPACE(s.at(len))){ len--; continue; }
+			break;
+		}
+		s.erase(s.begin() + len + 1, s.end());		// 擦除后面的空白字符
+		return s;
+	}
+
+	string&  trim(string  &s){ return _trim(s); }
+	wstring& trim(wstring &s){ return _trim(s); }
+
 	wstring&   replace_allW(wstring&   str, const   wstring&   old_value, const   wstring&   new_value)
 	{
 		while (true)   {
