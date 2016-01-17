@@ -11,6 +11,8 @@
 #include <Windows.h>
 #include <string>
 #include <sstream>
+#include <list>
+#include <mutex>
 #include "jwebtopex/jwebtopex.h"
 
 #define BTN_ADD_NOTE		101
@@ -22,14 +24,43 @@
 
 // 创建窗口函数
 void createWin(HINSTANCE hInstance);
+void relayout();
 
-class DemoCtrl :JWebTopAppInited, JWebTopBrowserCreated, JWebTopJSReturn, JWebtopJSONDispater {
+class DemoCtrl :public JWebtopJSONDispater
+	, public  JWebTopBrowserCreated
+	, public JWebTopAppInited {
 private:
+	typedef list<wstring> NameList;
+	NameList * names;
 	JWebTopContext * ctx = NULL;
 	HWND listBrowser = NULL;
 	HWND detailBrowser = NULL;
+	wstring currentNote;
+	mutex lock;
 
 	void _startJWebTop();
+	void initNames();
+	void showDetail(wstring note);
+	void saveNotes();
+	void saveNote(wstring note, wstring content);
+	int getNoteIdx(wstring note){
+		//return find(names->begin(), names->end(), note) != names->end();
+		int idx = 0;
+		NameList::iterator it;
+		for (it = names->begin(); it != names->end(); it++){
+			if (note == *(it))return idx;
+			idx++;
+		}
+		return -1;
+	}
+	wstring getNoteIdx(int idx){
+		NameList::iterator it;
+		for (it = names->begin(); it != names->end(); it++){
+			if (idx-- ==0)return * it;
+			idx++;
+		}
+		return L"";
+	}
 public :
 	void init();
 
@@ -38,12 +69,12 @@ public :
 	wstring getJWebTopExe();	// 得到JWebTop.exe的路径
 	HWND getListBrowser(){ return this->listBrowser; };
 	HWND getDetailBrowser(){ return this->detailBrowser; };
-	void addNote(wstring note);
+	wstring addNote(wstring note);
 	void delNote();
 
 	void onJWebTopAppInited();
 	void onJWebTopBrowserCreated(long browserHWnd);
 	void onJWebTopJSReturn(wstring jsonString);
-	wstring onDispatcher(long browserHWnd, wstring json);
+	wstring dispatcher(long browserHWnd, wstring json);
 
 };

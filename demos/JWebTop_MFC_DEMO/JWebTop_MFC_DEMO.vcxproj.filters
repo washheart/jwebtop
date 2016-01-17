@@ -7,16 +7,37 @@
     </ClCompile>
     <ClCompile Include="Demo_view.cpp" />
     <ClCompile Include="Demo_ctrl.cpp" />
+    <ClCompile Include="..\..\JWebTop_c\common\ui\dlgs\InputDialog.cpp">
+      <Filter>common\ui\dlgs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="jwebtopex\jwebtopex.h">
       <Filter>jwebtopex</Filter>
     </ClInclude>
     <ClInclude Include="Demo.h" />
+    <ClInclude Include="..\..\JWebTop_c\common\JWebTopMsg.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\JWebTop_c\common\ui\dlgs\InputDialog.h">
+      <Filter>common\ui\dlgs</Filter>
+    </ClInclude>
+    <ClInclude Include="jwebtopex\JWebTopConfigsEx.h">
+      <Filter>jwebtopex</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="jwebtopex">
       <UniqueIdentifier>{2a8f0391-df16-46bc-a819-876873a0b992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{4424821d-ef37-4fa0-aac6-24bec2c42429}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\ui">
+      <UniqueIdentifier>{e0523b4f-7376-4f1a-ab7c-d311d8e9f58c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\ui\dlgs">
+      <UniqueIdentifier>{2b360bf6-2274-4c66-bd7d-293a95a45398}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

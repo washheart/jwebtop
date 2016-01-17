@@ -55,9 +55,9 @@ BOOL __createWin(HINSTANCE hInstance)
 	return msg.wParam;
 }
 
-void relayout(HWND hWnd){
+void relayout(){
 	RECT	rect;
-	GetClientRect(hWnd, &rect);
+	GetClientRect(g_hWnd, &rect);
 	int w1 = 300, w2 = rect.right - MARGIN * 2 - 300;
 	int y = MARGIN + BAR_HEIGHT + MARGIN;
 	int h = (rect.bottom - y - MARGIN/*两个文本框之间的分隔*/ - MARGIN/*下面文本框与窗口边框间的分隔*/);
@@ -92,7 +92,10 @@ void _addNode(){
 	wstring note;
 	jw::ui::Dlgs::InputDialog::ShowInputDialog(g_hWnd, std::ref(note));
 	if (note.size() == 0)return;
-	ctrl->addNote(note);
+	wstring err = ctrl->addNote(note);
+	if (err.length() > 0){
+		MessageBox(g_hWnd, LPTSTR(err.c_str()), L"错误", 0);
+	}
 }
 void _delNote(){
 	ctrl->delNote();
@@ -102,7 +105,7 @@ LRESULT CALLBACK SimpleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	switch (message)
 	{
 	case WM_SIZE:
-		relayout(hWnd);
+		relayout();
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)){
