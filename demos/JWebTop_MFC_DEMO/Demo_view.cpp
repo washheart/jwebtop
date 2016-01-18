@@ -117,6 +117,7 @@ LRESULT CALLBACK SimpleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		_windowCreated(hWnd);
 		break;
 	case WM_DESTROY:
+		ctrl->quitSave();
 		PostQuitMessage(0);
 		break;
 	default:

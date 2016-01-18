@@ -108,7 +108,7 @@ void DemoCtrl::initNames() {
 			while (!in.eof()){
 				string line;
 				std::getline(in, line, '\n');
-				line=jw::trim(line);
+				line = jw::trim(line);
 				if (line.length() == 0)continue;
 				names->push_back(jw::s2w(line));
 			}
@@ -141,7 +141,7 @@ void DemoCtrl::showDetail(wstring note) {
 		if (names == NULL) initNames();
 		if (names == NULL || names->size() == 0) {
 			hasData = false;
-			detail.append( L"请使用“添加日记”按钮新建日记");
+			detail.append(L"请使用“添加日记”按钮新建日记");
 		} else {
 			note = *(names->begin());
 		}
@@ -170,8 +170,8 @@ void DemoCtrl::showDetail(wstring note) {
 	rtn->SetString(CefString("note"), CefString(note));
 	this->ctx->executeJSON_NoWait((long)detailBrowser, toJSON(rtn));
 }
- void DemoCtrl::saveNote(wstring note, wstring content) {
-	 if (jw::trim(note).length() > 0) {
+void DemoCtrl::saveNote(wstring note, wstring content) {
+	if (jw::trim(note).length() > 0) {
 		wstring fn = getNoteFile(note);
 		ofstream os(fn);
 		os << jw::w2s(content);
@@ -179,7 +179,10 @@ void DemoCtrl::showDetail(wstring note) {
 		os.close();
 	}
 }
- void DemoCtrl::saveNotes() {
+void DemoCtrl::quitSave(){
+	ctx->executeJS_Wait((long)this->detailBrowser, L"saveNote()", NULL, "");
+}
+void DemoCtrl::saveNotes() {
 	wstring fn = getNotesFile();
 	ofstream os(fn);
 	NameList::iterator it;
@@ -190,8 +193,9 @@ void DemoCtrl::showDetail(wstring note) {
 	os.close();
 }
 
- wstring DemoCtrl::addNote(wstring name) {
-	if (getNoteIdx(name)!=-1) return L"日记名称不能重复";
+
+wstring DemoCtrl::addNote(wstring name) {
+	if (getNoteIdx(name) != -1) return L"日记名称不能重复";
 	this->names->push_back(name);
 	saveNotes();
 	CefRefPtr<CefDictionaryValue> rtn = CefDictionaryValue::Create();
@@ -201,26 +205,26 @@ void DemoCtrl::showDetail(wstring note) {
 	return L"";
 }
 
-  void DemoCtrl::delNote() {
-	  int idx = getNoteIdx(currentNote);
-	  if (idx!=-1){
-		  this->names->remove(currentNote);
-		  saveNotes();
-		  CefRefPtr<CefDictionaryValue> rtn = CefDictionaryValue::Create();
-		  rtn->SetString(CefString("method"), CefString("noteRemoved"));
-		  rtn->SetString(CefString("value"), CefString(currentNote));
-		  this->currentNote = L"";
-		  if (idx > 0) idx = idx - 1;
-		  if (idx < this->names->size()) {
-			  rtn->SetString(CefString("newSel"), CefString(getNoteIdx(idx)));
-		  } else {
-			  showDetail(L"");
-		  }
-		  ctx->executeJSON_NoWait((long)listBrowser, toJSON(rtn));
-	  }
+void DemoCtrl::delNote() {
+	int idx = getNoteIdx(currentNote);
+	if (idx != -1){
+		this->names->remove(currentNote);
+		saveNotes();
+		CefRefPtr<CefDictionaryValue> rtn = CefDictionaryValue::Create();
+		rtn->SetString(CefString("method"), CefString("noteRemoved"));
+		rtn->SetString(CefString("value"), CefString(currentNote));
+		this->currentNote = L"";
+		if (idx > 0) idx = idx - 1;
+		if (idx < this->names->size()) {
+			rtn->SetString(CefString("newSel"), CefString(getNoteIdx(idx)));
+		} else {
+			showDetail(L"");
+		}
+		ctx->executeJSON_NoWait((long)listBrowser, toJSON(rtn));
+	}
 }
 
-  wstring DemoCtrl::dispatcher(long browserHWnd, wstring json){
+wstring DemoCtrl::dispatcher(long browserHWnd, wstring json){
 	if (json.length() == 0) return L"";
 	CefRefPtr<CefValue> v = CefParseJSON(CefString(json), JSON_PARSER_RFC);  // 进行解析
 	if (v == NULL)return L"";
@@ -258,7 +262,7 @@ void DemoCtrl::showDetail(wstring note) {
 		showDetail(name);
 	} else if (L"javaWindowHwnd" == (method)) {
 		wstringstream wss;;
-		wss<<L"{\"value\":" << (long)g_hWnd << L"}";
+		wss << L"{\"value\":" << (long)g_hWnd << L"}";
 		return  wss.str();
 	} else if (L"getDetailRect" == (method)) {
 		RECT	rect;

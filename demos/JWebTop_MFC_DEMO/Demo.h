@@ -64,14 +64,17 @@ private:
 public :
 	void init();
 
-	wstring getListAppFile();	// 得到配置文件
-	wstring getDetailAppFile();	// 得到配置文件
-	wstring getJWebTopExe();	// 得到JWebTop.exe的路径
+	// 具体的业务方法
+	wstring getListAppFile();		// 得到配置文件
+	wstring getDetailAppFile();		// 得到配置文件
+	wstring getJWebTopExe();		// 得到JWebTop.exe的路径
 	HWND getListBrowser(){ return this->listBrowser; };
 	HWND getDetailBrowser(){ return this->detailBrowser; };
-	wstring addNote(wstring note);
-	void delNote();
+	wstring addNote(wstring note);	// 保存一个笔记
+	void delNote();					// 删除一个笔记
+	void quitSave();				// 窗口退出前执行数据保存等操作
 
+	// 浏览器接口相关的方法回调
 	void onJWebTopAppInited();
 	void onJWebTopBrowserCreated(long browserHWnd);
 	void onJWebTopJSReturn(wstring jsonString);

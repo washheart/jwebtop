@@ -198,9 +198,13 @@ public:
 	*            执行js时用于获取返回结果，如果jsReturn是共用的，那么可以根据此uuid来区分不同的调用
 	*/
 	void executeJSON_Wait(long browserHWnd, wstring jsonstring, JWebTopJSReturn* jsReturn, string uuid) {
-		string taskId = (uuid.length() == 0) ? createTaskId() : uuid;
-		jsReturnListners.insert(pair<string, JWebTopJSReturn* >(taskId, jsReturn));
-		_write(JWM_JSON_EXECUTE_WAIT, browserHWnd, taskId, jsonstring);
+		if (jsReturn != NULL){
+			string taskId = (uuid.length() == 0) ? createTaskId() : uuid;
+			jsReturnListners.insert(pair<string, JWebTopJSReturn* >(taskId, jsReturn));
+			_write(JWM_JSON_EXECUTE_WAIT, browserHWnd, taskId, jsonstring);
+		} else{
+			_write(JWM_JSON_EXECUTE_WAIT, browserHWnd, uuid, jsonstring);
+		}
 	};
 
 	/**
@@ -227,9 +231,13 @@ public:
 	*            执行js时用于获取返回结果，如果jsReturn是共用的，那么可以根据此uuid来区分不同的调用
 	*/
 	void executeJS_Wait(long browserHWnd, wstring script, JWebTopJSReturn* jsReturn, string uuid) {
-		string taskId = (uuid.length() == 0) ? createTaskId() : uuid;
-		jsReturnListners.insert(pair<string, JWebTopJSReturn* >(taskId, jsReturn));
-		_write(JWM_JS_EXECUTE_WAIT, browserHWnd, taskId, script);
+		if (jsReturn != NULL){
+			string taskId = (uuid.length() == 0) ? createTaskId() : uuid;
+			jsReturnListners.insert(pair<string, JWebTopJSReturn* >(taskId, jsReturn));
+			_write(JWM_JS_EXECUTE_WAIT, browserHWnd, taskId, script);
+		} else{
+			_write(JWM_JS_EXECUTE_WAIT, browserHWnd, uuid, script);
+		}
 	};
 
 	/**
