@@ -20,7 +20,8 @@ class JWebTopClient : public CefClient,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRequestHandler,
-	public CefContextMenuHandler{
+	public CefContextMenuHandler,
+	public CefDragHandler{
 private:
 	bool isClosed;
 	JWebTopConfigs * configs = NULL; // 构建浏览器时的配置信息
@@ -50,6 +51,16 @@ public:
 	virtual CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() OVERRIDE{
 		//return this;
 		return dialog_handler_;
+	}
+	virtual CefRefPtr<CefDragHandler> GetDragHandler() OVERRIDE{
+		return this;
+	}
+
+	// CefDisplayHandler------------------------------------------------------------------------------------
+	virtual bool OnDragEnter(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDragData> dragData,
+		DragOperationsMask mask) OVERRIDE{
+		return true;// 返回true将禁止默认的拖动文件进入系统的行为
 	}
 
 	bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
