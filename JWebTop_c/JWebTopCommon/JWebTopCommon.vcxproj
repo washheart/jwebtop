@@ -74,10 +74,12 @@
       <PreprocessorDefinitions>JWebTopLog;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;FASTIPC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -101,6 +103,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>Cdecl</CallingConvention>
+      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,6 +112,7 @@
       </EnableCOMDATFolding>
       <OptimizeReferences>
       </OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -141,6 +145,7 @@ copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop_CSharp_Lib\bi
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>Cdecl</CallingConvention>
+      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +154,7 @@ copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop_CSharp_Lib\bi
       </EnableCOMDATFolding>
       <OptimizeReferences>
       </OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>

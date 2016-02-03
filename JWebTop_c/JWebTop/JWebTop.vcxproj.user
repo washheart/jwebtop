@@ -3,8 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>
-    </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments> --allow-file-access --JW_x=10 --JW_y=20 --JW_st --disable-gpu</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='发布版本|Win32'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)$(Configuration)\</LocalDebuggerWorkingDirectory>
