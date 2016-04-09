@@ -88,6 +88,7 @@
       <PreprocessorDefinitions>JWebTopJNI;JWebTopLog;WIN32;_DEBUG;_WINDOWS;_USRDLL;TBROWSERENTRY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AssemblerOutput>All</AssemblerOutput>
+      <AssemblerListingLocation>$(ProjectDir)$(Configuration)\mid\</AssemblerListingLocation>
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>../../../third_party/directxsdk/files/Lib/x86;../../../third_party/platformsdk_win7/files/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -200,7 +201,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <AssemblerListingLocation>$(ProjectDir)$(Configuration)\mid\</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnablePREfast>false</EnablePREfast>
       <AssemblerOutput>All</AssemblerOutput>
@@ -282,7 +283,7 @@ copy $(ProjectDir)$(Configuration)\$(ProjectName).dll  $(SolutionDir)..\demos\JW
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <AssemblerListingLocation>$(ProjectDir)$(Configuration)\mid\</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnablePREfast>false</EnablePREfast>
       <AssemblerOutput>All</AssemblerOutput>
