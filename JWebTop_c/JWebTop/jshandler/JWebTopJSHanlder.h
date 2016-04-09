@@ -13,4 +13,9 @@ HWND getHWND(CefRefPtr<CefV8Value> object/*JS∂‘œÛ*/
 void regist(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	CefRefPtr<CefV8Context> context);
+namespace jw{
+	namespace js{
+		CefRefPtr<CefListValue> parserCopyFile(HWND hWnd, CefRefPtr<CefDictionaryValue> json);
+	}
+}
 #endif  // CEF_JWEBTOP_JS_HANDLER_H_

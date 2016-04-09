@@ -195,6 +195,11 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 			extensionCode << "JWebTop.startDrag=function(){JWebTop.cefQuery({m:'startDrag',handler:JWebTop.handler})};" << endl;
 			// stopDrag();// 停止拖动
 			extensionCode << "JWebTop.stopDrag=function(){JWebTop.cefQuery({m:'stopDrag',handler:JWebTop.handler})};" << endl;
+			
+			//getPaste(url, handler);//加载网页，url为网页路径
+			extensionCode << "JWebTop.getPaste=function(jsonv,handler){JWebTop.cefQuery({m:'getPaste',jsonv:jsonv,handler:(handler?handler:JWebTop.handler)})};" << endl;
+
+
 		}
 		// runApp(appName,handler);//运行一个app，appName为.app文件路径。
 		extensionCode << "JWebTop.runApp=function(app,parentWin,handler){JWebTop.cefQuery({m:'runApp',app:app,parentWin:(parentWin?parentWin:0),handler:(handler?handler:JWebTop.handler)})};" << endl;

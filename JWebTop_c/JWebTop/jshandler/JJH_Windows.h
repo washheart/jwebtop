@@ -1,15 +1,110 @@
 #ifndef CEF_JWEBTOP_JJH_WINDOWS_H_
 #define CEF_JWEBTOP_JJH_WINDOWS_H_
 
+#include <iostream>  
+#include <fstream>  
+
 #include <sstream>
 #include <string>
+#include "include/cef_urlrequest.h"
 #include "include/cef_app.h" 
 #include "JWebTopJSHanlder.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
+#include <Shellapi.h>
+#include <oleidl.h>
+#include "common/tests/TestUtil.h"
+class RequestClient : public CefURLRequestClient {
+public:
+	explicit RequestClient() {}
+	void Detach() {}
+
+	void OnRequestComplete(CefRefPtr<CefURLRequest> request) OVERRIDE{
+		CefURLRequest::ErrorCode error_code = request->GetRequestError();
+		if (error_code == ERR_NONE) writeLog("文件成功上传uploadsuccess\r\n");
+		else						writeLog("文件上传失败uploadfailed\r\n");
+	}
+
+	void OnUploadProgress(CefRefPtr<CefURLRequest> request, int64 current, int64 total) OVERRIDE{
+		writeLog("uploading......uploading......\r\n");
+	}
+
+	void OnDownloadProgress(CefRefPtr<CefURLRequest> request, int64 current, int64 total) OVERRIDE{}
+	void OnDownloadData(CefRefPtr<CefURLRequest> request, const void* data, size_t data_length) OVERRIDE{
+		download_data_ += std::string(static_cast<const char*>(data), data_length);
+		writeLog("download_data_......");
+		writeLog(download_data_);
+		writeLog("\r\n");
+	}
+	bool GetAuthCredentials(bool isProxy, const CefString& host, int port, const CefString& realm, const CefString& scheme, CefRefPtr<CefAuthCallback> callback) OVERRIDE{
+		return false;
+	}
+
+private:
+	std::string download_data_;
+
+	IMPLEMENT_REFCOUNTING(RequestClient);
+	DISALLOW_COPY_AND_ASSIGN(RequestClient);
+};
 
 // JJH=JWebTop JavaScriptHandler
+// FIXME:函数原型应该是getPaste(postUrl,jsonObject,[handler])
+class JJH_GetPaste : public CefV8Handler {
+public:
+	void OnRequestComplete(CefURLRequest::ErrorCode error_code,
+		const std::string& download_data) {
+		//callback_->Failure(error_code, test_runner::GetErrorString(error_code));
+	}
+
+
+	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		CefRefPtr<CefV8Value> json = NULL;
+		if (arguments.size() > 0)json = arguments[0];
+		HWND hWnd = getHWND(object, arguments, 1);
+		CefRefPtr<CefDictionaryValue> json2 = CefDictionaryValue::Create();
+		if (json != NULL&&json->HasValue("url")){
+			json2->SetString("url", json->GetValue("url")->GetStringValue());
+		}
+		if (json != NULL&&json->HasValue("headers")){// 设置文件头
+			CefRefPtr<CefV8Value> headers = json->GetValue("headers");
+			std::vector<CefString> keys;
+			headers->GetKeys(keys);
+			CefRefPtr<CefDictionaryValue> headerMap = CefDictionaryValue::Create();
+			json2->SetDictionary("headers", headerMap);
+			vector<CefString>::iterator it = keys.begin();
+			while (it != keys.end()){
+				CefString key = (*it);
+				headerMap->SetString(key, headers->GetValue(key)->GetStringValue());
+				it++;
+			}
+		}
+		if (json != NULL&&json->HasValue("params")){// 设置文件头
+			CefRefPtr<CefV8Value> params = json->GetValue("params");
+			std::vector<CefString> keys;
+			params->GetKeys(keys);
+			CefRefPtr<CefDictionaryValue> paramMap = CefDictionaryValue::Create();
+			json2->SetDictionary("params", paramMap);
+			vector<CefString>::iterator it = keys.begin();
+			while (it != keys.end()){
+				CefString key = (*it);
+				paramMap->SetString(key, params->GetValue(key)->GetStringValue());
+				it++;
+			}
+		}
+		CefRefPtr<CefListValue>	list = jw::js::parserCopyFile(hWnd, json2);
+		// 将文件列表返回到前端
+		int size = list->GetSize();
+		retval = CefV8Value::CreateArray(size);
+		for (int i = 0; i < size; i++){
+			retval->SetValue(i, CefV8Value::CreateString(list->GetString(i)));
+		}
+		return retval != NULL;
+	}
+
+private:
+	IMPLEMENT_REFCOUNTING(JJH_GetPaste);
+};
 
 //getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 class JJH_GetPos : public CefV8Handler {
@@ -372,13 +467,13 @@ namespace jw{
 
 			// 发送窗口位置改变事件:new CustomEvent('JWebTopMove',{detail:{x:X坐标值,y:Y坐标值}})
 			void sendMove(const CefRefPtr<CefFrame> frame, const int x, const int y);
-	
+
 			// 发送窗口被激活事件:new CustomEvent('JWebTopWindowActive',{detail:{handler:被激活的窗口的句柄}})
 			void sendWinowActive(const CefRefPtr<CefFrame> frame, const long handler, const DWORD state);
 
 			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:除非此消息的窗口的句柄}})
 			void sendAppActive(const CefRefPtr<CefFrame> frame, const long handler);
-			}
+		}
 	}
 }
 #endif

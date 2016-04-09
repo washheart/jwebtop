@@ -7,6 +7,7 @@
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
+#include "JWebTop/jshandler/JWebTopJSHanlder.h"
 #include "JWebTopContext.h"
 #include "common/util/StrUtil.h"
 #include "common/winctrl/JWebTopWinCtrl.h"
@@ -106,6 +107,11 @@ bool excuteJSON(const CefString& request){
 		CefRefPtr<CefValue> handler = value->GetValue("handler");
 		if (handler == NULL)return false;
 		jb::showDev((HWND)handler->GetInt());
+	}
+	else if (methodName == L"getPaste"){
+		CefRefPtr<CefValue> handler = value->GetValue("handler");
+		if (handler == NULL)return false;
+		jw::js::parserCopyFile((HWND)handler->GetInt(),value->GetDictionary("jsonv"));
 	}
 	else{
 		return false;

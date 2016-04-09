@@ -1,6 +1,11 @@
 #include "JWebTopJSHanlder.h"
 #include "include/cef_app.h"
+#include "include/cef_parser.h"
 #include "JJH_Windows.h"
+#include "common/util/StrUtil.h"
+#include <iostream>  
+#include <fstream>  
+#include "JWebTop/browser/JWebTopScheme.h"
 
 namespace jw{
 	namespace js{
@@ -67,6 +72,129 @@ namespace jw{
 				frame->ExecuteJavaScript(js_event.str(), "", 0);
 			}
 		}// End ns-events
+
+		CefRefPtr<CefListValue> parserCopyFile(HWND hWnd, CefRefPtr<CefDictionaryValue> json){
+			UINT uDropEffect = RegisterClipboardFormat(L"Preferred DropEffect");
+			UINT cFiles = 0;
+			DWORD dwEffect, *dw;
+			// -----------------------------------------------------------------
+			CefRefPtr<CefListValue> retval = CefListValue::Create();
+			// 读取剪切板数据
+			if (OpenClipboard(hWnd)){
+				HDROP hDrop = HDROP(GetClipboardData(CF_HDROP));
+				if (hDrop){
+					dw = (DWORD*)(GetClipboardData(uDropEffect));
+					if (NULL == dw)
+					{
+						dwEffect = DROPEFFECT_COPY;
+					} else
+					{
+						dwEffect = *dw;
+					}
+					cFiles = DragQueryFile(hDrop, (UINT)-1, NULL, 0);
+					if (cFiles > 0){
+						// 将数据上传到服务器
+						CefRefPtr<CefRequest> request = CefRequest::Create();
+						//request->SetFlags(UR_FLAG_ALLOW_CACHED_CREDENTIALS);
+						//request->SetFirstPartyForCookies()
+						// Set the request URL.
+						wstring some_url = L"http://zjserver2-5/SSO/test/upload/receiveUpload.jsp";// FIXME：从参数中取
+						// some_url = L"http://localhost:8888/upload/receiveUpload.jsp";
+						if (json != NULL&&json->HasKey("url")){
+							some_url = json->GetValue("url")->GetString().ToWString();
+						}
+						request->SetURL(some_url);
+						// Set the request method. Supported methods include GET, POST, HEAD, DELETE and PUT.
+						request->SetMethod("POST");
+						CefRefPtr<CefPostData> postData = CefPostData::Create();
+						CefRequest::HeaderMap headerMap;
+						if (json != NULL&&json->HasKey("headers")){// 
+							CefRefPtr<CefDictionaryValue> headers = json->GetDictionary("headers");
+							std::vector<CefString> keys;
+							headers->GetKeys(keys);
+							vector<CefString>::iterator it = keys.begin();
+							while (it != keys.end()){
+								CefString key = (*it);
+								headerMap.insert(std::make_pair(key, headers->GetValue(key)->GetString()));
+								it++;
+							}
+						}			
+						// 将文件列表返回到前端						
+						TCHAR szFile[MAX_PATH];
+						std::string boundaryId =jw::GenerateGuidA();
+						std::string bound = "multipart/form-data;boundary="; bound += boundaryId;
+						headerMap.insert(std::make_pair("Content-Type", bound));
+						// 读取文件并上传
+						std::stringstream upload_data_s;
+						if (json != NULL&&json->HasKey("params")){// 将所有附加参数写入到form中
+							CefRefPtr<CefDictionaryValue> params = json->GetDictionary("params");
+							std::vector<CefString> keys;
+							params->GetKeys(keys);
+							vector<CefString>::iterator it = keys.begin();
+							while (it != keys.end()){
+								CefString key = (*it);
+								upload_data_s << "--" << boundaryId
+									<< "\r\n"
+									<< "Content-Disposition: form-data; name=\""<<key.ToString().c_str()<<"\""
+									<< "\r\n"
+									<< "\r\n"
+									<< params->GetValue(key)->GetString().ToString().c_str()
+									<< "\r\n";
+								it++;
+							}
+						}
+						for (UINT count = 0; count < cFiles; count++){
+							DragQueryFile(hDrop, count, szFile, sizeof(szFile));
+							CefString file = wstring(szFile);
+							try{
+								string fn = file.ToString();
+								std::ifstream in(file.ToWString(), std::ios::binary/*需要指定为二进制模式打开*/);
+								upload_data_s
+									<< "--" << boundaryId
+									<< "\r\n"
+									<< "Content-Disposition: form-data; name=\"up"<<count<<"\"; filename=\"" << fn.c_str() << "\""
+									//<< "Content-Disposition: form-data; name=\"upfile\"; filename=\"f" << count << "\""
+									<< "\r\n"
+									<< "Content-Type: " << jw::jb::GetMimeType(fn)
+									<< "\r\n"
+									<< "\r\n";
+								if (in.is_open()){
+									writeLog("读取文件成功\r\n");
+									while (!in.eof()){
+									    string line;
+									    std::getline(in, line, '\n');
+										upload_data_s << line<<"\n";
+									}
+								}
+								upload_data_s << "\r\n";
+								in.clear();
+								in.close();
+							} catch (...){
+								writeLog("读取文件失败\r\n");
+							}
+							retval->SetString(count, file);
+						}// End for-count:cFiles
+						// 上传数据的结尾标志
+						upload_data_s << "\r\n" << "\r\n" << "--" << boundaryId << "--" << "\r\n";
+						const std::string upload_data = upload_data_s.str();
+						CefRefPtr<CefPostDataElement> element = CefPostDataElement::Create();
+						element->SetToBytes(upload_data.size(), upload_data.c_str());// 最大缺点是文件太大后，传递不过去
+						stringstream sizeSS; sizeSS << upload_data.size();
+						headerMap.insert(std::make_pair("Content-Length", sizeSS.str()));// Content-Length可以不指定
+						postData->AddElement(element);
+						request->SetHeaderMap(headerMap);
+						request->SetPostData(postData);// 发送请求到服务端
+						BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
+						if (bw != NULL){
+							CefRefPtr<CefURLRequest> mUrlRequest =
+								CefURLRequest::Create(request, new RequestClient(), bw->browser->GetHost()->GetRequestContext());
+						}
+					}// End if:剪切板中有文件
+					CloseClipboard();
+				}// End if:能否获取剪切板数据
+			}// End if:剪切板是否正常打开
+			return retval;
+		}// End-method:parserCopyFile
 	}// End ns-js
 }// End ns-jw
 
@@ -121,7 +249,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "setWindowExStyle", new JJH_SetWindowExStyle());
 
 	regist(jWebTop, "invokeRemote_CallBack", new JJH_InvokeRemote_CallBack());// 容易阻塞render进程，屏蔽
-	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());
+	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());   
 
 	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//测试JS回调
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
@@ -135,6 +263,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 		regist(jWebTop, "enableDrag", new JJH_enableDrag());  // enableDrag(true|false);
 		regist(jWebTop, "startDrag", new JJH_startDrag());	  // startDrag();
 		regist(jWebTop, "stopDrag", new JJH_stopDrag());	  // stopDrag();
+		regist(jWebTop, "getPaste", new JJH_GetPaste());
 	}
 	// 以下方法只在实现JWebTopClient#OnLoadEnd实现（具体实现是JWebTopCommons#renderBrowserWindow）
 	//regist(jWebTop, "runApp", new JJH_RunApp());  //runApp(appName,handler);//运行一个app，appName为.app文件路径。
