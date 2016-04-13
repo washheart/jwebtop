@@ -100,8 +100,14 @@ namespace fastipc{
 				delete rtn;// 清理环境
 			}
 			// 多线程情况下，可能会出现server.close被调用后，还有线程在onRead，所以这里加个空指针检查
-			if (memBuf)InterlockedExchange(&memBuf->state, MEM_CAN_WRITE);// 数据读取之后，设置为可写
-			if (evtReaded)SetEvent(evtReaded);
+			if (memBuf){
+				InterlockedExchange(&memBuf->state, MEM_CAN_WRITE);// 数据读取之后，设置为可写
+				close();// 检查下是否有未关闭的资源
+			}
+			if (evtReaded){
+				SetEvent(evtReaded);
+				close();// 检查下是否有未关闭的资源
+			}
 		}
 	};
 }
