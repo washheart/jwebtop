@@ -49,62 +49,6 @@ private:
 };
 
 // JJH=JWebTop JavaScriptHandler
-// FIXME:函数原型应该是getPaste(postUrl,jsonObject,[handler])
-class JJH_GetPaste : public CefV8Handler {
-public:
-	void OnRequestComplete(CefURLRequest::ErrorCode error_code,
-		const std::string& download_data) {
-		//callback_->Failure(error_code, test_runner::GetErrorString(error_code));
-	}
-
-
-	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		CefRefPtr<CefV8Value> json = NULL;
-		if (arguments.size() > 0)json = arguments[0];
-		HWND hWnd = getHWND(object, arguments, 1);
-		CefRefPtr<CefDictionaryValue> json2 = CefDictionaryValue::Create();
-		if (json != NULL&&json->HasValue("url")){
-			json2->SetString("url", json->GetValue("url")->GetStringValue());
-		}
-		if (json != NULL&&json->HasValue("headers")){// 设置文件头
-			CefRefPtr<CefV8Value> headers = json->GetValue("headers");
-			std::vector<CefString> keys;
-			headers->GetKeys(keys);
-			CefRefPtr<CefDictionaryValue> headerMap = CefDictionaryValue::Create();
-			json2->SetDictionary("headers", headerMap);
-			vector<CefString>::iterator it = keys.begin();
-			while (it != keys.end()){
-				CefString key = (*it);
-				headerMap->SetString(key, headers->GetValue(key)->GetStringValue());
-				it++;
-			}
-		}
-		if (json != NULL&&json->HasValue("params")){// 设置文件头
-			CefRefPtr<CefV8Value> params = json->GetValue("params");
-			std::vector<CefString> keys;
-			params->GetKeys(keys);
-			CefRefPtr<CefDictionaryValue> paramMap = CefDictionaryValue::Create();
-			json2->SetDictionary("params", paramMap);
-			vector<CefString>::iterator it = keys.begin();
-			while (it != keys.end()){
-				CefString key = (*it);
-				paramMap->SetString(key, params->GetValue(key)->GetStringValue());
-				it++;
-			}
-		}
-		CefRefPtr<CefListValue>	list = jw::js::parserCopyFile(hWnd, json2);
-		// 将文件列表返回到前端
-		int size = list->GetSize();
-		retval = CefV8Value::CreateArray(size);
-		for (int i = 0; i < size; i++){
-			retval->SetValue(i, CefV8Value::CreateString(list->GetString(i)));
-		}
-		return retval != NULL;
-	}
-
-private:
-	IMPLEMENT_REFCOUNTING(JJH_GetPaste);
-};
 
 //getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
 class JJH_GetPos : public CefV8Handler {
@@ -473,6 +417,9 @@ namespace jw{
 
 			// 发送应用（一个应用可能有多个窗口）被激活事件:new CustomEvent('JWebTopAppActive',{detail:{handler:除非此消息的窗口的句柄}})
 			void sendAppActive(const CefRefPtr<CefFrame> frame, const long handler);
+
+			// 在浏览器执行了文件操作：粘贴(JWebTopFilePasted)、拖入文件(JWebTopFileDroped)
+			void sendFileEvent(const CefRefPtr<CefFrame> frame, vector<CefString> files, std::string eventName);
 		}
 	}
 }

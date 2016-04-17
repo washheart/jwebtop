@@ -152,6 +152,34 @@ HICON GetIcon(CefString url, CefString path){
 	}
 	return NULL;
 }
+
+void parseCopyFile(HWND hWnd, HDROP hDrop, string eventName){
+	UINT cFiles = 0;
+	// 读取剪切板数据
+	cFiles = DragQueryFile(hDrop, (UINT)-1, NULL, 0);
+	if (cFiles > 0){			
+		TCHAR szFile[MAX_PATH];
+		std::vector<CefString> files;
+		for (UINT count = 0; count < cFiles; count++){
+			DragQueryFile(hDrop, count, szFile, sizeof(szFile));
+			CefString file = wstring(szFile);
+			files.push_back(file);
+		}// End for-count:cFiles
+		jw::js::events::sendFileEvent(getBrowserWindowInfo(hWnd)->browser->GetMainFrame(), files, eventName);
+	}// End if:剪切板中有文件
+}// End-method:parseCopyFile
+
+// 检查剪切板中是否有文件，并解析发送相关事件
+void parseCopyFile(HWND hWnd){	
+	if (OpenClipboard(hWnd)){
+		HDROP hDrop = HDROP(GetClipboardData(CF_HDROP));
+		if (hDrop){
+			parseCopyFile(hWnd, hDrop, "JWebTopFilePasted");
+			CloseClipboard();
+		}// End if:能否获取剪切板数据
+	}// End if:剪切板是否正常打开
+}// End-method:parseCopyFile
+
 const LONG border_width = 5; // 定义边框的宽度
 LRESULT transparentNCHITTEST(HWND hWnd, LPARAM lParam){
 	RECT wRect;
@@ -230,16 +258,23 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_KILLFOCUS:
 		bwInfo->isDraging = false; // 失去焦点时，停止拖动
 		break;
-#ifdef JWebTopLog
+	case WM_DROPFILES:
+		parseCopyFile(hWnd, (HDROP)wParam, "JWebTopFileDroped");
+		break;
 	case WM_KEYUP:
 		switch (wParam)
 		{
+		case 0x56:
+			if (0x8000 & GetKeyState(VK_CONTROL))parseCopyFile(hWnd);
+			
+			break;
+#ifdef JWebTopLog
 		case VK_F12:
 			jb::showDev(hWnd);
 			break;
+#endif
 		}
 		break;
-#endif
 	case WM_MOUSEMOVE:{
 						  if (bwInfo->isDraging){
 							  POINT pt;
@@ -262,8 +297,7 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 							if (msg2 == WM_DESTROY){
 								if (bwInfo == NULL){
 									DefWindowProc(hWnd, message, wParam, lParam);
-								}
-								else{
+								} else{
 									SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)bwInfo->oldBrowserProc);// 设置回原来的处理函数
 									BrowserWindowInfos.erase(hWnd);// 清理掉在map中的数据
 								}
@@ -286,13 +320,12 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		HICON hIcon = GetIcon(configs.url, configs.icon);
 		if (hIcon)SetClassLong(hWnd, GCL_HICON, (LONG)hIcon);
 	}
-	
+
 	bool showMax = false;
 	if (configs.max){// 需要按最大化的方式来显示
-		jw::maxWin(hWnd); 
+		jw::maxWin(hWnd);
 		showMax = true;
-	}
-	else{// 检查坐标和宽高是否与设定相同，如果不同则重新设
+	} else{// 检查坐标和宽高是否与设定相同，如果不同则重新设
 		RECT rc = winInfo.rcWindow;
 		if ((p_configs->x != -1 && p_configs->x != rc.left)
 			|| (p_configs->y != -1 && p_configs->y != rc.top)
@@ -312,7 +345,7 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 	if (preWndProc != (LONG)JWebTop_BrowerWndProc){
 		SetWindowLongPtr(bWnd, GWLP_WNDPROC, (LONG)JWebTop_BrowerWndProc);
 		BrowserWindowInfo * bwInfo = new BrowserWindowInfo();
-		bwInfo->isWsChild = (WS_CHILD&p_configs->dwStyle) !=0;
+		bwInfo->isWsChild = (WS_CHILD&p_configs->dwStyle) != 0;
 		bwInfo->hWnd = hWnd;
 		bwInfo->bWnd = bWnd;
 		bwInfo->oldBrowserProc = preWndProc;
@@ -323,6 +356,8 @@ void renderBrowserWindow(CefRefPtr<CefBrowser> browser, JWebTopConfigs * p_confi
 		bwInfo->enableDrag = configs.enableDrag;
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(bWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
 		BrowserWindowInfos.insert(pair<HWND, BrowserWindowInfo*>(hWnd, bwInfo));// 在map常量中记录下hWnd和之前WndProc的关系
+		DragAcceptFiles(bwInfo->bWnd, TRUE);// 设置为可以接收拖进的文件
+		//DropFileFix();
 	}
 #ifdef JWebTopLog
 	GetWindowInfo(hWnd, &winInfo);// 获取窗口信息

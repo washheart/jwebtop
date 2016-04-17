@@ -108,11 +108,6 @@ bool excuteJSON(const CefString& request){
 		if (handler == NULL)return false;
 		jb::showDev((HWND)handler->GetInt());
 	}
-	else if (methodName == L"getPaste"){
-		CefRefPtr<CefValue> handler = value->GetValue("handler");
-		if (handler == NULL)return false;
-		jw::js::parserCopyFile((HWND)handler->GetInt(),value->GetDictionary("jsonv"));
-	}
 	else{
 		return false;
 	}
