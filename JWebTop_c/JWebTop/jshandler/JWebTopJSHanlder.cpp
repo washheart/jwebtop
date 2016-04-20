@@ -83,6 +83,7 @@ namespace jw{
 				js_event << "var e = new CustomEvent('" << eventName << "',{"
 					<< "	detail:{"
 					<< "		data:[\"" << convertFilePath(tmp) << "\"";
+				it++;
 				while (it != files.end()){
 					tmp = (*it).ToString();
 					js_event << ",\"" << convertFilePath(tmp) << "\"";

@@ -175,8 +175,8 @@ void parseCopyFile(HWND hWnd){
 		HDROP hDrop = HDROP(GetClipboardData(CF_HDROP));
 		if (hDrop){
 			parseCopyFile(hWnd, hDrop, "JWebTopFilePasted");
-			CloseClipboard();
 		}// End if:能否获取剪切板数据
+		CloseClipboard();
 	}// End if:剪切板是否正常打开
 }// End-method:parseCopyFile
 
@@ -266,7 +266,6 @@ LRESULT CALLBACK JWebTop_BrowerWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 		{
 		case 0x56:
 			if (0x8000 & GetKeyState(VK_CONTROL))parseCopyFile(hWnd);
-			
 			break;
 #ifdef JWebTopLog
 		case VK_F12:
