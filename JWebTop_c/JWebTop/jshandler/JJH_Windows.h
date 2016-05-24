@@ -15,39 +15,6 @@
 #include <Shellapi.h>
 #include <oleidl.h>
 #include "common/tests/TestUtil.h"
-class RequestClient : public CefURLRequestClient {
-public:
-	explicit RequestClient() {}
-	void Detach() {}
-
-	void OnRequestComplete(CefRefPtr<CefURLRequest> request) OVERRIDE{
-		CefURLRequest::ErrorCode error_code = request->GetRequestError();
-		if (error_code == ERR_NONE) writeLog("文件成功上传uploadsuccess\r\n");
-		else						writeLog("文件上传失败uploadfailed\r\n");
-	}
-
-	void OnUploadProgress(CefRefPtr<CefURLRequest> request, int64 current, int64 total) OVERRIDE{
-		writeLog("uploading......uploading......\r\n");
-	}
-
-	void OnDownloadProgress(CefRefPtr<CefURLRequest> request, int64 current, int64 total) OVERRIDE{}
-	void OnDownloadData(CefRefPtr<CefURLRequest> request, const void* data, size_t data_length) OVERRIDE{
-		download_data_ += std::string(static_cast<const char*>(data), data_length);
-		writeLog("download_data_......");
-		writeLog(download_data_);
-		writeLog("\r\n");
-	}
-	bool GetAuthCredentials(bool isProxy, const CefString& host, int port, const CefString& realm, const CefString& scheme, CefRefPtr<CefAuthCallback> callback) OVERRIDE{
-		return false;
-	}
-
-private:
-	std::string download_data_;
-
-	IMPLEMENT_REFCOUNTING(RequestClient);
-	DISALLOW_COPY_AND_ASSIGN(RequestClient);
-};
-
 // JJH=JWebTop JavaScriptHandler
 
 //getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}

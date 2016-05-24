@@ -48,10 +48,6 @@ namespace jb{
 		if (bw != NULL)bw->browser->Reload();
 	}
 
-	// 为当前网页动态记载一个js文件(url, handler);//加载网页，url为网页路径
-	void appendJSFile(HWND hWnd, std::wstring jsfile){
-
-	}
 	//reloadIgnoreCache(handler);//重新加载当前页面并忽略缓存
 	void reloadIgnoreCache(HWND hWnd){
 		BrowserWindowInfo * bw = getBrowserWindowInfo(hWnd);
