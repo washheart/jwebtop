@@ -15,6 +15,7 @@
 #include "common/tests/TestUtil.h"
 #endif
 using namespace std;
+
 class JWebTopClient : public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
@@ -139,12 +140,15 @@ public:
 	//// CefKeyboardHandler-------------------------------------------------------------------------------
 
 	// CefContextMenuHandler------------------------------------------------------------------------------
-	void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
-		CefRefPtr<CefFrame> frame,
-		CefRefPtr<CefContextMenuParams> params,
-		CefRefPtr<CefMenuModel> model) OVERRIDE{
+#ifdef JWebTopLog
+	void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model) OVERRIDE;
+	bool OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, int command_id, EventFlags event_flags) OVERRIDE;
+	void ShowDevTools(CefRefPtr<CefBrowser> browser, const CefPoint& inspect_element_at);
+#else
+	void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model) OVERRIDE{
 		model->Clear();// 移除所有默认菜单
 	}
+#endif
 private:
 	// 和render进程进行通信的相关变量
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;

@@ -243,3 +243,27 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 		jw::js::events::sendIFrameReady(frame);					 // 在【iframe】页面送iframe页面已准备好事件
 	}
 }
+#ifdef JWebTopLog
+enum JWebTop_Menu_IDs {
+	JWebTop_ID_SHOW_DEVTOOLS = MENU_ID_USER_FIRST,
+	JWebTop_ID_CLOSE_DEVTOOLS,
+	JWebTop_ID_INSPECT_ELEMENT,
+}; 
+void JWebTopClient::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model){
+	model->AddSeparator();
+	// Add DevTools items to all context menus.
+	model->AddItem(JWebTop_ID_SHOW_DEVTOOLS, L"打开调试工具(&Q)");
+	model->AddItem(JWebTop_ID_CLOSE_DEVTOOLS, L"关闭调试工具(&C)");
+	model->AddSeparator();
+	model->AddItem(JWebTop_ID_INSPECT_ELEMENT, L"审查元素(&S)");
+};
+void JWebTopClient::ShowDevTools(CefRefPtr<CefBrowser> browser, const CefPoint& inspect_element_at) {
+	CefWindowInfo windowInfo;
+	windowInfo.SetAsPopup(NULL, "cef_debug");
+	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), inspect_element_at);};
+
+bool JWebTopClient::OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, int command_id, EventFlags event_flags) {	switch (command_id) {	case JWebTop_ID_SHOW_DEVTOOLS:		ShowDevTools(browser, CefPoint());		return true;	case JWebTop_ID_CLOSE_DEVTOOLS:		browser->GetHost()->CloseDevTools();		return true;	case JWebTop_ID_INSPECT_ELEMENT:		ShowDevTools(browser, CefPoint(params->GetXCoord(), params->GetYCoord()));		return true;
+	};
+	return false;
+}
+#endif
