@@ -387,6 +387,9 @@ namespace jw{
 
 			// 在浏览器执行了文件操作：粘贴(JWebTopFilePasted)、拖入文件(JWebTopFileDroped)
 			void sendFileEvent(const CefRefPtr<CefFrame> frame, vector<CefString> files, std::string eventName);
+			
+			// 发送页面加载失败事件
+			void sendLoadError(const CefRefPtr<CefFrame> frame, int errorCode, const CefString& errorText, const CefString& failedUrl);
 		}
 	}
 }

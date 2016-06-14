@@ -1,6 +1,7 @@
 #include "JWebTopJSHanlder.h"
 #include "include/cef_app.h"
 #include "include/cef_parser.h"
+#include "include/cef_load_handler.h"
 #include "JJH_Windows.h"
 #include "common/util/StrUtil.h"
 #include <iostream>  
@@ -20,7 +21,6 @@ namespace jw{
 				CefString js_event(L"var e = new CustomEvent('JWebTopIFrameReady');dispatchEvent(e);");
 				frame->ExecuteJavaScript(js_event, "", 0);
 			}
-
 			// 发送窗口大小改变事件:new CustomEvent('JWebTopResize',{detail:{w:宽度数值,h:高度数值}})
 			void sendSize(const CefRefPtr<CefFrame> frame, const int w, const int h){
 				stringstream js_event;
@@ -90,6 +90,20 @@ namespace jw{
 					it++;
 				}
 				js_event << "]}"
+					<< "});"
+					<< "dispatchEvent(e);";
+				frame->ExecuteJavaScript(js_event.str(), "", 0);
+			}
+			// 发送页面加载失败事件
+			void sendLoadError(const CefRefPtr<CefFrame> frame,
+				int errorCode, const CefString& errorText, const CefString& failedUrl){
+				stringstream js_event;
+				js_event << "var e = new CustomEvent('JWebTopLoadError',{"
+					<< "	detail:{"
+					<< "		url:\"" << failedUrl.ToString() << "\","
+					<< "		msg:\"" << errorText.ToString() << "\","
+					<< "		code:"  << errorCode
+					<< "	}"
 					<< "});"
 					<< "dispatchEvent(e);";
 				frame->ExecuteJavaScript(js_event.str(), "", 0);

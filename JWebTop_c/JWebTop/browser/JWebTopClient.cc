@@ -133,13 +133,9 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	}
 	isClosed = true;
 }
-void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
-	CefRefPtr<CefFrame> frame,
-	ErrorCode errorCode,
-	const CefString& errorText,
-	const CefString& failedUrl) {
+void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) {
 	CEF_REQUIRE_UI_THREAD();
-
+	browser->StopLoad();
 	// Don't display an error for downloaded files.
 	if (errorCode == ERR_ABORTED) return;
 	CefString errorUrl(JWebTopConfigs::getErrorURL());
@@ -147,7 +143,8 @@ void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser,
 		frame->LoadURL(errorUrl);
 	}
 	else{
-		frame->LoadString(L"<html><body><h2>出错了（地址：" + failedUrl.ToWString() + L"）！</h2></body></html>", failedUrl);
+		jw::js::events::sendLoadError(frame, errorCode, errorText, failedUrl);
+		// frame->LoadString(L"<html><body><h2>出错了（地址：" + failedUrl.ToWString() + L"）！</h2></body></html>", failedUrl);
 	}
 }
 
