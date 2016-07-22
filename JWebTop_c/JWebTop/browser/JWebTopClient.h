@@ -24,7 +24,7 @@ class JWebTopClient : public CefClient,
 	public CefContextMenuHandler,
 	public CefDragHandler{
 private:
-	bool isClosed;
+
 	JWebTopConfigs * configs = NULL; // 构建浏览器时的配置信息
 	wstring taskId;                // DLL方式时对应创建浏览器的任务ID
 	CefRefPtr<JSDialogHandler> dialog_handler_;
@@ -149,6 +149,20 @@ public:
 		model->Clear();// 移除所有默认菜单
 	}
 #endif
+
+	// CefLifeSpanHandler------------------------------------------------------------------------------
+	bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		const CefString& target_url,
+		const CefString& target_frame_name,
+		CefLifeSpanHandler::WindowOpenDisposition target_disposition,
+		bool user_gesture,
+		const CefPopupFeatures& popupFeatures,
+		CefWindowInfo& windowInfo,
+		CefRefPtr<CefClient>& client,
+		CefBrowserSettings& settings,
+		bool* no_javascript_access) OVERRIDE;
+	
 private:
 	// 和render进程进行通信的相关变量
 	typedef std::set<CefMessageRouterBrowserSide::Handler*> MessageHandlerSet;

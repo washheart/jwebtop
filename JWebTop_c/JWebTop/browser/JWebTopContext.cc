@@ -37,19 +37,21 @@ namespace jw{
 			browser_list_.push_back(browser);// 记录下已经创建的窗口来
 		}
 
-		void removeBrowser(CefRefPtr<CefBrowser> browser) {
+		bool removeBrowser(CefRefPtr<CefBrowser> browser) {
 #ifdef JWebTopLog
 			wstringstream log;
-			log << L"JWebTopClient::OnBeforeClose 尚存[" << browser_list_.size() << L"]个,"
+			log << L"JWebTopContext::removeBrowser 尚存[" << browser_list_.size() << L"]个,"
 				<< L"正在关闭的URL地址：" << browser->GetMainFrame()->GetURL().ToWString().c_str()
 				<< L"\r\n";
 			writeLog(log.str());
 #endif
 			// Remove from the list of existing browsers.
+			bool success = false;
 			BrowserList::iterator bit = browser_list_.begin();
 			for (; bit != browser_list_.end(); ++bit) {
 				if ((*bit)->IsSame(browser)) {
 					browser_list_.erase(bit);
+					success = true;
 					break;
 				}
 			}
@@ -57,6 +59,7 @@ namespace jw{
 				// All browser windows have closed. Quit the application message loop.
 				CefQuitMessageLoop();
 			}
+			return success;
 		}
 
 		void CloseAllBrowsers(bool force_close) {

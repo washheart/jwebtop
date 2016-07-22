@@ -23,7 +23,7 @@ namespace jw{
 	extern JWebTopConfigs * g_configs;  // 应用启动时的第一个配置变量
 }
 JWebTopClient::JWebTopClient()
-: isClosed(false), dialog_handler_(new JSDialogHandler()){
+:  dialog_handler_(new JSDialogHandler()){
 }
 
 JWebTopClient::~JWebTopClient() {}
@@ -112,9 +112,30 @@ bool JWebTopClient::OnProcessMessageReceived(
 	//}
 	return false;
 }
+
+bool JWebTopClient::OnBeforePopup(CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefFrame> frame,
+	const CefString& target_url,
+	const CefString& target_frame_name,
+	CefLifeSpanHandler::WindowOpenDisposition target_disposition,
+	bool user_gesture,
+	const CefPopupFeatures& popupFeatures,
+	CefWindowInfo& windowInfo,
+	CefRefPtr<CefClient>& client,
+	CefBrowserSettings& settings,
+	bool* no_javascript_access) {
+	return false;// 返回true将不会打开新窗口
+}
 bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	HWND hWnd = browser->GetHost()->GetWindowHandle();
+	//#ifdef JWebTopLog
+	//	wstringstream log;
+	//	log << L"JWebTopClient::DoClose ,"
+	//		<< L"正在关闭的URL地址：" << browser->GetMainFrame()->GetURL().ToWString().c_str()
+	//		<< L"\r\n";
+	//	writeLog(log.str());
+	//#endif
 	if (hWnd != NULL || getBrowserWindowInfo(hWnd) == NULL){
 		OnBeforeClose(browser);
 	}
@@ -124,14 +145,13 @@ bool JWebTopClient::DoClose(CefRefPtr<CefBrowser> browser) {
 }
 
 void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
-	if (isClosed)return;
 	CEF_REQUIRE_UI_THREAD();
-	jw::ctx::removeBrowser(browser);
+	if (!jw::ctx::removeBrowser(browser))return;
 	if (jw::dllex::ex()) {
+		writeLog(L"\tJWebTopClient::OnBeforeClose4");
 		jw::dllex::DLLExState::removeBrowserSetting(browser->GetHost()->GetWindowHandle());
 		jw::dllex::invokeRemote_NoWait(browser->GetHost()->GetWindowHandle(), "{\"action\":\"window\",\"method\":\"browserClosed\"}");
 	}
-	isClosed = true;
 }
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) {
 	CEF_REQUIRE_UI_THREAD();
@@ -257,9 +277,20 @@ void JWebTopClient::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr
 void JWebTopClient::ShowDevTools(CefRefPtr<CefBrowser> browser, const CefPoint& inspect_element_at) {
 	CefWindowInfo windowInfo;
 	windowInfo.SetAsPopup(NULL, "cef_debug");
-	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), inspect_element_at);};
+	browser->GetHost()->ShowDevTools(windowInfo, new DEBUG_Handler(), CefBrowserSettings(), inspect_element_at);
+};
 
-bool JWebTopClient::OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, int command_id, EventFlags event_flags) {	switch (command_id) {	case JWebTop_ID_SHOW_DEVTOOLS:		ShowDevTools(browser, CefPoint());		return true;	case JWebTop_ID_CLOSE_DEVTOOLS:		browser->GetHost()->CloseDevTools();		return true;	case JWebTop_ID_INSPECT_ELEMENT:		ShowDevTools(browser, CefPoint(params->GetXCoord(), params->GetYCoord()));		return true;
+bool JWebTopClient::OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, int command_id, EventFlags event_flags) {
+	switch (command_id) {
+	case JWebTop_ID_SHOW_DEVTOOLS:
+		ShowDevTools(browser, CefPoint());
+		return true;
+	case JWebTop_ID_CLOSE_DEVTOOLS:
+		browser->GetHost()->CloseDevTools();
+		return true;
+	case JWebTop_ID_INSPECT_ELEMENT:
+		ShowDevTools(browser, CefPoint(params->GetXCoord(), params->GetYCoord()));
+		return true;
 	};
 	return false;
 }

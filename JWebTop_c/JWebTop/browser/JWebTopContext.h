@@ -25,7 +25,8 @@ namespace jw{
 		int getBrowserCount();
 		void addBrowser(CefRefPtr<CefBrowser> browser);
 
-		void removeBrowser(CefRefPtr<CefBrowser> browser);
+		// 从浏览器列表中移除一个浏览器。成功关闭后返回true，否则返回false
+		bool removeBrowser(CefRefPtr<CefBrowser> browser);
 
 		// 关闭所有打开的浏览器
 		void CloseAllBrowsers(bool force_close);
