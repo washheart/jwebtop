@@ -26,7 +26,10 @@ JWebTop对WebTop进行了一些封装，将其变为一个DLL，可以通过JNI�
 两个例子：
 1.FileManager：用WebTop做界面，java做后台实现文件的管理。
 2.WithinSwing：将WebTop作为一个“控件”，嵌入到Swing程序中。</p>
-
+<hr/>
+<p>JWebTop最初目的是通过JNI把连接Java和webtop，所以起名为JWebTop。
+但是在升级了chromium后发现通过JNI集成，有时CEF的消息循环控制不好，可能是功力不够,:(
+所以改为用多进程的方式集成java程序和JWebTop.exe，但是项目的名称就懒得改了。</p>
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/washheart/jwebtop">JWebTop</a> is maintained by <a href="https://github.com/washheart">washheart</a>.</span>
 
