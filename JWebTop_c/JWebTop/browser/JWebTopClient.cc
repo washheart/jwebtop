@@ -148,7 +148,7 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	if (!jw::ctx::removeBrowser(browser))return;
 	if (jw::dllex::ex()) {
-		writeLog(L"\tJWebTopClient::OnBeforeClose4");
+		// writeLog(L"\tJWebTopClient::OnBeforeClose4");
 		jw::dllex::DLLExState::removeBrowserSetting(browser->GetHost()->GetWindowHandle());
 		jw::dllex::invokeRemote_NoWait(browser->GetHost()->GetWindowHandle(), "{\"action\":\"window\",\"method\":\"browserClosed\"}");
 	}
