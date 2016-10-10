@@ -155,7 +155,7 @@ void JWebTopClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 }
 void JWebTopClient::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) {
 	CEF_REQUIRE_UI_THREAD();
-	browser->StopLoad();
+	// browser->StopLoad();// 当出现加载错误时不能StopLoad，因为可能是某个资源不能加载，但是其他资源有可能还是能加载的
 	// Don't display an error for downloaded files.
 	if (errorCode == ERR_ABORTED) return;
 	CefString errorUrl(JWebTopConfigs::getErrorURL());
