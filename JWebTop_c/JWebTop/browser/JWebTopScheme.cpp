@@ -109,6 +109,8 @@ namespace jw{
 				std::wstring url = request->GetURL();
 				url = url.substr(10 /* 10="jwebtop://".length() */);// 去除协议头后剩余的为文件路径
 				if (url.length() == 0)return false;					// 没有有效文件名时，直接取消
+				LPCTSTR path = url.c_str();
+				if (_waccess(path, 0) != 0)return false;			// 文件不存在时，直接取消
 				// 读取数据
 				string url2 = w2s(url); mime = GetMimeType(url2);	// 设置mime类型
 				stream_ = CefStreamReader::CreateForFile(url);		// 创建文件流
