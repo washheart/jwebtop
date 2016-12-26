@@ -257,8 +257,8 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPAR
 	mode:	0=选择文件对话框（默认）；1=选择文件夹对话框；2=保存文件对话框
 	title:	选择文件的提示信息，可以为空
 	dir:	对话框初始化时的目录，可以为空
-	file:	（暂不支持）对话框初始化时的文件，可以为空
-	filters:（暂不支持）过滤器规则[具体请参见MSDN]，可以为空。一个样例：所有文件\0*.*\0C/C++ Flie\0*.cpp;*.c;*.h\0\0
+	file:	对话框初始化时的文件，可以为空
+	filters:过滤器规则，一个JSON数组[名称、规则，名称、规则、... ...]，例如：['所有文件','*.*','C/C++ Flie','*.cpp;*.c;*.h']
  }
  返回值：字符串
 	当字符串为null时表示用户执行的是取消操作
@@ -322,8 +322,6 @@ public:
 				ofn.lpstrFilter = tt;
 				ofn.nFilterIndex = 1;//过滤器索引  
 			}
-			//ofn.lpstrFilter = TEXT("所有文件\0*.*\0C/C++ Flie\0*.cpp;*.c;*.h\0\0");
-			//ofn.nFilterIndex = 1;//过滤器索引  
 			WCHAR strFilename[1000 * MAX_PATH];//用于接收文件名 
 			CefString file = params->GetValue("file")->GetStringValue();
 			if (!file.empty())wcscpy_s(strFilename, file.ToWString().c_str());
@@ -331,7 +329,7 @@ public:
 			ofn.nMaxFile = sizeof(strFilename);//缓冲区长度  
 			if (mode == 2){// 保存文件对话框
 				ofn.Flags = OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;//目录必须存在，覆盖文件前发出警告
-				ofn.lpstrDefExt = TEXT("cpp");//默认追加的扩展名  
+				// ofn.lpstrDefExt = suffix_w;//默认追加的扩展名  
 				ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
 				if (GetSaveFileName(&ofn))
 				{
@@ -339,8 +337,7 @@ public:
 				}
 			}
 			else{// 选择文件对话框（默认）
-				ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT;//文件、目录必须存在，隐藏只读选项  
-				ofn.Flags =  OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY ;//文件、目录必须存在，隐藏只读选项  
+				ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT;//文件、目录必须存在，隐藏只读选项  s
 				ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
 				if (GetOpenFileName(&ofn)){
 					wstring str;
