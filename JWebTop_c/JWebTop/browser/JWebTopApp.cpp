@@ -20,6 +20,8 @@ void JWebTopApp::OnBeforeCommandLineProcessing(
 	// command_line->AppendSwitchWithValue("--register-pepper-plugins", "pepflashplayer.dll;application/x-shockwave-flash");
 	if (!jw::g_configs->proxyServer.empty()){
 		command_line->AppendSwitchWithValue("proxy-server", jw::g_configs->proxyServer);// 设置代理服务器（也可以）
+	}else{
+		command_line->AppendSwitchWithValue("no-proxy-server","1");//  关闭代理(可以减少代理检测，加快部分速度)
 	}
 }
 
@@ -28,8 +30,7 @@ void JWebTopApp::OnContextInitialized() {
 	if (jw::dllex::ex()){// 如果是从dll调用，不创建浏览器
 		jw::dllex::OnContextInitialized();
 		//createNewBrowser(jw::ctx::getDefaultConfigs());
-	}
-	else{// 如果不是从dll调用，那么直接创建浏览器
+	} else {// 如果不是从dll调用，那么直接创建浏览器
 		createNewBrowser(jw::ctx::getDefaultConfigs());
 	}
 }
