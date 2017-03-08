@@ -147,6 +147,9 @@ void createNewBrowser(JWebTopConfigs * configs,wstring taskId){
 #endif
 	if (configs->dwStyle != 0)window_info.style = configs->dwStyle;
 	if (configs->dwExStyle != 0)window_info.ex_style = configs->dwExStyle;
+	//window_info.style = WS_POPUP;// 这个没有边框
+	//window_info.style = WS_BORDER;// 这个边框太粗
+	//window_info.style = WS_POPUP | WS_BORDER;// 这个最接近，但是不能拖动
 	window_info.width = configs->w == -1 ? CW_USEDEFAULT : configs->w;
 	window_info.height = configs->h == -1 ? CW_USEDEFAULT : configs->h;
 	POINT p = jw::getScreenSize();
