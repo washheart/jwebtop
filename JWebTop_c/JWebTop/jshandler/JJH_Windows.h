@@ -480,6 +480,34 @@ private:
 };
 
 
+///*
+//JJH_TestFunInJSON({params}, [handler]);// 测试回调通过JSON样式传入的JS函数。
+//用法：JWebTop.selectFile({params}, [handler])
+//params={
+// str:	一个字符串
+// fun:	需要进行回调的JavaScript函数
+//}
+//返回值：无
+//*/
+//class JJH_TestFunInJSON : public CefV8Handler {
+//public:
+//	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+//		if (arguments.size() < 1) return false;
+//		CefRefPtr<CefV8Value> params = arguments[0];
+//		CefString str = params->GetValue("str")->GetStringValue();
+//		std::wstring ss = str.ToWString();
+//		std::reverse(ss.begin(), ss.end());
+//		// 函数回调
+//		CefRefPtr<CefV8Value> fun = params->GetValue("fun");
+//		CefV8ValueList args;
+//		CefRefPtr<CefV8Value> v = CefV8Value::CreateString(ss);
+//		args.push_back(v);
+//		fun->ExecuteFunction(object, args);
+//		return true;
+//	}
+//private:
+//	IMPLEMENT_REFCOUNTING(JJH_TestFunInJSON);
+//};
 ////invokeReflect(function(v){});// 测试回调js的function
 //class JJH_invokeReflect : public CefV8Handler {
 //public:

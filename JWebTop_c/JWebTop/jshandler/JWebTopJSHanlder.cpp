@@ -165,6 +165,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 
 	regist(jWebTop, "invokeRemote_CallBack", new JJH_InvokeRemote_CallBack());// 容易阻塞render进程，屏蔽
 	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());   
+	//regist(jWebTop, "testFunInJSON", new JJH_TestFunInJSON());
 	
 	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//测试JS回调
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
