@@ -1,9 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcef_dll_wrapper", "libcef_dll\libcef_dll_wrapper.vcxproj", "{DC86979F-523F-4DE4-9166-54CED83695D9}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop", "JWebTop\JWebTop.vcxproj", "{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_JNI", "JWebTop_JNI\JWebTop_JNI.vcxproj", "{654A6CD3-E5DC-499F-9887-5770D1D627FF}"
@@ -31,17 +29,6 @@ Global
 		发布版本|Win32 = 发布版本|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Debug|Win32.Build.0 = Debug|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Release|Any CPU.ActiveCfg = Release|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Release|Win32.ActiveCfg = Release|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.Release|Win32.Build.0 = Release|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.发布版本|Any CPU.ActiveCfg = 发布版本|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.发布版本|Mixed Platforms.ActiveCfg = 发布版本|Win32
-		{DC86979F-523F-4DE4-9166-54CED83695D9}.发布版本|Win32.ActiveCfg = 发布版本|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{5A1BEDBD-F4AB-4778-B723-F4DB5B07F107}.Debug|Mixed Platforms.Build.0 = Debug|Win32
