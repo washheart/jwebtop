@@ -112,4 +112,69 @@ namespace fastipc{
 			}
 		}
 	};
+
+	// 数据组装实现
+	class  RebuildedBlockListener_impl :public ReadListener {
+	private:
+		typedef std::map<std::string, MemBlock*> RebuildedBlockMap;// 定义一个存储BrowserWindowInfo的Map
+		RebuildedBlockMap rebuildBlocks;
+		MemBlock * getRebuildedBlock(std::string packId) {
+			RebuildedBlockMap::iterator it = rebuildBlocks.find(packId);
+			if (rebuildBlocks.end() != it) {
+				return it->second;
+			}
+			return NULL;
+		}
+		RebuildedBlockListener* callback;
+	public:
+		RebuildedBlockListener_impl(RebuildedBlockListener* callback) {
+			this->callback = callback;
+		}
+
+		// 当有服务端读取到数据后，会调用此方法通知等待者进行处理
+		// memBlock在分发后会由服务器销毁，外部调用者无需清理操作
+		void onRead(MemBlock* readed) {
+			if (readed->msgType == MSG_TYPE_NORMAL) {
+				callback->onRebuildedRead(readed);// 普通消息，直接转发
+			} else {// 获取重组数据用的uuid（由于发送端可能是多线程交错发送，所以这里用map来存id和数据块的关系）
+				char * uid;
+				uid = (char *)malloc(PACK_ID_LEN + 1);
+				memcpy(uid, readed->packId, PACK_ID_LEN);
+				uid[PACK_ID_LEN] = '\0';
+				std::string packId(uid);
+				MemBlock * tmpBlock = getRebuildedBlock(packId);
+				try {
+					if (!tmpBlock) {
+						tmpBlock = new MemBlock();
+						tmpBlock->msgType = MSG_TYPE_NORMAL;
+						tmpBlock->dataLen = 0;
+						tmpBlock->userMsgType = readed->userMsgType;
+						tmpBlock->userValue = readed->userValue;
+						int len = lstrlenA(readed->userShortStr);
+						ZeroMemory(tmpBlock->userShortStr, PACK_ID_LEN);
+						if (len > 0) {
+							memcpy(tmpBlock->userShortStr, readed->userShortStr, len);
+						}
+						rebuildBlocks.insert(std::pair<std::string, MemBlock*>(packId, tmpBlock));
+					}
+					int len = readed->dataLen;
+					tmpBlock->data = (char*)realloc(tmpBlock->data, tmpBlock->dataLen + len);
+					memcpy((tmpBlock->data + tmpBlock->dataLen), readed->data, len);// 追加拷贝数据
+					tmpBlock->dataLen = tmpBlock->dataLen + len;
+					if (readed->msgType == MSG_TYPE_END) {
+						rebuildBlocks.erase(packId);// 从map中移除
+						callback->onRebuildedRead(tmpBlock);// 重组完成，转发
+						delete tmpBlock;// 清理环境
+					}
+				} catch (...) {
+					delete tmpBlock;// 清理环境
+				}
+			}
+		}
+
+	};
+	RebuildedBlockListener::RebuildedBlockListener() {
+		this->impl = new RebuildedBlockListener_impl(this);
+	};
+	void  RebuildedBlockListener::onRead(MemBlock* readed) { impl->onRead(readed); };
 }
