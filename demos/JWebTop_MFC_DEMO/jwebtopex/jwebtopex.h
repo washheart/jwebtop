@@ -5,8 +5,7 @@
 #include "common/fastipc/client.h"
 #include "common/util/StrUtil.h"
 #include "common/JWebTopMsg.h"
-#include "JWebTopConfigsEx.h"
-
+#include "JWebTop\config\JWebTopConfigs.h"
 #include <string>
 #include <map>
 #include <sstream>

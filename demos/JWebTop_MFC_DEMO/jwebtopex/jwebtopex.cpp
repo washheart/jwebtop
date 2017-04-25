@@ -106,7 +106,7 @@ wstring wrapAsTaskJSON(JWebTopConfigs* configs){
 	value->SetString(CefString("appendJs"), CefString(configs->appendJs));
 	value->SetString(CefString("name"), CefString(configs->name));
 	value->SetString(CefString("icon"), CefString(configs->icon));
-	value->SetString(CefString("errorUrl"), CefString(configs->errorUrl));
+	// value->SetString(CefString("errorUrl"), CefString(configs->errorUrl));
 	stringstream tmp("");
 	if (configs->parentWin != tmpcfgs.parentWin){
 		tmp << configs->parentWin;
