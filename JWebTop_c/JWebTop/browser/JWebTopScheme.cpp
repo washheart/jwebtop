@@ -5,6 +5,17 @@
 #include "common/tests/TestUtil.h"
 namespace jw {
 	namespace jb {
+		std::wstring GetMimeType(const std::wstring& url_without_query) {
+			std::wstring mime_type;
+			size_t sep = url_without_query.find_last_of(L".");
+			if (sep != std::wstring::npos) {
+				mime_type = CefGetMimeType(url_without_query.substr(sep + 1));
+				if (!mime_type.empty())
+					return mime_type;
+			}
+			return L"text/html";
+		}
+
 		// Implementation of the schema handler for client:// requests.
 		class ClientSchemeHandler : public CefResourceHandler {
 		public:
@@ -30,11 +41,11 @@ namespace jw {
 				writeLog("\n");
 #endif			
 				wstring path = CefString(&parts.path).ToWString();
-				if (path.length() <= 2)return false;                       // URL无效时，直接取消
+				if (path.length() <= 2)return false;                        // URL无效时，直接取消
 				path = path.substr(2);
 				if (_waccess(path.c_str(), 0) != 0)return false;			// 文件不存在时，直接取消
 				// 读取数据				
-				string url2 = w2s(url); mime = CefGetMimeType(&parts.path);	// 设置mime类型（）
+				mime = GetMimeType(path);	                                // 设置mime类型（）
 				stream_ = CefStreamReader::CreateForFile(path);				// 创建文件流
 				callback->Continue();										// 标记请求已接收/处理
 				return true;												// 返回true表示请求已处理
@@ -63,7 +74,7 @@ namespace jw {
 			}
 
 		private:
-			std::string mime;
+			std::wstring mime;
 			CefRefPtr<CefStreamReader> stream_;
 
 			IMPLEMENT_REFCOUNTING(ClientSchemeHandler);
