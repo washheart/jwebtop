@@ -20,7 +20,6 @@ namespace jw {
 		class ClientSchemeHandler : public CefResourceHandler {
 		public:
 			ClientSchemeHandler() {}
-
 			virtual bool ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)				OVERRIDE{
 				CEF_REQUIRE_IO_THREAD();
 				CefString url = request->GetURL();
@@ -63,6 +62,8 @@ namespace jw {
 			}
 
 				virtual bool ReadResponse(void* data_out, int bytes_to_read, int& bytes_read, CefRefPtr<CefCallback> callback)OVERRIDE{
+				// 定义一个函数，在初始化时尝试从dll加载此函数，如果存在那么用dll中的此函数，否则用默认实现，目的是实现加密
+				// 注意：如果文件的长度超过bytes_to_read，那么当前方法会被调用多次
 				CEF_REQUIRE_IO_THREAD();
 				bytes_read = 0;
 				int read = 0;
@@ -76,29 +77,51 @@ namespace jw {
 		private:
 			std::wstring mime;
 			CefRefPtr<CefStreamReader> stream_;
-
 			IMPLEMENT_REFCOUNTING(ClientSchemeHandler);
 		};
+
+		typedef	void* (__cdecl  *CreateFunType) ();                  // 定义一个简单的函数指针，目的是方便使用外部dll（dll=scheme_name.s.dll）进行数据的扩展
+		CreateFunType CreateFun;									 // 声明一个简单函数指针
+		void* DefaultCreateFun() {
+			CEF_REQUIRE_IO_THREAD();
+			return new ClientSchemeHandler();
+		}
 		// Implementation of the factory for for creating schema handlers.
 		class ClientSchemeHandlerFactory : public CefSchemeHandlerFactory {
 		public:
 			// Return a new scheme handler instance to handle the request.
 			virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request)OVERRIDE{
 				CEF_REQUIRE_IO_THREAD();
-				writeLog("scheme_name====");
-				writeLog(scheme_name.ToWString());
-				writeLog("\r\n");
-				return new ClientSchemeHandler();
+				if (!CreateFun) {
+					CreateFun = DefaultCreateFun;                   // 先给函数默认赋个值，因为下面的if判断比较多
+					wstring	schemedll = scheme_name.ToWString();
+					schemedll.append(L".s.dll");
+					if (_waccess(schemedll.c_str(), 0) != -1) {       // scheme对应的dll文件存在，尝试加载函数
+						HINSTANCE hinstLib;
+						BOOL fFreeResult;
+						hinstLib = LoadLibrary(schemedll.c_str());	// 尝试加载dll
+						if (hinstLib != NULL) {						// dll已加载，尝试加载指定函数
+							CreateFun = (CreateFunType)GetProcAddress(hinstLib, "CreateResourceHandler");
+							if (NULL == CreateFun) {
+								CreateFun = DefaultCreateFun;       // 函数加载失败后，需要对其重新赋值
+								fFreeResult = FreeLibrary(hinstLib);// 函数加载失败后，释放dll模块
+							}
+						}
+					}
+				}
+				void* r = (CreateFun)();
+				CefRefPtr<CefResourceHandler> r2((CefResourceHandler *)r);
+				return r2;
 			}
 			IMPLEMENT_REFCOUNTING(ClientSchemeHandlerFactory);
 		};
 
 		void RegisterSchemeHandlers() {
-			//CefRegisterSchemeHandlerFactory("native", "", new ClientSchemeHandlerFactory());// 无法替换默认的file:///
-			//CefRegisterSchemeHandlerFactory("file", "", new ClientSchemeHandlerFactory());  // 无法替换默认的file:///
+			//CefRegisterSchemeHandlerFactory("native", "", new ClientSchemeHandlerFactory()); // 无法替换默认的file:///
+			//CefRegisterSchemeHandlerFactory("file", "", new ClientSchemeHandlerFactory());   // 无法替换默认的file:///
 			//CefRegisterSchemeHandlerFactory("local", "", new ClientSchemeHandlerFactory());  // 无法替换默认的file:///
-			//CefRegisterSchemeHandlerFactory("", "", new ClientSchemeHandlerFactory()); // 所以自定义一个schema=jwebtop://
-			CefRegisterSchemeHandlerFactory("jwebtop", "", new ClientSchemeHandlerFactory()); // 所以自定义一个schema=jwebtop://
+			//CefRegisterSchemeHandlerFactory("", "", new ClientSchemeHandlerFactory());       // 无法替换默认的file:///
+			CefRegisterSchemeHandlerFactory("jwebtop", "", new ClientSchemeHandlerFactory());  // 所以自定义一个schema=jwebtop://
 			// 下面方式也可以
 			//CefRequestContext::GetGlobalContext()->RegisterSchemeHandlerFactory("jwebtop", "", new ClientSchemeHandlerFactory());
 		}
