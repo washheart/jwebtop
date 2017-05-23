@@ -50,12 +50,10 @@ void encfile(char *in_filename, char *out_file) {
 		printf("cannot open or create out-file.\n");
 		exit(1);/*如果不能建立加密后的文件,便退出*/
 	}
-	int c = 0;
 	register int ch;
 	for (ch = fgetc(fp1); ch != EOF; ch = fgetc(fp1)) {// 执行加密
 		ch += FLAG;// 加密算法：直接加上一个数值
 		fputc(ch, fp2); 
-		c++;
 	}
 	fclose(fp1);/*关闭源文件*/
 	fclose(fp2);/*关闭目标文件*/
