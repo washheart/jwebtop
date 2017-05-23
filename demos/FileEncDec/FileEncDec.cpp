@@ -18,8 +18,6 @@ int main(int argc, char *argv[])/*定义main()函数的命令行参数*/
 		return -1;
 	}
 	int option=argv[1][0]; /*功能选择*/
-	char in_filename[30];/*用户输入的要加密的文件名 或是 要解密的文件*/
-	char out_filename[30]; /*用户输入加密后保存的文件名 或是解密保存的文件名*/
 
 	switch (option) {
 	case '1': //加密      

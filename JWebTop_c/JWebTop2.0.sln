@@ -16,6 +16,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_CSharp_DLL", "JWebT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTop_MFC_DEMO", "..\demos\JWebTop_MFC_DEMO\JWebTop_MFC_DEMO.vcxproj", "{B7BB166E-50C9-4482-BAB6-B56541A068FF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileEncDec", "..\demos\FileEncDec\FileEncDec.vcxproj", "{BE099072-2EE3-46BC-8612-FD317901124B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JWebTopSchemaEncDemo", "..\demos\JWebTopSchemaEnc_Demo\JWebTopSchemaEncDemo.vcxproj", "{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -134,6 +138,36 @@ Global
 		{B7BB166E-50C9-4482-BAB6-B56541A068FF}.发布版本|Mixed Platforms.Build.0 = Release|Win32
 		{B7BB166E-50C9-4482-BAB6-B56541A068FF}.发布版本|Win32.ActiveCfg = Release|Win32
 		{B7BB166E-50C9-4482-BAB6-B56541A068FF}.发布版本|Win32.Build.0 = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Debug|Win32.Build.0 = Debug|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Release|Win32.ActiveCfg = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.Release|Win32.Build.0 = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.发布版本|Any CPU.ActiveCfg = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.发布版本|Mixed Platforms.ActiveCfg = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.发布版本|Mixed Platforms.Build.0 = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.发布版本|Win32.ActiveCfg = Release|Win32
+		{BE099072-2EE3-46BC-8612-FD317901124B}.发布版本|Win32.Build.0 = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Debug|Win32.Build.0 = Debug|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Release|Win32.ActiveCfg = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.Release|Win32.Build.0 = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.发布版本|Any CPU.ActiveCfg = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.发布版本|Mixed Platforms.ActiveCfg = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.发布版本|Mixed Platforms.Build.0 = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.发布版本|Win32.ActiveCfg = Release|Win32
+		{C6EC8E8D-B3B1-4A05-B82E-D088FE156495}.发布版本|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
