@@ -6,7 +6,7 @@
 
 HANDLE hFile;// 调试时用于输出日志文件
 DWORD filePos = 0;// 调试时用于输出日志文件
-LPTSTR LOG_FILE_NAME = L"jwebtop.log";
+LPTSTR LOG_FILE_NAME ;
 
 void setLogFileName(std::wstring logFileName){
 	LOG_FILE_NAME = LPTSTR(logFileName.c_str());
@@ -14,6 +14,10 @@ void setLogFileName(std::wstring logFileName){
 
 void checFile(){
 	if (hFile == NULL){
+		if (LOG_FILE_NAME == NULL) {
+			wstringstream wss; wss << L"jwebtop" <<  GetCurrentProcessId()<<".log";
+			LOG_FILE_NAME = LPTSTR(wss.str().c_str());
+		}
 		hFile = CreateFile(LOG_FILE_NAME, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
 	}
 }
