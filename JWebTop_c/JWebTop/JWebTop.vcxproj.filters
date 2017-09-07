@@ -28,6 +28,9 @@
     <Filter Include="common\ui\dlgs">
       <UniqueIdentifier>{f3ddc2ec-b80b-4f5d-b664-70edf456deaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sqlite">
+      <UniqueIdentifier>{f62debf8-fc4b-41b2-b522-27d6c57d4c47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JWebTop_main.cpp">
@@ -75,6 +78,12 @@
     <ClCompile Include="dllex\DLLEx_Browser.cpp">
       <Filter>jwebtop\dllex</Filter>
     </ClCompile>
+    <ClCompile Include="sqlite\sqlite3.c">
+      <Filter>sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="sqlite\ex_sqlite.cpp">
+      <Filter>sqlite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -118,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="dllex\DLLExState.h">
       <Filter>jwebtop\dllex</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite\sqlite3.h">
+      <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite\ex_sqlite.h">
+      <Filter>sqlite</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

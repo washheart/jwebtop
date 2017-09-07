@@ -7,6 +7,7 @@
 #include <iostream>  
 #include <fstream>  
 #include "JWebTop/browser/JWebTopScheme.h"
+#include "JWebTop/sqlite/ex_sqlite.h"
 
 namespace jw{
 	namespace js{
@@ -166,6 +167,23 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(jWebTop, "invokeRemote_CallBack", new JJH_InvokeRemote_CallBack());// 容易阻塞render进程，屏蔽
 	regist(jWebTop, "invokeRemote_NoWait", new JJH_InvokeRemote_NoWait());   
 	//regist(jWebTop, "testFunInJSON", new JJH_TestFunInJSON());
+
+
+	CefRefPtr<CefV8Value> db = object->CreateObject(accessor);
+	jWebTop->SetValue("db", db, V8_PROPERTY_ATTRIBUTE_NONE);// 把创建的对象附加到JWebTop根对象上
+	CefRefPtr<CefV8Value> dbType = object->CreateObject(accessor);
+	// db的数据类型
+	db->SetValue("type", dbType, V8_PROPERTY_ATTRIBUTE_NONE);// 把创建的对象附加到JWebTop.db根对象上
+	dbType->SetValue("SQLITE_INTEGER", CefV8Value::CreateInt(SQLITE_INTEGER), V8_PROPERTY_ATTRIBUTE_NONE);
+	dbType->SetValue("SQLITE_FLOAT", CefV8Value::CreateInt(SQLITE_FLOAT), V8_PROPERTY_ATTRIBUTE_NONE);
+	dbType->SetValue("SQLITE_BLOB", CefV8Value::CreateInt(SQLITE_BLOB), V8_PROPERTY_ATTRIBUTE_NONE);
+	dbType->SetValue("SQLITE_NULL", CefV8Value::CreateInt(SQLITE_NULL), V8_PROPERTY_ATTRIBUTE_NONE);
+	dbType->SetValue("SQLITE_TEXT", CefV8Value::CreateInt(SQLITE_TEXT), V8_PROPERTY_ATTRIBUTE_NONE);
+	// db的常用函数
+	regist(db, "open", new jw::db::JJH_db_open());
+	regist(db, "close", new jw::db::JJH_db_close());
+	regist(db, "exec", new jw::db::JJH_DB_exec());
+	regist(db, "query", new jw::db::JJH_DB_query());
 	
 	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//测试JS回调
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
