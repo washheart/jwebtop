@@ -14,11 +14,11 @@ namespace jw {
 		 * 用法：JWebTop.db.open({dbpath:"数据库路径，可以是绝对路径或相对于运行目录的相对路径"},[handler]);
 		 * 返回值：{id:打开的数据库句柄(null表示打开失败),msg:"打开失败时的字符串描述"}
 		 */
-		class JJH_db_open : public CefV8Handler {
+		class JJH_DB_open : public CefV8Handler {
 		public:
 			bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception);
 		private:
-			IMPLEMENT_REFCOUNTING(JJH_db_open);
+			IMPLEMENT_REFCOUNTING(JJH_DB_open);
 		};
 
 		/*
@@ -26,11 +26,11 @@ namespace jw {
 		 * 用法：JWebTop.db.close({db:数据库句柄},[handler]);
 		 * 返回值：{msg:"关闭出错的原因，或者null"}
 		 */
-		class JJH_db_close : public CefV8Handler {
+		class JJH_DB_close : public CefV8Handler {
 		public:
 			bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception);
 		private:
-			IMPLEMENT_REFCOUNTING(JJH_db_close);
+			IMPLEMENT_REFCOUNTING(JJH_DB_close);
 		};
 	
 		/*

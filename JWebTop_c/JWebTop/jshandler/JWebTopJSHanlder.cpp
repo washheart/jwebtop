@@ -180,8 +180,8 @@ void regist(CefRefPtr<CefBrowser> browser,
 	dbType->SetValue("SQLITE_NULL", CefV8Value::CreateInt(SQLITE_NULL), V8_PROPERTY_ATTRIBUTE_NONE);
 	dbType->SetValue("SQLITE_TEXT", CefV8Value::CreateInt(SQLITE_TEXT), V8_PROPERTY_ATTRIBUTE_NONE);
 	// db的常用函数
-	regist(db, "open", new jw::db::JJH_db_open());
-	regist(db, "close", new jw::db::JJH_db_close());
+	regist(db, "open", new jw::db::JJH_DB_open());
+	regist(db, "close", new jw::db::JJH_DB_close());
 	regist(db, "exec", new jw::db::JJH_DB_exec());
 	regist(db, "query", new jw::db::JJH_DB_query());
 	

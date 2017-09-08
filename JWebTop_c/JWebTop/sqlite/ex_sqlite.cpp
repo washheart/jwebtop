@@ -5,7 +5,7 @@
 namespace jw {
 	namespace db {
 
-		bool JJH_db_open::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		bool JJH_DB_open::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
 			if (arguments.size() < 1 || !arguments[0]->HasValue("dbpath")) {
 				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.open({dbpath:\"数据库路径，可以是绝对路径或相对于运行目录的相对路径\"});"), V8_PROPERTY_ATTRIBUTE_NONE);
@@ -32,7 +32,7 @@ namespace jw {
 			return true;
 		}
 
-		bool JJH_db_close::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		bool JJH_DB_close::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
 			if (arguments.size() < 1 || !arguments[0]->HasValue("db")) {
 				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.close({db:数据库句柄})"), V8_PROPERTY_ATTRIBUTE_NONE);
