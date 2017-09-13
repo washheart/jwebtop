@@ -114,7 +114,6 @@ namespace jw{
 			CefRefPtr<JWebTopApp> app(new JWebTopApp);// 创建用于监听的顶级程序，通过此app的OnContextInitialized创建浏览器实例
 
 			CefMainArgs main_args(GetModuleHandle(NULL));  // 提供CEF命令行参数
-			CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
 			// CEF applications have multiple sub-processes (render, plugin, GPU, etc)
 			// that share the same executable. This function checks the command-line and,
 			// if this is a sub-process, executes the appropriate logic.
@@ -130,6 +129,7 @@ namespace jw{
 #endif
 				return;	// 子进程在这里完成，并返回							
 			}
+			CefInitialize(main_args, settings, app.get(), sandbox_info);// 初始化cef
 			CefRunMessageLoop();// 运行CEF消息监听，直到CefQuitMessageLoop()方法被调用
 			closeJWebtopContext();
 		}
