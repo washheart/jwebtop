@@ -39,7 +39,9 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		MessageBox(NULL, L"无法启动浏览器进程（参数不对）！", L"消息", 0); return -1;
 	}
 	else{
-		jw::ctx::startJWebTopByFile(lpCmdLine);
+		std::wstring cfgFile(lpCmdLine);
+		jw::replace_allW(cfgFile, L"\"", L"");
+		jw::ctx::startJWebTopByFile(cfgFile);
 	}
 	return 0;
 }

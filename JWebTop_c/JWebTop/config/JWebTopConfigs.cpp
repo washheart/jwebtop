@@ -57,66 +57,66 @@ JWebTopConfigs * JWebTopConfigs::loadConfigs(std::wstring appDefFile){
 	configs->appDefFile = CefString(appDefFile);
 	configs->appPath = jw::os::file::GetFilePath(appDefFile);
 	TCHAR url[1000], appendJs[1000], name[100], iconPath[1000];
-	GetPrivateProfileString(L"BASE", L"url", NULL, url, 1000, appDefFile.data());
+	GetPrivateProfileString(L"BASE", L"url", NULL, url, 1000, path);
 	configs->url = CefString(url);                                                                // 需要打开的地址 
-	GetPrivateProfileString(L"BASE", L"appendJs", NULL, appendJs, 1000, appDefFile.data());
+	GetPrivateProfileString(L"BASE", L"appendJs", NULL, appendJs, 1000, path);
 	configs->appendJs = CefString(appendJs);                                                                // 需要附加的JS文件 
 	
-	GetPrivateProfileString(L"BASE", L"name", NULL, name, 100, appDefFile.data());
+	GetPrivateProfileString(L"BASE", L"name", NULL, name, 100, path);
 	configs->name = CefString(name);                                                              // 设置浏览器窗口名称 
-	GetPrivateProfileString(L"BASE", L"icon", NULL, iconPath, 1000, appDefFile.data());
+	GetPrivateProfileString(L"BASE", L"icon", NULL, iconPath, 1000, path);
 	configs->icon = CefString(iconPath);                                                          // 设置浏览器图标 
 	// 其实这里可以先通过获取字符串再转换为int的方式来判断
-	configs->w = GetPrivateProfileInt(L"BASE", L"width", -1, appDefFile.data());
-	configs->h = GetPrivateProfileInt(L"BASE", L"height", -1, appDefFile.data());
-	configs->x = GetPrivateProfileInt(L"BASE", L"x", -1, appDefFile.data());
-	configs->y = GetPrivateProfileInt(L"BASE", L"y", -1, appDefFile.data());
-	configs->enableDrag = 1 == GetPrivateProfileInt(L"BASE", L"enableDrag", 1, appDefFile.data());        // 默认可以通过页面进行拖动
-	configs->disableRefresh = 0 == GetPrivateProfileInt(L"BASE", L"disableRefresh", 0, appDefFile.data());// 默认禁止刷新
-	configs->enableDebug = 0 == GetPrivateProfileInt(L"BASE", L"disableDevelop", 1, appDefFile.data());   // 默认不可以调试
-	configs->enableResize = 1 == GetPrivateProfileInt(L"BASE", L"enableResize", 1, appDefFile.data());    // 默认可以改变大小
-	//disableTransparent = 1==GetPrivateProfileInt(L"BASE", L"disableTransparent", 0, appDefFile.data());
-	//hasBorder = 1==GetPrivateProfileInt(L"BASE", L"hasBorder", 0, appDefFile.data());
-	configs->max = GetPrivateProfileInt(L"BASE", L"max", 0, appDefFile.data());
-	configs->dwStyle = GetPrivateProfileInt(L"BASE", L"style", 0, appDefFile.data());
-	configs->dwExStyle = GetPrivateProfileInt(L"BASE", L"exStyle", 0, appDefFile.data());
+	configs->w = GetPrivateProfileInt(L"BASE", L"width", -1, path);
+	configs->h = GetPrivateProfileInt(L"BASE", L"height", -1, path);
+	configs->x = GetPrivateProfileInt(L"BASE", L"x", -1, path);
+	configs->y = GetPrivateProfileInt(L"BASE", L"y", -1, path);
+	configs->enableDrag = 1 == GetPrivateProfileInt(L"BASE", L"enableDrag", 1, path);        // 默认可以通过页面进行拖动
+	configs->disableRefresh = 0 == GetPrivateProfileInt(L"BASE", L"disableRefresh", 0, path);// 默认禁止刷新
+	configs->enableDebug = 0 == GetPrivateProfileInt(L"BASE", L"disableDevelop", 1, path);   // 默认不可以调试
+	configs->enableResize = 1 == GetPrivateProfileInt(L"BASE", L"enableResize", 1, path);    // 默认可以改变大小
+	//disableTransparent = 1==GetPrivateProfileInt(L"BASE", L"disableTransparent", 0, path);
+	//hasBorder = 1==GetPrivateProfileInt(L"BASE", L"hasBorder", 0, path);
+	configs->max = GetPrivateProfileInt(L"BASE", L"max", 0, path);
+	configs->dwStyle = GetPrivateProfileInt(L"BASE", L"style", 0, path);
+	configs->dwExStyle = GetPrivateProfileInt(L"BASE", L"exStyle", 0, path);
 
 	// cef
-	configs->single_process = GetPrivateProfileInt(L"CEF", L"single_process", configs->single_process, appDefFile.data());             // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
+	configs->single_process = GetPrivateProfileInt(L"CEF", L"single_process", configs->single_process, path);             // 是否使用单进程模式：JWebTop默认使用。CEF默认不使用单进程模式
 	TCHAR user_data_path_[1000];
-	GetPrivateProfileString(L"CEF", L"user_data_path", configs->user_data_path.ToWString().c_str(), user_data_path_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"user_data_path", configs->user_data_path.ToWString().c_str(), user_data_path_, 1000, path);
 	configs->user_data_path = CefString(user_data_path_); // 用户数据保存目录
 	TCHAR cache_path_[1000];
-	GetPrivateProfileString(L"CEF", L"cache_path", configs->cache_path.ToWString().c_str(), cache_path_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"cache_path", configs->cache_path.ToWString().c_str(), cache_path_, 1000, path);
 	configs->cache_path = CefString(cache_path_); // 浏览器缓存数据的保存目录
-	configs->persist_session_cookies = GetPrivateProfileInt(L"CEF", L"single_process", configs->persist_session_cookies, appDefFile.data());             // 是否需要持久化用户cookie数据（若要设置为true，需要同时指定cache_path）
+	configs->persist_session_cookies = GetPrivateProfileInt(L"CEF", L"single_process", configs->persist_session_cookies, path);             // 是否需要持久化用户cookie数据（若要设置为true，需要同时指定cache_path）
 	TCHAR user_agent_[1000];
-	GetPrivateProfileString(L"CEF", L"user_agent", configs->user_agent.ToWString().c_str(), user_agent_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"user_agent", configs->user_agent.ToWString().c_str(), user_agent_, 1000, path);
 	configs->user_agent = CefString(user_agent_);  // HTTP请求中的user_agent,CEF默认是Chorminum的user agent
 	TCHAR locale_[1000];
-	GetPrivateProfileString(L"CEF", L"locale", configs->locale.ToWString().c_str(), locale_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"locale", configs->locale.ToWString().c_str(), locale_, 1000, path);
 	configs->locale = CefString(locale_);  // CEF默认是en-US
-	configs->log_severity = GetPrivateProfileInt(L"CEF", L"log_severity", configs->log_severity, appDefFile.data());// 指定日志输出级别，默认不输出(disable),其他取值：verbose,info,warning,error,error-report
+	configs->log_severity = GetPrivateProfileInt(L"CEF", L"log_severity", configs->log_severity, path);// 指定日志输出级别，默认不输出(disable),其他取值：verbose,info,warning,error,error-report
 	TCHAR log_file_[1000];
-	GetPrivateProfileString(L"CEF", L"log_file_", configs->log_file.ToWString().c_str(), log_file_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"log_file_", configs->log_file.ToWString().c_str(), log_file_, 1000, path);
 	configs->log_file = CefString(log_file_);  // 指定调试时的日志文件，默认为"debug.log"。如果关闭日志，则不输出日志
 	TCHAR resources_dir_path_[1000];
-	GetPrivateProfileString(L"CEF", L"resources_dir_path", configs->resources_dir_path.ToWString().c_str(), resources_dir_path_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"resources_dir_path", configs->resources_dir_path.ToWString().c_str(), resources_dir_path_, 1000, path);
 	configs->resources_dir_path = CefString(resources_dir_path_);  // 指定cef资源文件（ cef.pak、devtools_resources.pak）的目录，默认从程序运行目录取
 	TCHAR locales_dir_path_[1000];
-	GetPrivateProfileString(L"CEF", L"locales_dir_path", configs->locales_dir_path.ToWString().c_str(), locales_dir_path_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"locales_dir_path", configs->locales_dir_path.ToWString().c_str(), locales_dir_path_, 1000, path);
 	configs->locales_dir_path = CefString(locales_dir_path_);// 指定cef本地化资源(locales)目录，默认去程序运行目录下的locales目录
-	configs->ignore_certificate_errors = GetPrivateProfileInt(L"CEF", L"ignore_certificate_errors", configs->ignore_certificate_errors, appDefFile.data());             // 是否忽略SSL证书错误
-	configs->remote_debugging_port = GetPrivateProfileInt(L"CEF", L"remote_debugging_port", configs->remote_debugging_port, appDefFile.data());                 // 远程调试端口，取值范围[1024-65535]
+	configs->ignore_certificate_errors = GetPrivateProfileInt(L"CEF", L"ignore_certificate_errors", configs->ignore_certificate_errors, path);             // 是否忽略SSL证书错误
+	configs->remote_debugging_port = GetPrivateProfileInt(L"CEF", L"remote_debugging_port", configs->remote_debugging_port, path);                 // 远程调试端口，取值范围[1024-65535]
 	
 	TCHAR proxyServer_[1000];
-	GetPrivateProfileString(L"CEF", L"proxyServer", configs->proxyServer.ToWString().c_str(), proxyServer_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"proxyServer", configs->proxyServer.ToWString().c_str(), proxyServer_, 1000, path);
 	configs->proxyServer = CefString(proxyServer_);									// 设置代理服务器地址。设置一个http代理服务器：  设置多个代理服务器：--proxy-server="https=proxy1:80;http=socks4://baz:1080"
 	TCHAR proxyAuthUser_[1000];
-	GetPrivateProfileString(L"CEF", L"proxyAuthUser", configs->proxyAuthUser.ToWString().c_str(), proxyAuthUser_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"proxyAuthUser", configs->proxyAuthUser.ToWString().c_str(), proxyAuthUser_, 1000, path);
 	configs->proxyAuthUser = CefString(proxyAuthUser_);								// 登录代理服务器时需要的用户名（注意：不管proxyServer设置了多少代理服务器，这里暂时值支持一组用户名和密码）
 	TCHAR proxyAuthPwd_[1000];
-	GetPrivateProfileString(L"CEF", L"proxyAuthPwd", configs->proxyAuthPwd.ToWString().c_str(), proxyAuthPwd_, 1000, appDefFile.data());
+	GetPrivateProfileString(L"CEF", L"proxyAuthPwd", configs->proxyAuthPwd.ToWString().c_str(), proxyAuthPwd_, 1000, path);
 	configs->proxyAuthPwd = CefString(proxyAuthPwd_);									// 登录代理服务器时需要的密码
 
 	return configs;
