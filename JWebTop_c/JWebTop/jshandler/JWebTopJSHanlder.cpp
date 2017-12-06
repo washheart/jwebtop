@@ -183,7 +183,9 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(db, "open", new jw::db::JJH_DB_open());
 	regist(db, "close", new jw::db::JJH_DB_close());
 	regist(db, "exec", new jw::db::JJH_DB_exec());
+	regist(db, "queryCallback", new jw::db::JJH_DB_queryCallbcak());
 	regist(db, "query", new jw::db::JJH_DB_query());
+	regist(db, "batch", new jw::db::JJH_DB_batch());
 	
 	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//测试JS回调
 	// 单进程模式下，才可以根据HWND直接获取BrowerWindowInfo
