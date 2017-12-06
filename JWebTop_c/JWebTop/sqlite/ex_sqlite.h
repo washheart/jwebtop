@@ -44,58 +44,13 @@ namespace jw {
 		private:
 			IMPLEMENT_REFCOUNTING(JJH_DB_exec);
 		};
-
-	   /*
-		* 用途：执行指定的sql，并以callback方式把结果返回到JS端
-		* 用法：JWebTop.db.query({
-		*         db:(必填)数据库句柄,
-		*		  sql:"(必填)待执行的SQL语句，可以有?等参数"
-		*		  params:[[JWebTop.db.type.SQLITE_TEXT,"params参数必须是二维数组，按顺序设置到sql的每个?上，按类型进行绑定"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]],
-		*		  names: printColumnNames(colNameArray){}
-		*		  values:printValues(rowNumber,colNumber,value){}
-		*		);
-		* 返回值：{msg:"执行SQL出错的原因，或者null"}
-		*/
-		class JJH_DB_queryCallbcak : public CefV8Handler {
-		public:
-			bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception);
-		private:
-			typedef CefRefPtr<CefV8Value>(JJH_DB_queryCallbcak::* outfun)(CefV8ValueList args);// 定义一个函数指针，用户输出数据库的某列数据到js
-
+		class SQLiteQueryBase : public virtual CefV8Handler {
+		protected:
+			typedef CefRefPtr<CefV8Value>(SQLiteQueryBase::* outfun)();// 定义一个函数指针，用户输出数据库的某列数据到js
+			int n_columns = 0;                         // 总行数
 			int row = 0, col = 0;                      // 记录结果集的行数、列数
-			CefRefPtr<CefV8Value> jsObject;            // JS执行环境
-			CefRefPtr<CefV8Value> jsPrintQueryValues;  // 回调的js函数 
 			outfun *colFuns;                           // 结果集每列的数据读取函数
 			sqlite3_stmt *pStmt;                       // 查询后的结果集
-			inline bool outputOneRowCol(CefRefPtr<CefV8Value>(JJH_DB_queryCallbcak::* outfun)(CefV8ValueList));
-			inline CefRefPtr<CefV8Value> intOutFun(CefV8ValueList args) {
-				return CefV8Value::CreateInt(sqlite3_column_int(pStmt, col));
-			}
-			inline CefRefPtr<CefV8Value> doubleOutFun(CefV8ValueList args) {
-				return (CefV8Value::CreateDouble(sqlite3_column_double(pStmt, col)));
-			}
-			inline CefRefPtr<CefV8Value> txtOutFun(CefV8ValueList args) {
-				 const unsigned char *  txt=sqlite3_column_text(pStmt, col);
-				 if (txt) {
-					 //string str = ( char *)txt;
-					 return CefV8Value::CreateString((char *)txt);
-				 }
-				 return CefV8Value::CreateNull();
-			}
-			IMPLEMENT_REFCOUNTING(JJH_DB_queryCallbcak);
-		};
-	
-		class JJH_DB_query : public CefV8Handler {
-		public:
-			bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception);
-		private:
-			typedef CefRefPtr<CefV8Value>(JJH_DB_query::* outfun)();// 定义一个函数指针，用户输出数据库的某列数据到js
-
-			int row = 0, col = 0;                      // 记录结果集的行数、列数
-
-			outfun *colFuns;                           // 结果集每列的数据读取函数
-			sqlite3_stmt *pStmt;                       // 查询后的结果集
-			//inline bool outputOneRowCol(CefRefPtr<CefV8Value>(JJH_DB_query::* outfun)(), CefRefPtr<CefV8Value> arr);
 			inline CefRefPtr<CefV8Value> intOutFun() {
 				return CefV8Value::CreateInt(sqlite3_column_int(pStmt, col));
 			}
@@ -110,9 +65,57 @@ namespace jw {
 				}
 				return CefV8Value::CreateNull();
 			}
-			IMPLEMENT_REFCOUNTING(JJH_DB_query);
+			// 各基类实现，进行传入参数的基本验证
+			virtual bool checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) = 0;
+			// 查询已成功执行，此时可以处理结果集名称等任务
+			virtual void onSQLExecuted(const CefRefPtr<CefV8Value>  retval, const CefRefPtr<CefV8Value> columnNames) = 0;
+			// 开始一行新数据的处理
+			virtual void onRowStart() = 0;
+			// 处理行数据中的某列
+			virtual void onColumnValue() = 0;
+		public:
+			bool Execute(const CefString& name,
+				CefRefPtr<CefV8Value> object,
+				const CefV8ValueList& arguments,
+				CefRefPtr<CefV8Value>& retval,
+				CefString& exception) ;
 		};
 
+		class JJH_DB_queryDataSet : public virtual SQLiteQueryBase {
+		protected:
+			 bool checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval);
+			 void onSQLExecuted(const CefRefPtr<CefV8Value>  retval, const CefRefPtr<CefV8Value> columnNames);
+			 void onRowStart();
+			 void onColumnValue();
+		private:
+			CefRefPtr<CefV8Value>  dataset, curRowArr;	
+			IMPLEMENT_REFCOUNTING(JJH_DB_queryDataSet);
+		};
+	   
+	   /*
+		* 用途：执行指定的sql，并以callback方式把结果返回到JS端
+		* 用法：JWebTop.db.query({
+		*         db:(必填)数据库句柄,
+		*		  sql:"(必填)待执行的SQL语句，可以有?等参数"
+		*		  params:[[JWebTop.db.type.SQLITE_TEXT,"params参数必须是二维数组，按顺序设置到sql的每个?上，按类型进行绑定"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]],
+		*		  names: printColumnNames(colNameArray){}
+		*		  values:printValues(rowNumber,colNumber,value){}
+		*		);
+		* 返回值：{msg:"执行SQL出错的原因，或者null"}
+		*/
+		class JJH_DB_queryCallbcak : public virtual SQLiteQueryBase {
+		protected:
+			bool checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval);
+			void onSQLExecuted(const CefRefPtr<CefV8Value>  retval, const CefRefPtr<CefV8Value> columnNames);
+			void onRowStart();
+			void onColumnValue();
+		private:
+			CefRefPtr<CefV8Value> jsObject;            // JS执行环境
+			CefRefPtr<CefV8Value> jsColNamesFun;       // 回调的js函数
+			CefRefPtr<CefV8Value> jsPrintQueryValues;  // 回调的js函数 
+			IMPLEMENT_REFCOUNTING(JJH_DB_queryCallbcak);
+		};
+	
 		/*
 		* 用途：执行指定的sql，并以callback方式把结果返回到JS端
 		* 用法：JWebTop.db.batch({

@@ -184,7 +184,7 @@ void regist(CefRefPtr<CefBrowser> browser,
 	regist(db, "close", new jw::db::JJH_DB_close());
 	regist(db, "exec", new jw::db::JJH_DB_exec());
 	regist(db, "queryCallback", new jw::db::JJH_DB_queryCallbcak());
-	regist(db, "query", new jw::db::JJH_DB_query());
+	regist(db, "queryDataSet", new jw::db::JJH_DB_queryDataSet());
 	regist(db, "batch", new jw::db::JJH_DB_batch());
 	
 	//regist(jWebTop, "invokeReflect", new JJH_invokeReflect());//²âÊÔJS»Øµ÷

@@ -55,7 +55,7 @@ namespace jw {
 		}
 
 		// 获取传入参数中的sql，获取成功函数返回true
-		inline CefRefPtr<CefV8Value>   getParam_sql(const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) {
+		inline CefRefPtr<CefV8Value> getParam_sql(const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) {
 			CefRefPtr<CefV8Value>  sql = arguments[0]->GetValue("sql");
 			if (!sql->IsString()) {// 因为sql参数是必须的，之前已经检测过是否存在，所以这里不进行null检查
 				retval->SetValue("msg", CefV8Value::CreateString(L"sql参数必须是字符串"), V8_PROPERTY_ATTRIBUTE_NONE);
@@ -118,18 +118,14 @@ namespace jw {
 			return true;
 		}
 
-		// 执行查询，并通过回调函数返回结果集
-		bool JJH_DB_queryCallbcak::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
+		bool SQLiteQueryBase::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
-			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.queryCallbcak({db:数据库句柄,sql:\"待执行的SQL语句，可以有?等参数\",params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',names: printColumnNames(colNameArray){/*（可选）用于接收结果集列名数组的函数*/},values:printValues(rowNumber,colNumber,value){/*（可选）用于接收结果集的函数*/}  })"), V8_PROPERTY_ATTRIBUTE_NONE);
-				return true;
-			}
+			// 进行数据库操作之前检查各项参数是否正确
+			if (!checkParams(object, arguments, retval))return true;
 			CefRefPtr<CefV8Value>  db = getParam_db(arguments, retval);
 			if (db == nullptr)return true;
 			CefRefPtr<CefV8Value>  sql = getParam_sql(arguments, retval);
-			if (sql == nullptr)return true;
-
+			if (sql == nullptr)return true;		
 			CefRefPtr<CefV8Value>  params;
 			if (arguments[0]->HasValue("params")) {
 				params = arguments[0]->GetValue("params");
@@ -138,6 +134,7 @@ namespace jw {
 					return true;
 				}
 			}
+			// 开始进行数据操作
 			sqlite3 * pDb = (sqlite3 *)db->GetIntValue();
 			sqlite3_stmt *pStmt;
 			int rc = sqlite3_prepare_v2(pDb, sql->GetStringValue().ToString().c_str(), -1, &pStmt, NULL);
@@ -158,139 +155,9 @@ namespace jw {
 				sqlite3_finalize(pStmt);
 				return true;
 			}
-			// 函数回调：输出查询元信息（行数、列数、列名）
-			CefRefPtr<CefV8Value> jsColNamesFun;
-			if (arguments[0]->HasValue("names")) {
-				jsColNamesFun = arguments[0]->GetValue("names");
-				if (!jsColNamesFun->IsFunction()) {
-					retval->SetValue("msg", CefV8Value::CreateString(L"names参数必须是function printColumnNames(colNameArray)签名的JS函数"), V8_PROPERTY_ATTRIBUTE_NONE);
-					sqlite3_finalize(pStmt);
-					return true;
-				}
-				this->jsObject = object;
-			}
-			// 函数回调
-			if (arguments[0]->HasValue("values")) {
-				this->jsPrintQueryValues = arguments[0]->GetValue("values");
-				if (!this->jsPrintQueryValues->IsFunction()) {
-					retval->SetValue("msg", CefV8Value::CreateString(L"values参数必须是function printValues(rowNumber,colNumber,value)签名的JS函数"), V8_PROPERTY_ATTRIBUTE_NONE);
-					sqlite3_finalize(pStmt);
-					return true;
-				}
-				this->jsObject = object;
-			}
-			if (jsColNamesFun == NULL&&this->jsPrintQueryValues == NULL) {// 如果没有回调函数，则认为不需要返回结果，可以直接把函数结束了
-				sqlite3_finalize(pStmt);
-				return true;
-			}
 			//获取列数目
-			int n_columns = sqlite3_column_count(pStmt);
-			this->row = 0;
-			this->col = 0;
-			// 先取一行数据，把类型建立起来，避免后面每次都去判断类型，因为一个sql中的所有类型都是一致的			
-			this->colFuns = new outfun[n_columns];
-			this->pStmt = pStmt;
-			if (ret == SQLITE_ROW) {
-				if (jsColNamesFun != NULL) {
-					CefV8ValueList args;
-					CefRefPtr<CefV8Value> arr = CefV8Value::CreateArray(n_columns);
-					for (col = 0; col < n_columns; col++) {				;
-						arr->SetValue(col, CefV8Value::CreateString(sqlite3_column_name(pStmt, col)));
-					}
-					args.push_back(arr);
-					jsColNamesFun->ExecuteFunction(this->jsObject, args);
-				}
-				// 处理每一列
-				for (col = 0; col < n_columns; col++) {
-					switch (sqlite3_column_type(pStmt, col)) {
-					case SQLITE_INTEGER:						/*处理整型*/
-						this->colFuns[col] = &JJH_DB_queryCallbcak::intOutFun;
-						break;
-					case SQLITE_FLOAT:							/*处理浮点数*/
-						this->colFuns[col] = &JJH_DB_queryCallbcak::doubleOutFun;
-						break;
-					case SQLITE_TEXT:							/*处理字符串*/
-						this->colFuns[col] = &JJH_DB_queryCallbcak::txtOutFun;
-						break;
-						//case SQLITE_BLOB:							/*处理二进制*/	sqlite3_column_blob(stmt, col));	break;
-						//case SQLITE_NULL:							/*处理空*/				break;
-						//default:break;
-					}
-					outputOneRowCol(this->colFuns[col]);
-				}
-				this->row++;
-			}
-			do {
-				ret = sqlite3_step(pStmt);
-				if (ret == SQLITE_ROW) {// 还有需要处理的结果数据				
-					for (col = 0; col < n_columns; col++) {				//处理每一列		
-						outputOneRowCol(this->colFuns[col]);
-					}
-					this->row++;
-				} else if (ret == SQLITE_DONE) //结束
-				{
-					break;
-				}
-			} while (true);
-			delete[]colFuns;
-			sqlite3_finalize(pStmt);
-			this->pStmt = NULL;
-			return true;
-		}
-		inline bool JJH_DB_queryCallbcak::outputOneRowCol(CefRefPtr<CefV8Value>(JJH_DB_queryCallbcak::* outfun)(CefV8ValueList)) {
-			CefV8ValueList args;
-			args.push_back(CefV8Value::CreateInt(this->row));
-			args.push_back(CefV8Value::CreateInt(col));
-			args.push_back((this->*outfun)(args));
-			this->jsPrintQueryValues->ExecuteFunction(this->jsObject, args);
-			return true;
-		}
-
-		// 执行查询，并通过回调函数返回结果集
-		bool JJH_DB_query::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-			retval = CefV8Value::CreateObject(NULL);
-			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exex({db:数据库句柄,sql:\"待执行的SQL语句，可以有?等参数\",params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',names: printColumnNames(colNameArray){/*（可选）用于接收结果集列名数组的函数*/},values:printValues(rowNumber,colNumber,value){/*（可选）用于接收结果集的函数*/}  })"), V8_PROPERTY_ATTRIBUTE_NONE);
-				return true;
-			}
-			CefRefPtr<CefV8Value>  db = getParam_db(arguments, retval);
-			if (db == nullptr)return true;
-			CefRefPtr<CefV8Value>  sql = getParam_sql(arguments, retval);
-			if (sql == nullptr)return true;
-
-			CefRefPtr<CefV8Value>  params;
-			if (arguments[0]->HasValue("params")) {
-				params = arguments[0]->GetValue("params");
-				if (!params->IsArray()) {
-					retval->SetValue("msg", CefV8Value::CreateString(L"params参数必须是二维数组，比如：[[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234],[JWebTop.db.type.SQLITE_TEXT,\"string\"]]"), V8_PROPERTY_ATTRIBUTE_NONE);
-					return true;
-				}
-			}
-			sqlite3 * pDb = (sqlite3 *)db->GetIntValue();
-			sqlite3_stmt *pStmt;
-			int rc = sqlite3_prepare_v2(pDb, sql->GetStringValue().ToString().c_str(), -1, &pStmt, NULL);
-			if (rc != SQLITE_OK) {
-				wstringstream ss; ss << L"打开数据库失败：" << sqlite3_errmsg(pDb);
-				retval->SetValue("msg", CefV8Value::CreateString(ss.str()), V8_PROPERTY_ATTRIBUTE_NONE);
-				sqlite3_finalize(pStmt);
-				return true;
-			}
-			if (params != NULL) {// 绑定参数
-				if (setQueryParams(params, retval, pStmt)) {
-					sqlite3_finalize(pStmt);
-					return true;
-				}
-			}
-			int ret = sqlite3_step(pStmt);
-			if (ret == SQLITE_DONE) {// 对于DDL和DML语句而言，sqlite3_step执行正确的返回值只有SQLITE_DONE
-				sqlite3_finalize(pStmt);
-				return true;
-			}
-			// 函数回调：输出查询元信息（行数、列数、列名）
-			// 函数回调
-			//获取列数目
-			int n_columns = sqlite3_column_count(pStmt);
-			this->row = 0;
+			this->n_columns = sqlite3_column_count(pStmt);
+			this->row = -1;
 			this->col = 0;
 			// 先取一行数据，把类型建立起来，避免后面每次都去判断类型，因为一个sql中的所有类型都是一致的			
 			this->colFuns = new outfun[n_columns];
@@ -300,43 +167,37 @@ namespace jw {
 			for (col = 0; col < n_columns; col++) {
 				columnNames->SetValue(col, CefV8Value::CreateString(sqlite3_column_name(pStmt, col)));
 			}
-			retval->SetValue("columnNames", columnNames, V8_PROPERTY_ATTRIBUTE_NONE);
+			onSQLExecuted(retval, columnNames);
 
 			// 处理结果集
-			CefRefPtr<CefV8Value> dataset = CefV8Value::CreateArray(n_columns);
-			retval->SetValue("dataset", dataset, V8_PROPERTY_ATTRIBUTE_NONE);
 			if (ret == SQLITE_ROW) {
-				CefRefPtr<CefV8Value> arr = CefV8Value::CreateArray(n_columns);
+				onRowStart();
 				// 处理每一列，为没列设置一个读取函数
 				for (col = 0; col < n_columns; col++) {
 					switch (sqlite3_column_type(pStmt, col)) {
 					case SQLITE_INTEGER:						/*处理整型*/
-						this->colFuns[col] = &JJH_DB_query::intOutFun;
+						this->colFuns[col] = &SQLiteQueryBase::intOutFun;
 						break;
 					case SQLITE_FLOAT:							/*处理浮点数*/
-						this->colFuns[col] = &JJH_DB_query::doubleOutFun;
+						this->colFuns[col] = &SQLiteQueryBase::doubleOutFun;
 						break;
 					case SQLITE_TEXT:							/*处理字符串*/
-						this->colFuns[col] = &JJH_DB_query::txtOutFun;
+						this->colFuns[col] = &SQLiteQueryBase::txtOutFun;
 						break;
 						//case SQLITE_BLOB:							/*处理二进制*/	sqlite3_column_blob(stmt, col));	break;
 						//case SQLITE_NULL:							/*处理空*/				break;
 						//default:break;
 					}
-					//outputOneRowCol(this->colFuns[col],arr);
-					arr->SetValue(this->col, (this->*colFuns[col])());
+					onColumnValue();
 				}
-				dataset->SetValue(this->row++, arr);
 			}
 			do {
 				ret = sqlite3_step(pStmt);
-				if (ret == SQLITE_ROW) {// 还有需要处理的结果数据	
-					CefRefPtr<CefV8Value> arr = CefV8Value::CreateArray(n_columns);
+				if (ret == SQLITE_ROW) {// 还有需要处理的结果数据
+					onRowStart();
 					for (col = 0; col < n_columns; col++) {				//处理每一列		
-						//outputOneRowCol(this->colFuns[col],arr);
-						arr->SetValue(this->col, (this->*colFuns[col])());
+						onColumnValue();
 					}
-					dataset->SetValue(this->row++, arr);
 				} else if (ret == SQLITE_DONE) //结束
 				{
 					break;
@@ -347,10 +208,73 @@ namespace jw {
 			this->pStmt = NULL;
 			return true;
 		}
-		//inline bool JJH_DB_query::outputOneRowCol(CefRefPtr<CefV8Value>(JJH_DB_query::* outfun)(), CefRefPtr<CefV8Value> arr) {
-		//	arr->SetValue(this->col, (this->*outfun)());
-		//	return true;
-		//}
+		/*------------------------------query callback---------------------------*/
+		bool JJH_DB_queryCallbcak::checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) {
+			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")
+				|| !arguments[0]->HasValue("names") || !arguments[0]->HasValue("values")) {
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exex({" 
+					L"db:数据库句柄,"
+					L"sql:\"待执行的SQL语句，可以有?等参数\","
+					L"params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',"
+					L"names: printColumnNames(colNameArray){/* 用于接收结果集列名数组的函数 */},"
+					L"values:printValues(rowNumber,colNumber,value){/* 用于接收结果集的函数 */}  "
+					L"})"), V8_PROPERTY_ATTRIBUTE_NONE);
+				return false;
+			}
+			this->jsObject = object;// JS执行环境
+			// 函数回调：输出查询元信息			
+			this->jsColNamesFun = arguments[0]->GetValue("names");
+			if (!this->jsColNamesFun->IsFunction()) {
+				retval->SetValue("msg", CefV8Value::CreateString(L"names参数必须是function printColumnNames(colNameArray)签名的JS函数"), V8_PROPERTY_ATTRIBUTE_NONE);
+				sqlite3_finalize(pStmt);
+				return false;
+			}
+			// 函数回调：用于输出结果集
+			this->jsPrintQueryValues = arguments[0]->GetValue("values");
+			if (!this->jsPrintQueryValues->IsFunction()) {
+				retval->SetValue("msg", CefV8Value::CreateString(L"values参数必须是function printValues(rowNumber,colNumber,value)签名的JS函数"), V8_PROPERTY_ATTRIBUTE_NONE);
+				sqlite3_finalize(pStmt);
+				return false;
+			}
+			return true;
+		};
+		void JJH_DB_queryCallbcak::onSQLExecuted(const CefRefPtr<CefV8Value>  retval, const CefRefPtr<CefV8Value> columnNames) {
+			CefV8ValueList args;
+			args.push_back(columnNames);
+			jsColNamesFun->ExecuteFunction(this->jsObject, args);
+		}
+		void JJH_DB_queryCallbcak::onRowStart() {
+			this->row++;
+		}
+		void JJH_DB_queryCallbcak::onColumnValue() {
+			CefV8ValueList args;
+			args.push_back(CefV8Value::CreateInt(this->row));
+			args.push_back(CefV8Value::CreateInt(col));
+			args.push_back((this->*colFuns[this->col])());
+			this->jsPrintQueryValues->ExecuteFunction(this->jsObject, args);
+		}
+
+		/*------------------------------query dataset---------------------------*/
+		bool JJH_DB_queryDataSet::checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) {
+			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")) {
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exex({db:数据库句柄,sql:\"待执行的SQL语句，可以有?等参数\",params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',names: printColumnNames(colNameArray){/*（可选）用于接收结果集列名数组的函数*/},values:printValues(rowNumber,colNumber,value){/*（可选）用于接收结果集的函数*/}  })"), V8_PROPERTY_ATTRIBUTE_NONE);
+				return false;
+			}
+			return true;
+		};
+		void JJH_DB_queryDataSet::onSQLExecuted(const CefRefPtr<CefV8Value>  retval, const CefRefPtr<CefV8Value> columnNames) {
+			retval->SetValue("columnNames", columnNames, V8_PROPERTY_ATTRIBUTE_NONE);
+			this->dataset = CefV8Value::CreateArray(this->n_columns);
+			retval->SetValue("dataset", dataset, V8_PROPERTY_ATTRIBUTE_NONE);
+		}
+		void JJH_DB_queryDataSet::onRowStart() {
+			this->curRowArr = CefV8Value::CreateArray(this->n_columns);
+			this->row++;
+			this->dataset->SetValue(this->row, this->curRowArr);
+		}
+		void JJH_DB_queryDataSet::onColumnValue() {
+			this->curRowArr->SetValue(this->col, (this->*colFuns[this->col])());
+		}
 
 		// 批量执行SQL语句，不返回任何结果集
 		bool JJH_DB_batch::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
