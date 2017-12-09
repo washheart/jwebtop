@@ -8,7 +8,8 @@ namespace jw {
 		bool JJH_DB_open::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
 			if (arguments.size() < 1 || !arguments[0]->HasValue("dbpath")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.open({dbpath:\"数据库路径，可以是绝对路径或相对于运行目录的相对路径\"});"), V8_PROPERTY_ATTRIBUTE_NONE);
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.open({dbpath:\"数据库路径，可以是绝对路径或相对于运行目录的相对路径\"});"
+					L"\r\n返回值：{msg:\"出错时返回错误提示，否则为{}对象\"}"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return true;
 			}
 			CefRefPtr<CefV8Value>  dbpath = arguments[0]->GetValue("dbpath");
@@ -45,7 +46,8 @@ namespace jw {
 		bool JJH_DB_close::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
 			if (arguments.size() < 1 || !arguments[0]->HasValue("db")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.close({db:数据库句柄})"), V8_PROPERTY_ATTRIBUTE_NONE);
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.close({db:数据库句柄})"
+					L"\r\n返回值：{msg:\"出错时返回错误提示，否则为{}对象\"}"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return true;
 			}
 			CefRefPtr<CefV8Value>  db = getParam_db(arguments, retval);
@@ -69,7 +71,8 @@ namespace jw {
 		bool JJH_DB_exec::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
 			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exec({db:数据库句柄,sql:\"待执行的SQL\"})"), V8_PROPERTY_ATTRIBUTE_NONE);
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exec({db:数据库句柄,sql:\"待执行的SQL\"})"
+					L"\r\n返回值：{msg:\"出错时返回错误提示，否则为{}对象\"}"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return true;
 			}
 			CefRefPtr<CefV8Value>  db=getParam_db(arguments, retval);
@@ -126,8 +129,8 @@ namespace jw {
 			if (db == nullptr)return true;
 			CefRefPtr<CefV8Value>  sql = getParam_sql(arguments, retval);
 			if (sql == nullptr)return true;		
-			CefRefPtr<CefV8Value>  params;
-			if (arguments[0]->HasValue("params")) {
+			CefRefPtr<CefV8Value>  params = arguments[0]->GetValue("params");
+			if (params != NULL && !params->IsNull()) {
 				params = arguments[0]->GetValue("params");
 				if (!params->IsArray()) {
 					retval->SetValue("msg", CefV8Value::CreateString(L"params参数必须是二维数组，比如：[[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234],[JWebTop.db.type.SQLITE_TEXT,\"string\"]]"), V8_PROPERTY_ATTRIBUTE_NONE);
@@ -139,20 +142,23 @@ namespace jw {
 			sqlite3_stmt *pStmt;
 			int rc = sqlite3_prepare_v2(pDb, sql->GetStringValue().ToString().c_str(), -1, &pStmt, NULL);
 			if (rc != SQLITE_OK) {
-				wstringstream ss; ss << L"打开数据库失败：" << sqlite3_errmsg(pDb);
+				wstringstream ss; ss << L"打开数据库失败：" << CefString(sqlite3_errmsg(pDb)).ToWString();
 				retval->SetValue("msg", CefV8Value::CreateString(ss.str()), V8_PROPERTY_ATTRIBUTE_NONE);
 				sqlite3_finalize(pStmt);
 				return true;
 			}
-			if (params != NULL) {// 绑定参数
-				if (setQueryParams(params, retval, pStmt)) {
+			if (params != NULL && !params->IsNull()) {// 绑定参数
+				if (!setQueryParams(params, retval, pStmt)) {
 					sqlite3_finalize(pStmt);
 					return true;
 				}
 			}
 			int ret = sqlite3_step(pStmt);
-			if (ret == SQLITE_DONE) {// 对于DDL和DML语句而言，sqlite3_step执行正确的返回值只有SQLITE_DONE
+			if (ret != SQLITE_ROW) {// 对于DDL和DML语句而言，sqlite3_step执行正确的返回值只有SQLITE_DONE
+				wstringstream ss; ss << L"执行【" << sql->GetStringValue().ToWString() << "】失败：" << CefString(sqlite3_errmsg(pDb)).ToWString();
+				retval->SetValue("msg", CefV8Value::CreateString(ss.str()), V8_PROPERTY_ATTRIBUTE_NONE);
 				sqlite3_finalize(pStmt);
+				this->pStmt = NULL;
 				return true;
 			}
 			//获取列数目
@@ -212,12 +218,13 @@ namespace jw {
 		bool JJH_DB_queryCallbcak::checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) {
 			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")
 				|| !arguments[0]->HasValue("names") || !arguments[0]->HasValue("values")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exex({" 
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.queryCallbcak({" 
 					L"db:数据库句柄,"
 					L"sql:\"待执行的SQL语句，可以有?等参数\","
 					L"params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',"
 					L"names: printColumnNames(colNameArray){/* 用于接收结果集列名数组的函数 */},"
 					L"values:printValues(rowNumber,colNumber,value){/* 用于接收结果集的函数 */}  "
+					L"\r\n返回值：{msg:\"出错时返回错误提示，否则为{}对象\"}"
 					L"})"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return false;
 			}
@@ -257,7 +264,12 @@ namespace jw {
 		/*------------------------------query dataset---------------------------*/
 		bool JJH_DB_queryDataSet::checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval) {
 			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.exex({db:数据库句柄,sql:\"待执行的SQL语句，可以有?等参数\",params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',names: printColumnNames(colNameArray){/*（可选）用于接收结果集列名数组的函数*/},values:printValues(rowNumber,colNumber,value){/*（可选）用于接收结果集的函数*/}  })"), V8_PROPERTY_ATTRIBUTE_NONE);
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.queryDataSet({"
+					L"db:数据库句柄,"
+					L"sql:\"待执行的SQL语句，可以有?等参数\","
+					L"params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',"
+					L"\r\n返回值：{msg:\"出错时返回错误提示，否则无此属性\",columnNames:[/*结果集列名称数组*/],dataset:[ [], [], [/*结果集*/] ]}"
+					L"})"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return false;
 			}
 			return true;
@@ -280,7 +292,12 @@ namespace jw {
 		bool JJH_DB_batch::Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
 			retval = CefV8Value::CreateObject(NULL);
 			if (arguments.size() < 1 || !arguments[0]->HasValue("db") || !arguments[0]->HasValue("sql")) {
-				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.batch({db:数据库句柄,sql:\"待执行的SQL语句，可以有?等参数\",params:'（可选）[[JWebTop.db.type.SQLITE_TEXT,\"params参数必须是二维数组，按顺序设置到sql的每个 ? 上，按类型进行绑定\"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]]',names: printColumnNames(colNameArray){/*（可选）用于接收结果集列名数组的函数*/},values:printValues(rowNumber,colNumber,value){/*（可选）用于接收结果集的函数*/}  })"), V8_PROPERTY_ATTRIBUTE_NONE);
+				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.batch({"
+					L"db: 数据库句柄,"
+					L"sql: \"待执行的SQL语句，可以有?等参数\","
+					L"paramsTypes: '（可选）paramsTypes参数必须是数组，比如：[JWebTop.db.type.SQLITE_INTEGER,JWebTop.db.type.SQLITE_FLOAT,JWebTop.db.type.SQLITE_TEXT]',"
+					L"paramValues: 'paramValues参数必须是二维数组，比如：[[1,1.234,\"string1\"]  ,[2,2.234,\"string2\"] ]' },"
+					L"})"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return true;
 			}
 			CefRefPtr<CefV8Value>  db = getParam_db(arguments, retval);
@@ -288,6 +305,7 @@ namespace jw {
 			CefRefPtr<CefV8Value>  sql = getParam_sql(arguments, retval);
 			if (sql == nullptr)return true;
 			CefRefPtr<CefV8Value>  paramsTypes;
+			wstringstream ss;
 			if (arguments[0]->HasValue("paramsTypes")) {
 				paramsTypes = arguments[0]->GetValue("paramsTypes");
 				if (!paramsTypes->IsArray()) {
@@ -308,9 +326,8 @@ namespace jw {
 							//case SQLITE_BLOB:							/*处理二进制*/
 							//case SQLITE_NULL:							/*处理空*/
 						default:
-							wstringstream err;
-							err << L"不支持[" << tmpColType->GetIntValue() << L"]类型的参数";
-							retval->SetValue("msg", CefV8Value::CreateString(err.str()), V8_PROPERTY_ATTRIBUTE_NONE);
+							ss << L"不支持[" << tmpColType->GetIntValue() << L"]类型的参数";
+							retval->SetValue("msg", CefV8Value::CreateString(ss.str()), V8_PROPERTY_ATTRIBUTE_NONE);
 							return true;
 						}
 					}
@@ -337,27 +354,26 @@ namespace jw {
 			sqlite3_stmt *pStmt;
 			rc = sqlite3_prepare_v2(pDb, sql->GetStringValue().ToString().c_str(), -1, &pStmt, NULL);
 			if (rc != SQLITE_OK) {
-				wstringstream ss; ss << L"初始化【" << sql << "】失败：" << sqlite3_errmsg(pDb);
+				ss << L"初始化【" << sql->GetStringValue().ToWString() << "】失败：" << CefString(sqlite3_errmsg(pDb)).ToWString();
 				retval->SetValue("msg", CefV8Value::CreateString(ss.str()), V8_PROPERTY_ATTRIBUTE_NONE);
 				sqlite3_finalize(pStmt);
 				return true;
 			}
 			bool success = true;
-			wstringstream ss;
 			if (paramValues != NULL) {// 绑定参数
 				int batchCount = paramValues->GetArrayLength();
-				int typeLen = paramsTypes->GetArrayLength(), minLen = 0, rowParamsLen = 0;
+				int typeLen = paramsTypes->GetArrayLength(), rowParamsLen = 0;
 				CefRefPtr<CefV8Value> rowParams , tmpColType;				
 				string str;
 				for (int row = 0; row < batchCount; row++) {
 					rowParams = paramValues->GetValue(row);
 					rowParamsLen = rowParams->GetArrayLength();
 					if (rowParamsLen > typeLen)rowParamsLen = typeLen;// 按最小的数组长度来设置值
-					for (int col = 0; col < minLen; col++) {
+					for (int col = 0; col < rowParamsLen; col++) {
 						tmpColType = paramsTypes->GetValue(col);
 						switch (tmpColType->GetIntValue()) {
 						case SQLITE_TEXT:							/*处理字符串*/
-							str = rowParams->GetValue(col)->GetValue(1)->GetStringValue();
+							str = rowParams->GetValue(col)->GetStringValue();
 							sqlite3_bind_text(pStmt, col + 1, str.c_str(), str.length(), SQLITE_TRANSIENT);
 							break;
 						case SQLITE_INTEGER:						/*处理整型*/
@@ -372,15 +388,17 @@ namespace jw {
 					}
 					int ret = sqlite3_step(pStmt);
 					if (ret != SQLITE_DONE) {// 出错了？？？
-						sqlite3_finalize(pStmt);
-						ss << L"执行【" << sql << "】失败：" << sqlite3_errmsg(pDb) << L"   row=" << row;
-					}				
+						success = false;
+						ss << L"执行【" << sql->GetStringValue().ToWString() << "】失败：" << CefString(sqlite3_errmsg(pDb)).ToWString() << L"   row=" << row;
+						break;
+					}
+					sqlite3_reset(pStmt);// 重新初始化该sqlite3_stmt对象绑定的变量。
 				}
 			} else {
 				int ret = sqlite3_step(pStmt);
 				if (ret != SQLITE_DONE) {
 					success = false;
-					ss << L"执行【" << sql << "】失败：" << sqlite3_errmsg(pDb);
+					ss << L"执行【" << sql->GetStringValue().ToWString() << "】失败：" << CefString(sqlite3_errmsg(pDb)).ToWString();
 				}
 			}
 			sqlite3_finalize(pStmt);

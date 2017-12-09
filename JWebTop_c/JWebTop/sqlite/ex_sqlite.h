@@ -34,9 +34,8 @@ namespace jw {
 		};
 	
 		/*
-		 * 用途：执行指定的sql，此方法不返回结果到JS端，需要结果时请采用query
-		 * 用法：JWebTop.db.exec({db:(必填)数据库句柄,sql:"(必填)待执行的SQL语句");
-		 * 返回值：{msg:"执行SQL出错的原因，或者null"}
+		 * 用途：执行指定的sql，无传入参数也无结果集返回，返回是否执行成功以及出错时的错误信息
+		 * 用法：参见实现类。另外调用时不传任何参数会显示使用说明
 		 */
 		class JJH_DB_exec : public CefV8Handler {
 		public:
@@ -44,6 +43,8 @@ namespace jw {
 		private:
 			IMPLEMENT_REFCOUNTING(JJH_DB_exec);
 		};
+		
+		// 查询类的基类，抽象一些公共逻辑
 		class SQLiteQueryBase : public virtual CefV8Handler {
 		protected:
 			typedef CefRefPtr<CefV8Value>(SQLiteQueryBase::* outfun)();// 定义一个函数指针，用户输出数据库的某列数据到js
@@ -81,6 +82,10 @@ namespace jw {
 				CefString& exception) ;
 		};
 
+		/*
+		* 用途：执行指定的sql，并把查询结果放到结果集返回，同时返回是否执行成功以及出错时的错误信息
+		* 用法：参见实现类。另外调用时不传任何参数会显示使用说明
+		*/
 		class JJH_DB_queryDataSet : public virtual SQLiteQueryBase {
 		protected:
 			 bool checkParams(const CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, const CefRefPtr<CefV8Value>& retval);
@@ -93,15 +98,8 @@ namespace jw {
 		};
 	   
 	   /*
-		* 用途：执行指定的sql，并以callback方式把结果返回到JS端
-		* 用法：JWebTop.db.query({
-		*         db:(必填)数据库句柄,
-		*		  sql:"(必填)待执行的SQL语句，可以有?等参数"
-		*		  params:[[JWebTop.db.type.SQLITE_TEXT,"params参数必须是二维数组，按顺序设置到sql的每个?上，按类型进行绑定"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]],
-		*		  names: printColumnNames(colNameArray){}
-		*		  values:printValues(rowNumber,colNumber,value){}
-		*		);
-		* 返回值：{msg:"执行SQL出错的原因，或者null"}
+		* 用途：执行指定的sql，函数执行过程中以callback方式把结果返回到JS端，函数执行完毕后返回是否执行成功以及出错时的错误信息
+		* 用法：参见实现类。另外调用时不传任何参数会显示使用说明
 		*/
 		class JJH_DB_queryCallbcak : public virtual SQLiteQueryBase {
 		protected:
@@ -117,15 +115,8 @@ namespace jw {
 		};
 	
 		/*
-		* 用途：执行指定的sql，并以callback方式把结果返回到JS端
-		* 用法：JWebTop.db.batch({
-		*         db:(必填)数据库句柄,
-		*		  sql:"(必填)待执行的SQL语句，可以有?等参数"
-		*		  params:[[JWebTop.db.type.SQLITE_TEXT,"params参数必须是二维数组，按顺序设置到sql的每个?上，按类型进行绑定"],[JWebTop.db.type.SQLITE_INTEGER,1],[JWebTop.db.type.SQLITE_FLOAT,1.234]],
-		*		  paramsTypes: printColumnNames(colNameArray){}
-		*		  paramsValues:printValues(rowNumber,colNumber,value){}
-		*		);
-		* 返回值：{msg:"执行SQL出错的原因，或者null"}
+		* 用途：执行批量插入和更新，无结果集返回，返回是否执行成功以及出错时的错误信息
+		* 用法：参见实现类。另外调用时不传任何参数会显示使用说明
 		*/
 		class JJH_DB_batch : public CefV8Handler {
 		public:
