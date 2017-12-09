@@ -135,4 +135,9 @@
       <Filter>sqlite</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="sqlite\sqlite.js">
+      <Filter>sqlite</Filter>
+    </None>
+  </ItemGroup>
 </Project>
