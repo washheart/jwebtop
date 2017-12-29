@@ -51,6 +51,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPTSTR    lpCmdLine,
 	int       nCmdShow) {
+	SetProcessDPIAware();// 禁用dpi调整的早期版本函数，但其api说明中提到：可能会导致未知结果
+	//SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);// win8.1的sdk才有此api
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	startJWebTop(hInstance, lpCmdLine);

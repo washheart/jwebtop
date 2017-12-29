@@ -15,6 +15,10 @@ void JWebTopApp::OnBeforeCommandLineProcessing(
 	command_line->AppendSwitch("--disable-web-security");
 	command_line->AppendSwitch("--allow-file-access");
 	command_line->AppendSwitch("--enable-npapi");// 允许npapi，主要是支持flash
+
+	//command_line->AppendSwitch("--enable-use-zoom-for-dsf");// zoom控制
+	command_line->AppendSwitchWithValue("high-dpi-support", "0");
+	command_line->AppendSwitchWithValue("force-device-scale-factor", "1");
 	// 下面ppapi方式注册的flash，无法正确的获取flash的name
 	// command_line->AppendSwitch("--ppapi-out-of-process ");
 	// command_line->AppendSwitchWithValue("--register-pepper-plugins", "pepflashplayer.dll;application/x-shockwave-flash");
