@@ -10,6 +10,12 @@ namespace jw{
 
 	_declspec(dllexport) wstring&   replace_allW(wstring& str, const wstring& old_value, const wstring& new_value);
 	_declspec(dllexport) string&    replace_all(string&  str, const string&  old_value, const string&  new_value);
+
+	_declspec(dllexport) bool startswith(const std::wstring& str, const std::wstring& start);
+	_declspec(dllexport) bool startswith(const std::string& str, const std::string& start);
+	_declspec(dllexport)bool endswith(const std::wstring& str, const std::wstring& end);
+	_declspec(dllexport)bool endswith(const std::string& str, const std::string& end);
+
 	//string&   replace_all_distinct(string&   str, const   string&   old_value, const   string&   new_value);
 
 	//wstring&   replace_all(wstring&   str, const   wstring&   old_value, const   wstring&   new_value);

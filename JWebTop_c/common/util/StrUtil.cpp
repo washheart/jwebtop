@@ -81,6 +81,26 @@ namespace jw{
 	//	}
 	//	return   str;
 	//}
+
+	bool startswith(const std::wstring& str, const std::wstring& start) {
+		unsigned int startlen = start.size();
+		return (str.size() >= startlen) && (str.compare(0, startlen, start) == 0);
+	}	
+	bool startswith(const std::string& str, const std::string& start) {
+		unsigned int startlen = start.size();
+		return (str.size() >= startlen) && str.compare(0, startlen, start) == 0;
+	}
+	bool endswith(const std::wstring& str, const std::wstring& end) {
+		unsigned int endlen = end.size();
+		unsigned int srclen = str.size();
+		return (srclen >= endlen) && str.compare(srclen - endlen, endlen, end) == 0;
+	}
+	bool endswith(const std::string& str, const std::string& end) {
+		unsigned int endlen = end.size();
+		unsigned int srclen = str.size();
+		return (srclen >= endlen) && str.compare(srclen - endlen, endlen, end) == 0;
+	}
+
 	//bool isGB(const char*gb, int len){
 	//	for (int i = 0; i < len; ++i){
 	//		if (gb[i] < 0){
