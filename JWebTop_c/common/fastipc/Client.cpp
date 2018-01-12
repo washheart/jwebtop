@@ -58,7 +58,7 @@ namespace fastipc{
 		DWORD idx = 0, tmp = len%blockSize;
 		DWORD result = (DWORD)-1;
 		len = len - tmp;
-		char * id = jw::GenerateGuid();
+		char * id = jw::str::GenerateGuid();
 		len = len - blockSize;// 多减一次，避免在while循环内判断是否是最后的数据包
 		while (idx < len){// 将数据分为多个包来写
 			result = writeBlock(userMsgType, userValue, userShortStr, pBuff + idx, blockSize, id, MSG_TYPE_PART);

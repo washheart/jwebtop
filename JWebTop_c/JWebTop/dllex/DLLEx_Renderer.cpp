@@ -38,16 +38,16 @@ namespace jw{
 			BrowserWindowInfo * bw = getBrowserWindowInfo(browserHWnd);
 			if (bw == NULL)writeLog(L"消息出现异常，sendJWebTopProcessMsg时bw==null,taskId"); writeLog(taskId); writeLog(L"\r\n");
 #endif
-			string tmp = jw::w2s(msg);
+			string tmp = jw::str::w2s(msg);
 			if (client == NULL){// 如果是多进程模式，那么render会在自己的进程中，将服务器的信息记录到共享内存，以便render进程获取到相关信息
 				static int step = 100;
 				while (client_render == NULL){// 等待client_render创建成功				
 					Sleep(step);
 					step += step;
 				}
-				return client_render->write(msgId, (long)browserHWnd, LPSTR(jw::w2s(taskId).c_str()), LPSTR(tmp.c_str()), tmp.size()) == 0;
+				return client_render->write(msgId, (long)browserHWnd, LPSTR(jw::str::w2s(taskId).c_str()), LPSTR(tmp.c_str()), tmp.size()) == 0;
 			} else{
-				return client->write(msgId, (long)browserHWnd, LPSTR(jw::w2s(taskId).c_str()), LPSTR(tmp.c_str()), tmp.size()) == 0;
+				return client->write(msgId, (long)browserHWnd, LPSTR(jw::str::w2s(taskId).c_str()), LPSTR(tmp.c_str()), tmp.size()) == 0;
 			}
 		}
 

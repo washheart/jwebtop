@@ -73,8 +73,8 @@ namespace jw{
 				frame->ExecuteJavaScript(js_event.str(), "", 0);
 			}
 			string & convertFilePath(string & p){
-				p = jw::replace_all(p, "\\", "/");
-				return jw::replace_all(p, "\"", "\\\"");
+				p = jw::str::replace_all(p, "\\", "/");
+				return jw::str::replace_all(p, "\"", "\\\"");
 			}
 			void sendFileEvent(const CefRefPtr<CefFrame> frame, vector<CefString> files, const std::string eventName){
 				if (files.size() == 0)return;

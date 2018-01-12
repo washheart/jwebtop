@@ -230,18 +230,18 @@ void JWebTopClient::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 			wstring appendFile = configs->appendJs.ToWString();
 			//下面这种方式会有跨域问题，所以采用读入文件的方式
 			if (isReference(ref(appendFile))){// 通过docuemnt.wirte的方式来写
-				appendFile = jw::replace_allW(ref(appendFile), L"\\", L"/");// 替换文件中的换行符号	
+				appendFile = jw::str::replace_allW(ref(appendFile), L"\\", L"/");// 替换文件中的换行符号	
 				extensionCode
 					<< "\r\n var scriptLet = document.createElement('SCRIPT');"
 					<< "\r\n scriptLet.type = 'text/javascript';"
-					<< "\r\n scriptLet.src = '" << jw::w2s(appendFile) << "';"
+					<< "\r\n scriptLet.src = '" << jw::str::w2s(appendFile) << "';"
 					<< "\r\n addEventListener(\"JWebTopReady\",function(){document.body.appendChild(scriptLet);});"
 					<< "\r\n";
 			}
 			else{
 				appendFile = configs->getAbsolutePath(appendFile);
 				string appendJS;
-				if (jw::readfile(appendFile, ref(appendJS))){
+				if (jw::str::readfile(appendFile, ref(appendJS))) {
 					extensionCode << "\r\n" << appendJS << "\r\n";
 				}
 			}

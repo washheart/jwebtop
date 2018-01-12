@@ -28,8 +28,8 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 		LPTSTR * args = CommandLineToArgvW(lpCmdLine, &argc);
 		if (argc > 4){// 从dll发来的处理
 			jw::dllex::setAsEx();
-			DWORD	processId = jw::parseLong(args[1]);
-			DWORD	blockSize = jw::parseLong(args[2]);
+			DWORD	processId = jw::str::parseLong(args[1]);
+			DWORD	blockSize = jw::str::parseLong(args[2]);
 			wstring serverName = (args[3]);
 			int r = jw::dllex::startIPCServer(serverName, blockSize, processId);
 			if (r != 0)return r;
@@ -40,7 +40,7 @@ int startJWebTop(HINSTANCE hInstance/*当前应用的实例*/, LPTSTR lpCmdLine) {
 	}
 	else{
 		std::wstring cfgFile(lpCmdLine);
-		jw::replace_allW(cfgFile, L"\"", L"");
+		jw::str::replace_allW(cfgFile, L"\"", L"");
 		jw::ctx::startJWebTopByFile(cfgFile);
 	}
 	return 0;

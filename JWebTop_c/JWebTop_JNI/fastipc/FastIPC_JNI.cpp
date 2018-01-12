@@ -41,8 +41,8 @@ public:
 		 wss << L"Readed "
 			 << L" userMsgType=" << memBlock->userMsgType
 			 << L" userValue=" << memBlock->userValue
-			 << L" userShortStr=" << jw::s2w(memBlock->getUserShortStr())
-			 << L" pBuff=" << jw::s2w(memBlock->getData())
+			 << L" userShortStr=" << jw::str::s2w(memBlock->getUserShortStr())
+			 << L" pBuff=" << jw::str::s2w(memBlock->getData())
 			 << L"||\r\n";
 		 writeLog(wss.str());
 #endif

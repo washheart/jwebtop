@@ -25,7 +25,7 @@ namespace jw {
 			if (rc) {
 				string err = "打开数据库失败：";
 				err.append(sqlite3_errmsg(db));
-				retval->SetValue("msg", CefV8Value::CreateString(jw::s2w(err)), V8_PROPERTY_ATTRIBUTE_NONE);
+				retval->SetValue("msg", CefV8Value::CreateString(jw::str::s2w(err)), V8_PROPERTY_ATTRIBUTE_NONE);
 				sqlite3_close(db);
 				return true;
 			}

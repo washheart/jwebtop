@@ -23,7 +23,7 @@ void checFile(){
 }
 void writeLog(std::wstring str){
 	checFile();
-	std::string s = jw::w2s(str);
+	std::string s = jw::str::w2s(str);
 	WriteFile(hFile, s.c_str(), s.size(), &filePos, NULL);
 	FlushFileBuffers(hFile);
 }

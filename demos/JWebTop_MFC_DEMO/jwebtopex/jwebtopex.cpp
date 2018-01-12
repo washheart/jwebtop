@@ -40,7 +40,7 @@ int JWebTopContext::createJWebTopByCfgFile(wstring processPath, wstring cfgFile,
 
 void JWebTopContext::onRebuildedRead(fastipc::MemBlock* memBlock){
 	thread t(std::mem_fn(&JWebTopContext::__onRead), this//
-		, memBlock->userMsgType, memBlock->userValue, memBlock->getUserShortStr(), jw::s2w(memBlock->getData()));
+		, memBlock->userMsgType, memBlock->userValue, memBlock->getUserShortStr(), jw::str::s2w(memBlock->getData()));
 	t.detach(); //启动线程  
 }
 void JWebTopContext::__onRead(int userMsgType, int userValue, string userShortStr, wstring data){
@@ -50,7 +50,7 @@ void JWebTopContext::__onRead(int userMsgType, int userValue, string userShortSt
 		break;
 	case JWM_DLL_EXECUTE_WAIT:{
 		wstring result = this->jsonDispater->dispatcher(userValue, data); // 取回执行结果
-		string s = jw::w2s(result);
+		string s = jw::str::w2s(result);
 		this->client->write(JWM_RESULT_RETURN, userValue, LPSTR(userShortStr.c_str()), LPSTR(s.c_str()), s.length()); // 发送结果到远程进程
 		}
 		break;

@@ -245,7 +245,7 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPAR
 		if (uMsg == BFFM_INITIALIZED)
 	{
 		std::wstring tmp = (const wchar_t  *)lpData;
-		std::cout << "path: " << jw::w2s(tmp) << std::endl;
+		std::cout << "path: " << jw::str :: w2s(tmp) << std::endl;
 		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)lpData);
 	}
 	return 0;

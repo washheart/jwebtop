@@ -50,8 +50,8 @@ namespace jw{
 		}
 
 		void __onRead(LONG userMsgType, LONG userValue, std::string& taskIds, std::string& datas){
-			std::wstring taskId = jw::s2w(taskIds);
-			std::wstring data = jw::s2w(datas);
+			std::wstring taskId = jw::str::s2w(taskIds);
+			std::wstring data = jw::str::s2w(datas);
 #ifdef JWebTopLog
 			std::wstringstream wss;
 			wss << L"start__onRead "
@@ -173,8 +173,8 @@ namespace jw{
 				wss << L"Readed "
 					<< L" userMsgType=" << memBlock->userMsgType
 					<< L" userValue=" << memBlock->userValue
-					<< L" userShortStr=" << jw::s2w(memBlock->getUserShortStr())
-					<< L" pBuff=" << jw::s2w(memBlock->getData())
+					<< L" userShortStr=" << jw::str::s2w(memBlock->getUserShortStr())
+					<< L" pBuff=" << jw::str::s2w(memBlock->getData())
 					<< L"||\r\n";
 				writeLog(wss.str());
 #endif
@@ -250,7 +250,7 @@ namespace jw{
 				<< L"||\r\n";
 			writeLog(wss.str());
 #endif
-			client->write(JWM_BROWSER_CREATED, browserHWnd, LPSTR(jw::w2s(taskId).c_str()), NULL, 0);
+			client->write(JWM_BROWSER_CREATED, browserHWnd, LPSTR(jw::str::w2s(taskId).c_str()), NULL, 0);
 		}
 
 	}// End dllex namespace

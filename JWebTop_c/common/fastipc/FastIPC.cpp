@@ -3,7 +3,7 @@
 
 namespace fastipc{
 	std::wstring genServerName(){
-		return jw::GenerateGuidW();
+		return jw::str::GenerateGuidW();
 	}
 	std::wstring genServerName(const std::wstring servername){
 		return servername + L"_c";

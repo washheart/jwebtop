@@ -22,7 +22,7 @@ EXPORT long WINAPI nCreateSubProcess(LPTSTR subProcess, LPTSTR szCmdLine, int wa
 
 // 把wstring转为char*返回给csharp端
 char* wstring2char(wstring ws){
-	string s = jw::w2s(ws);
+	string s = jw::str::w2s(ws);
 	char* c;
 	const int len = s.length();
 	c = new char[len + 1];

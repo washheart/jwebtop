@@ -28,7 +28,7 @@ void JWebTopConfigs::setErrorURL(wstring url){
 	 wstring _appPath = appPath.ToWString();
 	 if (relativePath.find(L":") == -1){// 如果指定的路径是相对路径
 		 _appPath.append(relativePath);
-		 return jw::URLEncode(_appPath);
+		 return jw::str::URLEncode(_appPath);
 	 }
 	 return relativePath;
  }
@@ -131,7 +131,7 @@ JWebTopConfigs * JWebTopConfigs::loadAsJSON(wstring jsonString){
 	CefRefPtr<CefValue> tmp= value->GetValue("appDefFile");
 	JWebTopConfigs * configs = loadConfigs(JWebTopConfigs::getAppDefFile((tmp != NULL ? LPCTSTR(tmp->GetString().ToWString().c_str()) : NULL)));
 	tmp = value->GetValue("parentWinS");
-	if (tmp != NULL)configs->parentWin = jw::parseLong64(tmp->GetString().ToWString());
+	if (tmp != NULL)configs->parentWin = jw::str::parseLong64(tmp->GetString().ToWString());
 	// url,appendJs,name,icon,dwStyle,dwExStyle
 	tmp = value->GetValue("url");
 	if (tmp != NULL)configs->url = tmp->GetString();
@@ -142,9 +142,9 @@ JWebTopConfigs * JWebTopConfigs::loadAsJSON(wstring jsonString){
 	tmp = value->GetValue("icon");
 	if (tmp != NULL)configs->icon = tmp->GetString();
 	tmp = value->GetValue("dwStyleS");
-	if (tmp != NULL)configs->dwStyle = jw::parseLong64(tmp->GetString().ToWString());
+	if (tmp != NULL)configs->dwStyle = jw::str::parseLong64(tmp->GetString().ToWString());
 	tmp = value->GetValue("dwExStyleS");
-	if (tmp != NULL)configs->dwExStyle = jw::parseLong64(tmp->GetString().ToWString());
+	if (tmp != NULL)configs->dwExStyle = jw::str::parseLong64(tmp->GetString().ToWString());
 	// x,y,w,h,max
 	tmp = value->GetValue("x");
 	if (tmp != NULL)configs->x = tmp->GetInt();

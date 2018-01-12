@@ -108,9 +108,9 @@ void DemoCtrl::initNames() {
 			while (!in.eof()){
 				string line;
 				std::getline(in, line, '\n');
-				line = jw::trim(line);
+				line = jw::str::trim(line);
 				if (line.length() == 0)continue;
-				names->push_back(jw::s2w(line));
+				names->push_back(jw::str::s2w(line));
 			}
 		}
 		in.clear();
@@ -137,7 +137,7 @@ void DemoCtrl::showDetail(wstring note) {
 	rtn->SetString(CefString("method"), CefString("showDetail"));
 	wstring detail;
 	bool hasData = true;
-	if (jw::trim(note).length() == 0) {// 如果note无效，默认取第一个note进行显示
+	if (jw::str::trim(note).length() == 0) {// 如果note无效，默认取第一个note进行显示
 		if (names == NULL) initNames();
 		if (names == NULL || names->size() == 0) {
 			hasData = false;
@@ -162,7 +162,7 @@ void DemoCtrl::showDetail(wstring note) {
 			}
 			in.clear();
 			in.close();
-			detail = jw::s2w(tmp);
+			detail = jw::str::s2w(tmp);
 		}
 	}
 	//detail = jw::s2w(G2U(detail.c_str()));
@@ -171,10 +171,10 @@ void DemoCtrl::showDetail(wstring note) {
 	this->ctx->executeJSON_NoWait((long)detailBrowser, toJSON(rtn));
 }
 void DemoCtrl::saveNote(wstring note, wstring content) {
-	if (jw::trim(note).length() > 0) {
+	if (jw::str::trim(note).length() > 0) {
 		wstring fn = getNoteFile(note);
 		ofstream os(fn);
-		os << jw::w2s(content);
+		os << jw::str::w2s(content);
 		os.clear();
 		os.close();
 	}
@@ -187,7 +187,7 @@ void DemoCtrl::saveNotes() {
 	ofstream os(fn);
 	NameList::iterator it;
 	for (it = names->begin(); it != names->end(); it++)  {
-		os << jw::w2s(*(it)) << "\r\n";
+		os << jw::str::w2s(*(it)) << "\r\n";
 	}
 	os.clear();
 	os.close();

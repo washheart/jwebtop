@@ -71,15 +71,15 @@ private:
 	JWebTopAppInited * appInitListener;
 
 	DWORD _write(LONG userMsgType, LONG userValue,  wstring data){
-		string _data=jw::w2s(data);
+		string _data = jw::str::w2s(data);
 		return client->write(userMsgType, userValue, NULL, LPSTR(_data.c_str()), _data.size());
 	}
 	DWORD _write(LONG userMsgType, LONG userValue, string userShortStr, wstring data){
-		string _data = jw::w2s(data);
+		string _data = jw::str::w2s(data);
 		return client->write(userMsgType, userValue, LPSTR(userShortStr.c_str()), LPSTR(_data.c_str()), _data.size());
 	}
 	string createTaskId(){
-		return jw::GenerateGuidA();
+		return jw::str::GenerateGuidA();
 	}
 
 
@@ -118,7 +118,7 @@ private:
 	// ´´½¨ä¯ÀÀÆ÷
 	int _createBrowser(int createType, string taskId, wstring cfgData)
 	{
-		string s = jw::w2s(cfgData);
+		string s = jw::str::w2s(cfgData);
 		return client->write(createType, 0, LPSTR(taskId.c_str()), LPSTR(s.c_str()), s.length());
 	}
 public:

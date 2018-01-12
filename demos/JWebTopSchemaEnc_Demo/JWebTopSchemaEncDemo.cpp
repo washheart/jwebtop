@@ -63,7 +63,7 @@ public:
 				return false;// 如果文件已经打开过，并且现在是null，那么可能是出现了某种意外情况，直接标记为不能读取了事
 			} else {
 				fileIsReaded = true;
-				fp1 = fopen(jw::w2s(path2).c_str(), "rb");/*打开要解密的文件*/
+				fp1 = fopen(jw::str::w2s(path2).c_str(), "rb");/*打开要解密的文件*/
 				if (fp1 == NULL) {
 					return false;// 文件无法读取，直接返回
 				}
