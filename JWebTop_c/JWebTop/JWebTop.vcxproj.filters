@@ -84,6 +84,9 @@
     <ClCompile Include="sqlite\ex_sqlite.cpp">
       <Filter>sqlite</Filter>
     </ClCompile>
+    <ClCompile Include="jshandler\JJH_File.cpp">
+      <Filter>jwebtop\jshandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="browser\JWebTopCommons.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="sqlite\ex_sqlite.h">
       <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="jshandler\JJH_Files.h">
+      <Filter>jwebtop\jshandler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

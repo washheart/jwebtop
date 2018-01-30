@@ -3,8 +3,8 @@
 
 #include <iostream>  
 #include <fstream>  
-
 #include <sstream>
+#include <list>
 #include <string>
 #include "include/cef_urlrequest.h"
 #include "include/cef_app.h" 
@@ -13,17 +13,10 @@
 #include "JWebTop/dllex/JWebTop_DLLEx.h"
 #include "JWebTop/wndproc/JWebTopWndProc.h"
 
-#include <Shellapi.h>
-#include <oleidl.h>
 #include "common/tests/TestUtil.h"
 
-
-//打开保存文件对话框  
-#include<Commdlg.h>  
 #include "common/util/StrUtil.h"
-//选择文件夹对话框  
-#include<Shlobj.h>  
-//#pragma comment(lib,"Shell32.lib")  
+
 // JJH=JWebTop JavaScriptHandler
 
 //getPos(handler);//获得窗口位置，返回值为一object，格式如下{x:13,y:54}
@@ -238,129 +231,6 @@ public:
 	}
 private:
 	IMPLEMENT_REFCOUNTING(JJH_SetWindowExStyle);
-};
-
-static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
-{
-		if (uMsg == BFFM_INITIALIZED)
-	{
-		std::wstring tmp = (const wchar_t  *)lpData;
-		std::cout << "path: " << jw::str :: w2s(tmp) << std::endl;
-		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, (LPARAM)lpData);
-	}
-	return 0;
-}
-/*
- JJH_SelectFile({params}, [handler]);//高级函数，打开选择文件对话框。
- 用法：JWebTop.selectFile({params}, [handler])
- params={
-	mode:	0=选择文件对话框（默认）；1=选择文件夹对话框；2=保存文件对话框
-	title:	选择文件的提示信息，可以为空
-	dir:	对话框初始化时的目录，可以为空
-	file:	对话框初始化时的文件，可以为空
-	filters:过滤器规则，一个JSON数组[名称、规则，名称、规则、... ...]，例如：['所有文件','*.*','C/C++ Flie','*.cpp;*.c;*.h']
- }
- 返回值：字符串
-	当字符串为null时表示用户执行的是取消操作
-	mode=0，返回以换行符分隔的多个文件。第一行是文件路径，后续每行为文件名称。
-	mode=1，返回选中的文件夹路径
-	mode=2，返回选中的文件路径
-*/
-class JJH_SelectFile : public CefV8Handler {
-public:
-	bool Execute(const CefString& name, CefRefPtr<CefV8Value> object, const CefV8ValueList& arguments, CefRefPtr<CefV8Value>& retval, CefString& exception) {
-		if (arguments.size() < 1) return false;
-		CefRefPtr<CefV8Value> params = arguments[0];
-		int mode=params->GetValue("mode")->GetIntValue();
-		HWND hwnd = getHWND(object, arguments, 1);// 在哪个窗口上进行文件对话框的弹出
-		CefString title = params->GetValue("title")->GetStringValue();
-		CefString dir = params->GetValue("dir")->GetStringValue();
-		if (mode == 1){// 择文件夹对话框
-			TCHAR szBuffer[MAX_PATH] = { 0 };
-			BROWSEINFO bi = { 0 };
-			if (!title.empty())bi.lpszTitle = LPCWSTR(title.ToWString().c_str());			
-			bi.hwndOwner = hwnd;//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
-			std::wstring tmp = dir.ToWString();
-			std::wstring wtmp(tmp.begin(), tmp.end());
-			const wchar_t * psTmp = wtmp.c_str();
-			if (!dir.empty()){// 需要设置初始化目录
-				bi.lpfn = BrowseCallbackProc;// 回调函数：用于设置初始化目录
-				bi.lParam = (LPARAM)psTmp;
-			}
-			bi.pszDisplayName = szBuffer;//接收文件夹的缓冲区  
-			bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-			LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
-			if (pidl != 0 && SHGetPathFromIDList(pidl, szBuffer)){
-				IMalloc * imalloc = 0;
-				if (SUCCEEDED(SHGetMalloc(&imalloc)))
-				{
-					imalloc->Free(pidl);
-					imalloc->Release();
-				}
-				retval = CefV8Value::CreateString(szBuffer);
-			}
-		}else{// 打开或保存文件
-			OPENFILENAME ofn = { 0 };
-			if (!title.empty())ofn.lpstrTitle = title.ToWString().c_str();//标题  
-			ofn.hwndOwner = hwnd;//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
-			if (!dir.empty())ofn.lpstrInitialDir = dir.ToWString().c_str();//初始目录为默认  
-			CefRefPtr<CefV8Value> filters=params->GetValue("filters");
-			// CefString filters = params->GetValue("filters")->GetStringValue();
-			if (filters != NULL&&filters->IsArray()){
-				int flen=filters->GetArrayLength();
-				int len2=0;
-				WCHAR tt[1000]; WCHAR *tt3 = tt;
-				for (int i = 0; i < flen; i++){
-					wstring tt2 = filters->GetValue(i)->GetStringValue().ToWString();
-					len2 = tt2.length();
-					for (int k = 0; k < len2; k++){
-						(*tt3) = tt2.at(k);	tt3++;
-					}
-					(*tt3) = 0; tt3++;
-				}
-				(*tt3) = 0; tt3++;
-				ofn.lpstrFilter = tt;
-				ofn.nFilterIndex = 1;//过滤器索引  
-			}
-			WCHAR strFilename[1000 * MAX_PATH];//用于接收文件名 
-			CefString file = params->GetValue("file")->GetStringValue();
-			if (!file.empty())wcscpy_s(strFilename, file.ToWString().c_str());
-			ofn.lpstrFile = strFilename;
-			ofn.nMaxFile = sizeof(strFilename);//缓冲区长度  
-			if (mode == 2){// 保存文件对话框
-				ofn.Flags = OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;//目录必须存在，覆盖文件前发出警告
-				// ofn.lpstrDefExt = suffix_w;//默认追加的扩展名  
-				ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
-				if (GetSaveFileName(&ofn))
-				{
-					retval = CefV8Value::CreateString(strFilename);
-				}
-			}
-			else{// 选择文件对话框（默认）
-				ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT;//文件、目录必须存在，隐藏只读选项  s
-				ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
-				if (GetOpenFileName(&ofn)){
-					wstring str;
-					str.append(ofn.lpstrFile);
-					WCHAR *tmp = ofn.lpstrFile + ofn.nFileOffset;
-					while (*tmp){
-						str.append(L"\n").append(tmp);
-						tmp += lstrlenW(tmp) + 1;
-					}
-					retval = CefV8Value::CreateString(str);
-				}
-			}
-		}
-		// 【测试验证用代码】将对象参数按全部是字符串取出并返回
-		//string s;stringstream ss;vector<CefString> keys;arguments[0]->GetKeys(keys);vector<CefString>::iterator it = keys.begin();
-		//while (it != keys.end()){s = (*it).ToString();
-		//	ss << s << "=" << arguments[0]->GetValue((*it))->GetStringValue().ToString()/*注意这里都按字符串来取了*/<< "\r\n";
-		//	it++;}
-		//retval = CefV8Value::CreateString(ss.str());// 将组织好的字符串返回
-		return true;
-	}
-private:
-	IMPLEMENT_REFCOUNTING(JJH_SelectFile);
 };
 
 //loadUrl(url, handler);//加载网页，url为网页路径

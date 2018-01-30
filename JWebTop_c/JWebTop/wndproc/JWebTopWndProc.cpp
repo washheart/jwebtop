@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <gdiplus.h>
 #include "JWebTop/jshandler/JJH_Windows.h"
+#include "JWebTop/jshandler/JJH_Files.h"
 #ifdef JWebTopLog
 #include "common/tests/TestUtil.h"
 #endif
