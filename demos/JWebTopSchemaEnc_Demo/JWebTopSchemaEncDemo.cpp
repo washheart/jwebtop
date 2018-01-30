@@ -28,7 +28,7 @@ public:
 		CefURLParts parts;
 		CefParseURL(url, parts);
 #ifdef JWebTopLog
-		writeLog("\r\n--dll---url--"); writeLog(url.ToWString());
+		//writeLog("\r\n--dll---url--"); writeLog(url.ToWString());
 #endif			
 		wstring path = CefString(&parts.path).ToWString();
 		if (path.length() <= 2)return false;                        // URL无效时，直接取消
@@ -57,7 +57,7 @@ public:
 		// 定义一个函数，在初始化时尝试从dll加载此函数，如果存在那么用dll中的此函数，否则用默认实现，目的是实现加密
 		// 注意：如果文件的长度超过bytes_to_read，那么当前方法会被调用多次
 		CEF_REQUIRE_IO_THREAD();
-		writeLog(L"--DLL--加载文件"); writeLog(path2); writeLog("\r\n");
+		//writeLog(L"--DLL--加载文件"); writeLog(path2); writeLog("\r\n");
 		if (fp1 == NULL) {
 			if (fileIsReaded) {
 				return false;// 如果文件已经打开过，并且现在是null，那么可能是出现了某种意外情况，直接标记为不能读取了事
@@ -79,7 +79,7 @@ public:
 			//fputc(ch, fp2);/*我的解密算法*/
 		}
 		string s2(out);
-		writeLog(s2);
+		//writeLog(s2);
 		bytes_read = j;
 		fclose(fp1);/*关闭源文件*/
 		return (bytes_read > 0);
