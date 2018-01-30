@@ -18,7 +18,6 @@ namespace jw {
 				return true;
 			}
 			sqlite3 *db;
-			char *zErrMsg = 0;
 			int rc;
 			// 打开数据库
 			rc = sqlite3_open_v2(dbpath->GetStringValue().ToString().c_str(), &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE, NULL);
@@ -93,7 +92,6 @@ namespace jw {
 		// 为query函数设置参数
 		inline bool setQueryParams(const CefRefPtr<CefV8Value> params, const CefRefPtr<CefV8Value>  retval, sqlite3_stmt *pStmt) {
 			int len = params->GetArrayLength();
-			int type = 0;
 			CefRefPtr<CefV8Value>   tmp, typeJO; string str;
 			for (int paramIdx = 0; paramIdx < len; paramIdx++) {
 				tmp = params->GetValue(paramIdx);
