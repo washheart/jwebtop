@@ -76,6 +76,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>All</AssemblerOutput>
       <AssemblerListingLocation>$(ProjectDir)$(Configuration)\mid\</AssemblerListingLocation>
+      <DisableSpecificWarnings>4100;4127;4244;4512;4701;4702;4996</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -173,6 +175,7 @@ copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop_CSharp_Lib\bi
     <ClCompile Include="..\common\fastipc\Client.cpp" />
     <ClCompile Include="..\common\fastipc\FastIPC.cpp" />
     <ClCompile Include="..\common\fastipc\Server.cpp" />
+    <ClCompile Include="..\common\file\FileUtil.cpp" />
     <ClCompile Include="..\common\os\OS.cpp" />
     <ClCompile Include="..\common\tests\TestUtil.cpp" />
     <ClCompile Include="..\common\util\StrUtil.cpp" />
@@ -182,6 +185,7 @@ copy ..\$(Configuration)\JWebTopCommon.dll  $(SolutionDir)\JWebTop_CSharp_Lib\bi
     <ClInclude Include="..\common\fastipc\Client.h" />
     <ClInclude Include="..\common\fastipc\FastIPC.h" />
     <ClInclude Include="..\common\fastipc\Server.h" />
+    <ClInclude Include="..\common\file\FileUtil.h" />
     <ClInclude Include="..\common\os\OS.h" />
     <ClInclude Include="..\common\tests\TestUtil.h" />
     <ClInclude Include="..\common\util\StrUtil.h" />

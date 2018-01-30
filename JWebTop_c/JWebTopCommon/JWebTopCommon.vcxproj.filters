@@ -19,6 +19,9 @@
     <Filter Include="common\tests">
       <UniqueIdentifier>{e64d5c47-21e7-45c7-961d-87ea665de9e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\file">
+      <UniqueIdentifier>{ed21aa1e-d22c-437e-8326-a764e105fb5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\fastipc\Client.cpp">
@@ -42,6 +45,9 @@
     <ClCompile Include="..\common\tests\TestUtil.cpp">
       <Filter>common\tests</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\file\FileUtil.cpp">
+      <Filter>common\file</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\fastipc\Client.h">
@@ -64,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="..\common\tests\TestUtil.h">
       <Filter>common\tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\file\FileUtil.h">
+      <Filter>common\file</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
