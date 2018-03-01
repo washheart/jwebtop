@@ -51,7 +51,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPTSTR    lpCmdLine,
 	int       nCmdShow) {
-	SetProcessDPIAware();// 禁用dpi调整的早期版本函数，但其api说明中提到：可能会导致未知结果
+	FARPROC spdpia = GetProcAddress(GetModuleHandle(TEXT("user32")), "SetProcessDPIAware");
+	if (spdpia != NULL) {// 不直接调用SetProcessDPIAware()函数，避免在xp等不支持的系统上出现问题
+		spdpia();// 禁用dpi调整的早期版本函数，但其api说明中提到：可能会导致未知结果
+	}
 	//SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);// win8.1的sdk才有此api
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
