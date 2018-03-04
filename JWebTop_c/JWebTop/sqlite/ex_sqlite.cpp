@@ -293,7 +293,7 @@ namespace jw {
 				retval->SetValue("msg", CefV8Value::CreateString(L"用法：JWebTop.db.batch({"
 					L"db: 数据库句柄,"
 					L"sql: \"待执行的SQL语句，可以有?等参数\","
-					L"paramsTypes: '（可选）paramsTypes参数必须是数组，比如：[JWebTop.db.type.SQLITE_INTEGER,JWebTop.db.type.SQLITE_FLOAT,JWebTop.db.type.SQLITE_TEXT]',"
+					L"paramTypes: '（可选）paramTypes参数必须是数组，比如：[JWebTop.db.type.SQLITE_INTEGER,JWebTop.db.type.SQLITE_FLOAT,JWebTop.db.type.SQLITE_TEXT]',"
 					L"paramValues: 'paramValues参数必须是二维数组，比如：[[1,1.234,\"string1\"]  ,[2,2.234,\"string2\"] ]' },"
 					L"})"), V8_PROPERTY_ATTRIBUTE_NONE);
 				return true;
@@ -302,18 +302,18 @@ namespace jw {
 			if (db == nullptr)return true;
 			CefRefPtr<CefV8Value>  sql = getParam_sql(arguments, retval);
 			if (sql == nullptr)return true;
-			CefRefPtr<CefV8Value>  paramsTypes;
+			CefRefPtr<CefV8Value>  paramTypes;
 			wstringstream ss;
-			if (arguments[0]->HasValue("paramsTypes")) {
-				paramsTypes = arguments[0]->GetValue("paramsTypes");
-				if (!paramsTypes->IsArray()) {
-					retval->SetValue("msg", CefV8Value::CreateString(L"paramsTypes参数必须是数组，比如：[JWebTop.db.type.SQLITE_INTEGER,JWebTop.db.type.SQLITE_FLOAT,JWebTop.db.type.SQLITE_TEXT]"), V8_PROPERTY_ATTRIBUTE_NONE);
+			if (arguments[0]->HasValue("paramTypes")) {
+				paramTypes = arguments[0]->GetValue("paramTypes");
+				if (!paramTypes->IsArray()) {
+					retval->SetValue("msg", CefV8Value::CreateString(L"paramTypes参数必须是数组，比如：[JWebTop.db.type.SQLITE_INTEGER,JWebTop.db.type.SQLITE_FLOAT,JWebTop.db.type.SQLITE_TEXT]"), V8_PROPERTY_ATTRIBUTE_NONE);
 					return true;
 				} else {
-					int typeLen = paramsTypes->GetArrayLength();
+					int typeLen = paramTypes->GetArrayLength();
 					CefRefPtr<CefV8Value>  tmpColType;
 					for (int col = 0; col < typeLen; col++) {// 首先检查所有传入类型是否正确
-						tmpColType = paramsTypes->GetValue(col);
+						tmpColType = paramTypes->GetValue(col);
 						switch (tmpColType->GetIntValue()) {
 						case SQLITE_TEXT:							/*处理字符串*/
 							break;
@@ -360,7 +360,7 @@ namespace jw {
 			bool success = true;
 			if (paramValues != NULL) {// 绑定参数
 				int batchCount = paramValues->GetArrayLength();
-				int typeLen = paramsTypes->GetArrayLength(), rowParamsLen = 0;
+				int typeLen = paramTypes->GetArrayLength(), rowParamsLen = 0;
 				CefRefPtr<CefV8Value> rowParams , tmpColType;				
 				string str;
 				for (int row = 0; row < batchCount; row++) {
@@ -368,7 +368,7 @@ namespace jw {
 					rowParamsLen = rowParams->GetArrayLength();
 					if (rowParamsLen > typeLen)rowParamsLen = typeLen;// 按最小的数组长度来设置值
 					for (int col = 0; col < rowParamsLen; col++) {
-						tmpColType = paramsTypes->GetValue(col);
+						tmpColType = paramTypes->GetValue(col);
 						switch (tmpColType->GetIntValue()) {
 						case SQLITE_TEXT:							/*处理字符串*/
 							str = rowParams->GetValue(col)->GetStringValue();
