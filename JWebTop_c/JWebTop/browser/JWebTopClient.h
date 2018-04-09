@@ -22,7 +22,8 @@ class JWebTopClient : public CefClient,
 	public CefLoadHandler,
 	public CefRequestHandler,
 	public CefContextMenuHandler,
-	public CefDragHandler{
+	public CefDragHandler,
+	public CefDownloadHandler {
 private:
 
 	JWebTopConfigs * configs = NULL; // 构建浏览器时的配置信息
@@ -56,6 +57,20 @@ public:
 	virtual CefRefPtr<CefDragHandler> GetDragHandler() OVERRIDE{
 		return this;
 	}
+	virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() {
+		return this;
+	}
+	// CefDownloadHandler------------------------------------------------------------------------------------
+	virtual void OnBeforeDownload(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		const CefString& suggested_name,
+		CefRefPtr<CefBeforeDownloadCallback> callback)OVERRIDE;
+	virtual void OnDownloadUpdated(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		CefRefPtr<CefDownloadItemCallback> callback)OVERRIDE;
+
 
 	// CefDisplayHandler------------------------------------------------------------------------------------
 	virtual bool OnDragEnter(CefRefPtr<CefBrowser> browser,

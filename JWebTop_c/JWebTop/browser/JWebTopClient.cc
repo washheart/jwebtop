@@ -295,3 +295,47 @@ bool JWebTopClient::OnContextMenuCommand(CefRefPtr<CefBrowser> browser, CefRefPt
 	return false;
 }
 #endif
+
+void JWebTopClient::OnBeforeDownload(
+	CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefDownloadItem> download_item,
+	const CefString& suggested_name,
+	CefRefPtr<CefBeforeDownloadCallback> callback) {
+	callback->Continue(download_item->GetURL(), true);	
+}
+
+
+void JWebTopClient::OnDownloadUpdated(
+	CefRefPtr<CefBrowser> browser,
+	CefRefPtr<CefDownloadItem> download_item,
+	CefRefPtr<CefDownloadItemCallback> callback) {
+	if (!download_item->IsValid())return;// 下载对象已失效，不再进行其他处理
+
+	uint32 id = download_item->GetId();// 针对当前下载的一个唯一性标识符
+	int percentComplete = download_item->GetPercentComplete() ;// 下载进度
+	int64 totalBytes = download_item->GetTotalBytes();// 下载文件总大小
+	int64 receivedBytes = download_item->GetReceivedBytes();// 已下载的文件大小
+	int64 currentSpeed = download_item->GetCurrentSpeed();// 返回一个下载速度（评估）
+	CefTime startTime = download_item->GetStartTime();// 下载开始时间
+	CefTime endTime = download_item->GetEndTime();// 下载结束时间
+	CefString url = download_item->GetURL();// 正在被下载的链接
+	CefString originalUrl = download_item->GetOriginalUrl();// 在任何重定向之前的初始链接
+	CefString fullPath = download_item->GetFullPath();// 返回正在下载的文件的全路径
+	CefString suggestedFileName = download_item->GetSuggestedFileName();// 下载时的建议名称
+	CefString mimeType = download_item->GetMimeType();// 
+	CefString contentDisposition = download_item->GetContentDisposition();//  MIME协议扩展，由服务器端指定下载时的文件名称
+	int state = 0;
+	if (download_item->IsInProgress()) {// 正在下载中
+		state = 1;
+	}else if (download_item->IsComplete()) {// 下载完成
+		state = 2;
+		//MessageBox.Show("下载成功");  
+		if (browser->IsPopup() && !browser->HasDocument()) {
+			//browser->GetHost()->ParentWindowWillClose();  
+			browser->GetHost()->CloseBrowser(true);
+		}
+	}else if(download_item->IsCanceled()) {// 下载已被取消
+		state = 3;
+	}
+	jw::js::events::sendDownload(browser->GetMainFrame(), state, id, percentComplete, totalBytes, receivedBytes, currentSpeed, url, originalUrl, fullPath, suggestedFileName, mimeType, contentDisposition, startTime, endTime);
+}

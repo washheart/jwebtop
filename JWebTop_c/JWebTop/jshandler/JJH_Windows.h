@@ -420,6 +420,12 @@ namespace jw{
 			
 			// 发送页面加载失败事件
 			void sendLoadError(const CefRefPtr<CefFrame> frame, int errorCode, const CefString& errorText, const CefString& failedUrl);
+
+			// 发送下载事件
+			void sendDownload(const  CefRefPtr<CefFrame> frame,
+				const int state, const  uint32 id, const int percentComplete, const  int64 totalBytes, const int64 receivedBytes, const int64 currentSpeed,
+				const CefString& url, const CefString& originalUrl, const CefString& fullPath, const CefString& suggestedFileName, const CefString& mimeType,
+				const CefString& contentDisposition, const CefTime startTime, const CefTime endTime);
 		}
 	}
 }

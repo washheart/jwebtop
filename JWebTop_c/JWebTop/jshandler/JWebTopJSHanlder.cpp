@@ -9,7 +9,7 @@
 #include <fstream>  
 #include "JWebTop/browser/JWebTopScheme.h"
 #include "JWebTop/sqlite/ex_sqlite.h"
-
+#include "common/tests/TestUtil.h"
 namespace jw{
 	namespace js{
 		namespace events{
@@ -110,6 +110,36 @@ namespace jw{
 					<< "dispatchEvent(e);";
 				frame->ExecuteJavaScript(js_event.str(), "", 0);
 			}
+
+			// 发送下载事件
+			void sendDownload(const CefRefPtr<CefFrame> frame,
+				const int state, const  uint32 id, const int percentComplete, const  int64 totalBytes, const int64 receivedBytes, const int64 currentSpeed,
+				const CefString& url, const CefString& originalUrl, const CefString& fullPath, const CefString& suggestedFileName, const CefString& mimeType,
+				const CefString& contentDisposition, const CefTime startTime, const CefTime endTime){
+				stringstream js_event;
+				js_event << "var e = new CustomEvent('JWebTopDownLoad',{"
+					<< "	detail:{"
+					<< "		contentDisposition:\"" << contentDisposition.ToString() << "\","  // MIME协议扩展，由服务器端指定下载时的文件名称
+					<< "		mimeType:\"" << mimeType.ToString() << "\","                      // MIME
+					<< "		suggestedFileName:\"" << suggestedFileName.ToString() << "\","    // 下载时的建议名称
+					<< "		fullPath:\"" << fullPath.ToString() << "\","                      // 返回正在下载的文件的全路径
+					<< "		originalUrl:\"" << originalUrl.ToString() << "\","                // 在任何重定向之前的初始链接
+					<< "		url:\"" << url.ToString() << "\","                                // 正在被下载的链接
+					<< "		startTime:" << startTime.GetTimeT() << ","                        // 下载开始时间
+					<< "		endTime:" << endTime.GetTimeT() << ","                            // 下载结束时间
+					<< "		currentSpeed:" << currentSpeed << ","                             // 返回一个下载速度（评估）
+					<< "		receivedBytes:" << receivedBytes << ","                           // 已下载的文件大小
+					<< "		totalBytes:" << totalBytes << ","                                 // 下载文件总大小
+					<< "		percentComplete:" << percentComplete << ","                       // 下载进度
+					<< "		id:" << id << ","                                                 // 针对当前下载的一个唯一性标识符
+					<< "		state:" << state                                                  // 当前下载状态：1=下载中；2=下载完；3=取消下载；返回其他值为错误
+					<< "	}"
+					<< "});"
+					<< "dispatchEvent(e);";
+				frame->ExecuteJavaScript(js_event.str(), "", 0);
+			}
+
+
 		}// End ns-events
 	}// End ns-js
 }// End ns-jw
